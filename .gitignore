@@ -1,0 +1,5 @@
+.git
+/.allure/
+/.gradle/
+/.idea/
+/build/

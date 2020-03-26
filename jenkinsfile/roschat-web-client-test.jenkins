@@ -47,7 +47,7 @@ pipeline{
     post{
         always{
             echo "${SERVER_VER}"
-            emailext body: "Тестируемая версия - ${SERVER_VER} \n Результат тестирования web клиента - ${STATUS} \n Отчет - ${BUILD_URL}allure", subject: 'Тестирование Росчат сервера', to: 'bezpalko', from: 'jenkins@ros.chat'
+            emailext body: "Тестируемая версия - ${SERVER_VER} \n Результат тестирования web клиента - ${STATUS} \n Отчет - ${BUILD_URL}allure", subject: 'Тестирование WEB клиента', to: 'bezpalko', from: 'jenkins@ros.chat'
         }
     }
 }

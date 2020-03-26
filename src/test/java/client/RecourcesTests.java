@@ -1,6 +1,8 @@
 package client;
 
+import chat.ros.testing2.helpers.SSHManager;
 import chat.ros.testing2.server.LoginPage;
+import chat.ros.testing2.server.contacts.ContactsPage;
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.WebDriverRunner;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
@@ -19,6 +21,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.logging.Level;
 
+import static chat.ros.testing2.data.ContactsData.*;
 import static chat.ros.testing2.data.LoginData.*;
 import static com.codeborne.selenide.Selenide.open;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -71,7 +74,8 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback {
     @Override
     public void beforeEach(ExtensionContext context){
         if(String.valueOf(context.getRequiredTestMethod()).contains("Do_Tested_Channel")) openMS("/admin/channels");
-        else {
+        else if (String.valueOf(context.getRequiredTestMethod()).contains("Channel_7013")){
+            addContactAndAccount(CONTACT_NUMBER_7013);
             Configuration.baseUrl = hostClient;
             open("/");
         }
@@ -83,5 +87,13 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback {
         if( ! loginPage.isLoginMS()) loginPage.loginOnServer(LOGIN_ADMIN_MS, PASSWORD_ADMIN_MS);
         assertTrue(loginPage.isLoginMS(), "Не удалось авторизоваться");
         open(page);
+    }
+
+    private void addContactAndAccount(String number){
+        if (!SSHManager.isCheckQuerySSH(sshCommandIsContact + number)) {
+            ContactsPage contactsPage = new ContactsPage();
+            openMS("/contacts");
+            contactsPage.addContact(number).addUserAccount(number, USER_ACCOUNT_PASSWORD, USER_ACOUNT_ITEM_MENU);
+        }
     }
 }

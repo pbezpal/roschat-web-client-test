@@ -13,18 +13,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import static chat.ros.testing2.data.ContactsData.USER_ACCOUNT_PASSWORD;
+import static chat.ros.testing2.data.ContactsData.*;
 import static data.CommentsData.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Epic(value = "Сервер")
-@Feature(value = "Настройка -> Интеграция")
+@Epic(value = "WEB клиент")
+@Feature(value = "Каналы")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ExtendWith(RecourcesTests.class)
 public class WC_ChannelsPage extends chat.ros.testing2.server.administration.ChannelsPage implements CommentsPage {
 
-    private String login7012 = "7012@ros.chat";
-    private String login7013 = "7013@ros.chat";
+    private String login7012 = CONTACT_NUMBER_7012 + "@ros.chat";
+    private String login7013 = CONTACT_NUMBER_7013 + "@ros.chat";
     private ChannelsPage clientChannelsPage;
 
     @Story(value = "Создаём новый публичный канал")

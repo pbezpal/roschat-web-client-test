@@ -89,6 +89,7 @@ public class WC_ChannelsPage extends chat.ros.testing2.server.administration.Cha
     }
 
     private ChannelsPage getClientChannelsPage(String login){
+        System.out.println(CLIENT_TYPE_COMMENTS_CHANNELS);
         return (ChannelsPage) getInstanceClient(login, USER_ACCOUNT_PASSWORD, CLIENT_TYPE_COMMENTS_CHANNELS);
     }
 

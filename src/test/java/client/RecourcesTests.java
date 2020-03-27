@@ -69,13 +69,15 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback {
         WebDriverRunner.setWebDriver(driver);
 
         Configuration.screenshots = false;
+
+        addContactAndAccount(CONTACT_NUMBER_7012);
+        addContactAndAccount(CONTACT_NUMBER_7013);
     }
 
     @Override
     public void beforeEach(ExtensionContext context){
         if(String.valueOf(context.getRequiredTestMethod()).contains("Do_Tested_Channel")) openMS("/admin/channels");
-        else if (String.valueOf(context.getRequiredTestMethod()).contains("Channel_7013")){
-            addContactAndAccount(CONTACT_NUMBER_7013);
+        else {
             Configuration.baseUrl = hostClient;
             open("/");
         }

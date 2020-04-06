@@ -1,8 +1,5 @@
 package data;
 
-
-import static chat.ros.testing2.data.GetDataTests.getProperty;
-
 public interface CommentsData {
 
     String config = "Comments.properties";

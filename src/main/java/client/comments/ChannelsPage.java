@@ -43,7 +43,7 @@ public class ChannelsPage implements CommentsPage {
 
     @Step(value = "Проверяем, что в заголовке канала появился статус проверенного")
     public boolean isStatusTestedChannelMainHeader() {
-        itemListChat.click();
+        itemsListChat.first().click();
         try{
             divMainHeader.find(statusTestedChannel).shouldBe(Condition.visible);
         }catch (ElementNotFound e){
@@ -52,6 +52,7 @@ public class ChannelsPage implements CommentsPage {
         return true;
     }
 
+    @Step(value = "Проверяем, что тип канала не выбран")
     public boolean isNotActiveRadioTypeChannel(String type){
         try{
             radioTypeChannel.findBy(Condition.text(type)).find("input[value='false']").isEnabled();
@@ -82,7 +83,7 @@ public class ChannelsPage implements CommentsPage {
     @Step(value = "Проверяем, что в разделе Беседы у канала появился статус проверенного")
     public boolean isStatusTestedChannelListChat() {
         try{
-            itemListChat.find(statusTestedChannel).shouldBe(Condition.visible);
+            itemsListChat.first().find(statusTestedChannel).shouldBe(Condition.visible);
         }catch (ElementNotFound e){
             return false;
         }

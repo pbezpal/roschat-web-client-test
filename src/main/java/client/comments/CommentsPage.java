@@ -7,6 +7,8 @@ import com.codeborne.selenide.SelenideElement;
 import com.codeborne.selenide.ex.ElementNotFound;
 import io.qameta.allure.Step;
 
+import static com.codeborne.selenide.Condition.not;
+import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
 
@@ -15,7 +17,7 @@ public interface CommentsPage extends ClientPage {
     SelenideElement itemComments = $("i.fa.fa-comments");
     SelenideElement contextMenu = $("div.chat-list.content svg");
     ElementsCollection itemsContextMenu = $$("div#context-menu li");
-    SelenideElement itemListChat = $("div.chat-list-item div.name");
+    ElementsCollection itemsListChat = $$("div.chat-list-item div.name");
 
     ElementsCollection itemsToolbar = $$("div.toolbar-wrapper span");
 
@@ -38,18 +40,20 @@ public interface CommentsPage extends ClientPage {
     }
 
     @Step(value = "Проверяем, существует ли беседа {comments}")
-    default boolean isExistComments(String comments, String status){
-        switch(status){
+    default boolean isExistComments(String comments, String show){
+        switch(show){
             case "Yes":
                 try{
-                    itemListChat.find("span").text().contains(comments);
+                    System.out.println(itemsListChat.find(Condition.text(comments)));
+                    itemsListChat.find(Condition.text(comments)).shouldBe(visible);
                 }catch (ElementNotFound e){
                     return false;
                 }
                 break;
             case "No":
                 try{
-                    itemListChat.find("span").shouldNotHave(Condition.text(comments));
+                    System.out.println(itemsListChat.find(Condition.not(Condition.text(comments))));
+                    itemsListChat.find(Condition.text(comments)).shouldBe(not(visible));
                 }catch (ElementNotFound e){
                     return false;
                 }
@@ -60,11 +64,12 @@ public interface CommentsPage extends ClientPage {
     }
 
     @Override
-    default Object getInstanceClient(String login, String password, String typeComments){
-        getLoginClient(login, password).shouldBe(Condition.visible);
+    default Object getInstanceClient(String typeComments){
         switch(typeComments){
             case "Каналы":
                 return new ChannelsPage();
+            case "Беседы":
+                return new ChatsPage();
         }
         return null;
     }

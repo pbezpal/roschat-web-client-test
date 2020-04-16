@@ -1,5 +1,6 @@
-package client;
+package client.comments;
 
+import client.RecourcesTests;
 import client.comments.ChannelsPage;
 import client.comments.CommentsPage;
 import io.qameta.allure.Description;
@@ -17,14 +18,12 @@ import static chat.ros.testing2.data.ContactsData.*;
 import static data.CommentsData.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Epic(value = "WEB клиент")
+@Epic(value = "Беседы")
 @Feature(value = "Каналы")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ExtendWith(RecourcesTests.class)
-public class WC_ChannelsPage extends chat.ros.testing2.server.administration.ChannelsPage implements CommentsPage {
+public class TestChannelsPage extends chat.ros.testing2.server.administration.ChannelsPage implements CommentsPage {
 
-    private String login7012 = CONTACT_NUMBER_7012 + "@ros.chat";
-    private String login7013 = CONTACT_NUMBER_7013 + "@ros.chat";
     private ChannelsPage clientChannelsPage;
 
     @Story(value = "Создаём новый публичный канал")
@@ -32,7 +31,7 @@ public class WC_ChannelsPage extends chat.ros.testing2.server.administration.Cha
     @Order(1)
     @Test
     void test_Create_Public_Channel_7012(){
-        clientChannelsPage = getClientChannelsPage(login7012);
+        clientChannelsPage = (ChannelsPage) getInstanceClient(CLIENT_TYPE_COMMENTS_CHANNELS);
         assertTrue(clientChannelsPage.createNewChannel(CLIENT_NAME_CHANNEL_PUBLIC, CLIENT_ITEM_NEW_CHANNEL, CLIENT_TYPE_CHANNEL_PUBLIC).isExistComments(CLIENT_NAME_CHANNEL_PUBLIC, "Yes"),
                 "Канал не найден в списке бесед");
     }
@@ -50,7 +49,7 @@ public class WC_ChannelsPage extends chat.ros.testing2.server.administration.Cha
     @Order(3)
     @Test
     void test_Check_Status_Public_Tested_Channel_7012(){
-        clientChannelsPage = getClientChannelsPage(login7012);
+        clientChannelsPage = (ChannelsPage) getInstanceClient(CLIENT_TYPE_COMMENTS_CHANNELS);
         clientChannelsPage.clickItemComments();
         Assertions.assertTrue(clientChannelsPage.isStatusTestedChannelListChat(),
                 "Отсутствует статус Проверенный у канала в разделе Беседы");
@@ -63,7 +62,7 @@ public class WC_ChannelsPage extends chat.ros.testing2.server.administration.Cha
     @Order(4)
     @Test
     void test_Search_Public_Channel_7013(){
-        clientChannelsPage = getClientChannelsPage(login7013);
+        clientChannelsPage = (ChannelsPage) getInstanceClient(CLIENT_TYPE_COMMENTS_CHANNELS);
         assertTrue(clientChannelsPage.searchChannel(CLIENT_NAME_CHANNEL_PUBLIC, CLIENT_TYPE_CHANNEL_PUBLIC),
                 "У канала отсутствует статус проверенный");
     }
@@ -73,7 +72,7 @@ public class WC_ChannelsPage extends chat.ros.testing2.server.administration.Cha
     @Order(5)
     @Test
     void test_Create_Closed_Channel_7012(){
-        clientChannelsPage = getClientChannelsPage(login7012);
+        clientChannelsPage = (ChannelsPage) getInstanceClient(CLIENT_TYPE_COMMENTS_CHANNELS);
         assertTrue(clientChannelsPage.createNewChannel(CLIENT_NAME_CHANNEL_CLOSED, CLIENT_ITEM_NEW_CHANNEL, CLIENT_TYPE_CHANNEL_CLOSED).isExistComments(CLIENT_NAME_CHANNEL_CLOSED, "Yes"),
                 "Канал не найден в списке бесед");
     }
@@ -83,14 +82,8 @@ public class WC_ChannelsPage extends chat.ros.testing2.server.administration.Cha
     @Order(6)
     @Test
     void test_Search_Closed_Channel_7013(){
-        clientChannelsPage = getClientChannelsPage(login7013);
+        clientChannelsPage = (ChannelsPage) getInstanceClient(CLIENT_TYPE_COMMENTS_CHANNELS);
         assertTrue(clientChannelsPage.searchChannel(CLIENT_NAME_CHANNEL_CLOSED, CLIENT_TYPE_CHANNEL_CLOSED),
                 "Канал отображается в списке бесед");
     }
-
-    private ChannelsPage getClientChannelsPage(String login){
-        System.out.println(CLIENT_TYPE_COMMENTS_CHANNELS);
-        return (ChannelsPage) getInstanceClient(login, USER_ACCOUNT_PASSWORD, CLIENT_TYPE_COMMENTS_CHANNELS);
-    }
-
 }

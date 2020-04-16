@@ -11,7 +11,6 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -24,6 +23,7 @@ import java.util.logging.Level;
 import static chat.ros.testing2.data.ContactsData.*;
 import static chat.ros.testing2.data.LoginData.*;
 import static com.codeborne.selenide.Selenide.open;
+import static com.codeborne.selenide.Selenide.sleep;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback {
@@ -32,8 +32,6 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback {
     private String hostServer;
     private String hostClient;
     private String classTest = "";
-    private StringBuilder logs = new StringBuilder();
-    private LogEntries logEntries;
     private String sshCommandIsContact = "/var/db/roschat-db/userlist.sh | grep ";
 
     public RecourcesTests() {
@@ -76,10 +74,13 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback {
 
     @Override
     public void beforeEach(ExtensionContext context){
+        sleep(5000);
         if(String.valueOf(context.getRequiredTestMethod()).contains("Do_Tested_Channel")) openMS("/admin/channels");
-        else {
-            Configuration.baseUrl = hostClient;
-            open("/");
+        else if (String.valueOf(context.getRequiredTestMethod()).contains(CONTACT_NUMBER_7012)){
+            openClient(CONTACT_NUMBER_7012 + "@ros.chat");
+        }
+        else if (String.valueOf(context.getRequiredTestMethod()).contains(CONTACT_NUMBER_7013)){
+            openClient(CONTACT_NUMBER_7013 + "@ros.chat");
         }
     }
 
@@ -89,6 +90,12 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback {
         if( ! loginPage.isLoginMS()) loginPage.loginOnServer(LOGIN_ADMIN_MS, PASSWORD_ADMIN_MS);
         assertTrue(loginPage.isLoginMS(), "Не удалось авторизоваться");
         open(page);
+    }
+
+    private void openClient(String login){
+        Configuration.baseUrl = hostClient;
+        open("/");
+        ClientPage.loginClient(login, USER_ACCOUNT_PASSWORD, false);
     }
 
     private void addContactAndAccount(String number){

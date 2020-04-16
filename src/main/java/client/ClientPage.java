@@ -12,10 +12,10 @@ import static com.codeborne.selenide.Selenide.*;
 
 public interface ClientPage {
 
-    SelenideElement divLogin = $("div#login");
     SelenideElement buttonPencil = $("i.fal.fa-pencil");
     SelenideElement inputEmail = $("input.input.non-border-input[type='text']");
     SelenideElement inputPassword = $("input.input.non-border-input[type='password']");
+    SelenideElement iStaySystem = $("i.fal.fa-check");
     SelenideElement buttonLogin = $("button#login-btn");
     SelenideElement divSide = $("div#side");
 
@@ -23,11 +23,12 @@ public interface ClientPage {
     ElementsCollection itemsToolbar = $$("div.toolbar-wrapper span");
     SelenideElement divMainHeader = $("div.main-header");
     SelenideElement inputSearch = $("div.search-wrapper input");
+    SelenideElement divSuccessLogin = $("div.side div.section-header h4.header-text");
 
     @Step(value = "Проверяем, появилось ли окно авторизации на WEB-клиенте")
     default boolean isLoginWindow(){
         try{
-            divLogin.waitUntil(Condition.visible, 30000);
+            buttonPencil.waitUntil(Condition.visible, 30000);
         }catch (ElementNotFound elementNotFound){
             return false;
         }
@@ -36,44 +37,41 @@ public interface ClientPage {
     }
 
     @Step(value = "Нажимаем кнопку 'Ввести логин и пароль'")
-    default ClientPage clickButtonPencil(){
+    static void clickButtonPencil(){
         buttonPencil.click();
-        return this;
     }
 
     @Step(value = "Вводим адрес электронной почты {email}")
-    default ClientPage sendInputEmail(String email){
+    static void sendInputEmail(String email){
         inputEmail.sendKeys(Keys.CONTROL + "a");
         inputEmail.sendKeys(Keys.BACK_SPACE);
         inputEmail.sendKeys(email);
-        return this;
     }
 
     @Step(value = "Вводим пароль {password}")
-    default ClientPage sendInputPassword(String password){
+    static void sendInputPassword(String password){
         inputPassword.sendKeys(Keys.CONTROL + "a");
         inputPassword.sendKeys(Keys.BACK_SPACE);
         inputPassword.sendKeys(password);
-        return this;
+    }
+
+    @Step(value = "Нажимаем челбокс, чтобы оставаться в системе")
+    static void clickCheckboxStaySystem(){
+        iStaySystem.click();
     }
 
     @Step(value = "Нажимаем кнопку 'Войти'")
-    default ClientPage clickButtonLogin(){
+    static void clickButtonLogin(){
         buttonLogin.click();
-        return this;
     }
 
-    default SelenideElement getLoginClient(String email, String password){
-        if(isLoginWindow()) {
-            clickButtonPencil();
-            sendInputEmail(email);
-            sendInputPassword(password);
-            clickButtonLogin();
-
-            return divSide;
-        }
-
-        return null;
+    static boolean loginClient(String email, String password, boolean staySystem){
+        clickButtonPencil();
+        sendInputEmail(email);
+        sendInputPassword(password);
+        if(staySystem) clickCheckboxStaySystem();
+        clickButtonLogin();
+        return isLoginClient();
     }
 
     @Step(value = "Проверяем, что появился заголовок контакта/группы/канала")
@@ -94,6 +92,16 @@ public interface ClientPage {
         return this;
     }
 
-    public Object getInstanceClient(String login, String password, String type);
+    @Step(value = "Проверяем, авторизованы ли мы на клиенте")
+    static boolean isLoginClient(){
+        try{
+            divSuccessLogin.shouldBe(Condition.visible);
+        }catch (ElementNotFound elementNotFound){
+            return false;
+        }
+        return true;
+    }
+
+    Object getInstanceClient(String type);
 
 }

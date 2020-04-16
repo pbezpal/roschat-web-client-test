@@ -12,4 +12,8 @@ public interface CommentsData {
     String CLIENT_NAME_CHANNEL_CLOSED = "Closed test channel";
     String CLIENT_TYPE_CHANNEL_CLOSED = "Закрытый";
 
+    /***** Параметры для проверки бесед ******/
+    String CLIENT_TYPE_COMMENTS_CHATS = "Беседы";
+    String CLIENT_CHATS_SEND_MESSAGE = "Это тестовое сообщение от пользователя 7013";
+
 }

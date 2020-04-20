@@ -7,6 +7,9 @@ import com.codeborne.selenide.ex.ElementNotFound;
 import io.qameta.allure.Step;
 import org.openqa.selenium.Keys;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
 
@@ -30,8 +33,8 @@ public class ChatsPage implements CommentsPage {
     }
 
     @Step(value = "Нажимаем на участника новой беседы")
-    protected ChatsPage clickNewChat(){
-        itemsListChat.first().click();
+    protected ChatsPage clickNewChat(String user){
+        itemsListChat.findBy(Condition.text(user)).waitUntil(Condition.visible, 10000).click();
         return this;
     }
 
@@ -49,9 +52,9 @@ public class ChatsPage implements CommentsPage {
         return this;
     }
 
-    public boolean isGetNewMessage(String message){
+    public boolean isGetNewMessage(String user, String message){
         clickItemComments();
-        clickNewChat();
+        clickNewChat(user);
         return isExistMessage(message);
     }
 

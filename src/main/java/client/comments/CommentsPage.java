@@ -23,7 +23,7 @@ public interface CommentsPage extends ClientPage {
 
     @Step(value = "Переходим в раздел Беседы")
     default CommentsPage clickItemComments(){
-        itemComments.click();
+        itemComments.waitUntil(visible, 30000).click();
         return this;
     }
 
@@ -44,7 +44,6 @@ public interface CommentsPage extends ClientPage {
         switch(show){
             case "Yes":
                 try{
-                    System.out.println(itemsListChat.find(Condition.text(comments)));
                     itemsListChat.find(Condition.text(comments)).shouldBe(visible);
                 }catch (ElementNotFound e){
                     return false;
@@ -52,26 +51,15 @@ public interface CommentsPage extends ClientPage {
                 break;
             case "No":
                 try{
-                    System.out.println(itemsListChat.find(Condition.not(Condition.text(comments))));
                     itemsListChat.find(Condition.text(comments)).shouldBe(not(visible));
                 }catch (ElementNotFound e){
                     return false;
                 }
                 break;
         }
-
         return true;
     }
 
-    @Override
-    default Object getInstanceClient(String typeComments){
-        switch(typeComments){
-            case "Каналы":
-                return new ChannelsPage();
-            case "Беседы":
-                return new ChatsPage();
-        }
-        return null;
-    }
+
 
 }

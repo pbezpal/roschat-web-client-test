@@ -95,7 +95,11 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback {
     private void openClient(String login){
         Configuration.baseUrl = hostClient;
         open("/");
-        ClientPage.loginClient(login, USER_ACCOUNT_PASSWORD, false);
+        if(ClientPage.isLoginWindow()) {
+            assertTrue(ClientPage.loginClient(login, USER_ACCOUNT_PASSWORD, false), "Ошибка при " +
+                    "авторизации");
+
+        }
     }
 
     private void addContactAndAccount(String number){

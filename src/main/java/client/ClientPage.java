@@ -12,12 +12,13 @@ import static com.codeborne.selenide.Selenide.*;
 
 public interface ClientPage {
 
+    ElementsCollection loginWindow = $$("div.component-footer span");
     SelenideElement buttonPencil = $("i.fal.fa-pencil");
     SelenideElement inputEmail = $("input.input.non-border-input[type='text']");
     SelenideElement inputPassword = $("input.input.non-border-input[type='password']");
     SelenideElement iStaySystem = $("i.fal.fa-check");
     SelenideElement buttonLogin = $("button#login-btn");
-    SelenideElement divSide = $("div#side");
+    SelenideElement buttonConfirmError = $("div.alert-confirn button");
 
     //Раздел инструментов(Рация, Контакты, Беседы, Вызовы)
     ElementsCollection itemsToolbar = $$("div.toolbar-wrapper span");
@@ -26,9 +27,9 @@ public interface ClientPage {
     SelenideElement divSuccessLogin = $("div.side div.section-header h4.header-text");
 
     @Step(value = "Проверяем, появилось ли окно авторизации на WEB-клиенте")
-    default boolean isLoginWindow(){
+    static boolean isLoginWindow(){
         try{
-            buttonPencil.waitUntil(Condition.visible, 30000);
+            loginWindow.findBy(Condition.text("Ввести логин и пароль")).waitUntil(Condition.visible, 30000);
         }catch (ElementNotFound elementNotFound){
             return false;
         }
@@ -71,7 +72,7 @@ public interface ClientPage {
         sendInputPassword(password);
         if(staySystem) clickCheckboxStaySystem();
         clickButtonLogin();
-        return isLoginClient();
+        return isNotShowConfirmError();
     }
 
     @Step(value = "Проверяем, что появился заголовок контакта/группы/канала")
@@ -92,16 +93,14 @@ public interface ClientPage {
         return this;
     }
 
-    @Step(value = "Проверяем, авторизованы ли мы на клиенте")
-    static boolean isLoginClient(){
+    @Step(value = "Проверяем, что не появилось сообщение об ошибке")
+    static boolean isNotShowConfirmError(){
         try{
-            divSuccessLogin.shouldBe(Condition.visible);
-        }catch (ElementNotFound elementNotFound){
+            buttonConfirmError.shouldNotBe(Condition.visible);
+        }catch (ElementShould elementShould){
             return false;
         }
         return true;
     }
-
-    Object getInstanceClient(String type);
 
 }

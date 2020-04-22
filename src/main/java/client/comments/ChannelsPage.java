@@ -29,7 +29,7 @@ public class ChannelsPage implements CommentsPage {
     }
 
     @Step(value = "Нажимаем кнопку Создать")
-    private ClientPage clickCreateNewChannel(){
+    private ChannelsPage clickCreateNewChannel(){
         buttonCreateChannel.click();
         return this;
     }
@@ -63,7 +63,7 @@ public class ChannelsPage implements CommentsPage {
     }
 
     @Step(value = "Выбираем тип канала {type}")
-    public ClientPage clickTypeChannel(String type){
+    public ChannelsPage clickTypeChannel(String type){
         if(isNotActiveRadioTypeChannel(type)) radioTypeChannel.findBy(Condition.text(type)).find("i").click();
         return this;
     }
@@ -75,7 +75,7 @@ public class ChannelsPage implements CommentsPage {
         if(type.equals(CLIENT_TYPE_CHANNEL_PUBLIC)) {
             return isStatusTestedChannelListChat() && isStatusTestedChannelMainHeader();
         }else if(type.equals(CLIENT_TYPE_CHANNEL_CLOSED)) {
-            return isExistComments(text, "No");
+            return isExistComments(text, false);
         }
         return false;
     }
@@ -96,8 +96,7 @@ public class ChannelsPage implements CommentsPage {
         clickContextMenu();
         clickItemContextMenu(item);
         sendInputNameChannel(name);
-        clickTypeChannel(type);
-        clickCreateNewChannel();
+        clickTypeChannel(type).clickCreateNewChannel();
         return this;
     }
 }

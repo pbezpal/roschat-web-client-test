@@ -1,13 +1,18 @@
 package client;
 
+import com.codeborne.selenide.Selenide;
 import io.socket.client.Ack;
 import io.socket.client.IO;
 import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class APIToServer {
 
@@ -24,6 +29,7 @@ public class APIToServer {
     private String serverURL;
     private String userLogin;
     private String userPassword;
+    private String[] receivingMessageData = new String[2];
 
     //Так как не разобрался как правильно исопльзольвать библиотеку при вызове именно тестов использую данную переменную
     //Для того, чтобы вернуть id пользователя из базы данных при его поиске по имени
@@ -145,6 +151,24 @@ public class APIToServer {
     }
 
     /**
+     * Приём сообщения
+     */
+    private void receivingMessage(){
+        socket.on("message-event", new Emitter.Listener() {
+            @Override
+            public void call(final Object... args) {
+                JSONObject obj = (JSONObject)args[0];
+                if(obj.optString("dataType").equals("unstored")) return;
+                else if(obj.optString("dataType").equals("text")) {
+                    receivingMessageData[0] = obj.optString("senderId");
+                    receivingMessageData[1] = obj.optString("data");
+                    isActionFinish = true;
+                }
+            }
+        });
+    }
+
+    /**
      * Получение списка контактов и поиск id абонента по фамилии
      * Найденный id пользователя передаётся в поле userID
      */
@@ -228,6 +252,30 @@ public class APIToServer {
                 e.printStackTrace();
             }
         }
+
+    }
+
+    public String[] GetTextMessageFromUser(int maxIntervalInSecToDoThisActions) {
+        isActionFinish = false;
+        Thread connectionThread = new Thread(() -> {
+            receivingMessage();
+        });
+
+        connectionThread.start();
+
+        //Завершаем ожидание главного потока по таймеру или по выполнению действия
+        for (int i = 0; i < maxIntervalInSecToDoThisActions; i++) {
+            if (isActionFinish) {
+                return receivingMessageData;
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return null;
     }
 
     /**

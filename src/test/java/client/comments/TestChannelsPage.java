@@ -28,7 +28,7 @@ public class TestChannelsPage extends chat.ros.testing2.server.administration.Ch
     @Order(1)
     @Test
     void test_Create_Public_Channel_7012(){
-        assertTrue(clientChannelsPage.createNewChannel(CLIENT_NAME_CHANNEL_PUBLIC, CLIENT_ITEM_NEW_CHANNEL, CLIENT_TYPE_CHANNEL_PUBLIC).isExistComments(CLIENT_NAME_CHANNEL_PUBLIC, "Yes"),
+        assertTrue(clientChannelsPage.createNewChannel(CLIENT_NAME_CHANNEL_PUBLIC, CLIENT_ITEM_NEW_CHANNEL, CLIENT_TYPE_CHANNEL_PUBLIC).isExistComments(CLIENT_NAME_CHANNEL_PUBLIC, true),
                 "Канал не найден в списке бесед");
     }
 
@@ -66,7 +66,7 @@ public class TestChannelsPage extends chat.ros.testing2.server.administration.Ch
     @Order(5)
     @Test
     void test_Create_Closed_Channel_7012(){
-        assertTrue(clientChannelsPage.createNewChannel(CLIENT_NAME_CHANNEL_CLOSED, CLIENT_ITEM_NEW_CHANNEL, CLIENT_TYPE_CHANNEL_CLOSED).isExistComments(CLIENT_NAME_CHANNEL_CLOSED, "Yes"),
+        assertTrue(clientChannelsPage.createNewChannel(CLIENT_NAME_CHANNEL_CLOSED, CLIENT_ITEM_NEW_CHANNEL, CLIENT_TYPE_CHANNEL_CLOSED).isExistComments(CLIENT_NAME_CHANNEL_CLOSED, true),
                 "Канал не найден в списке бесед");
     }
 

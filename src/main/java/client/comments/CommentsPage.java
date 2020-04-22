@@ -5,6 +5,7 @@ import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import com.codeborne.selenide.ex.ElementNotFound;
+import com.codeborne.selenide.ex.ElementShould;
 import io.qameta.allure.Step;
 
 import static com.codeborne.selenide.Condition.not;
@@ -40,22 +41,19 @@ public interface CommentsPage extends ClientPage {
     }
 
     @Step(value = "Проверяем, существует ли беседа {comments}")
-    default boolean isExistComments(String comments, String show){
-        switch(show){
-            case "Yes":
-                try{
-                    itemsListChat.find(Condition.text(comments)).shouldBe(visible);
-                }catch (ElementNotFound e){
-                    return false;
-                }
-                break;
-            case "No":
-                try{
-                    itemsListChat.find(Condition.text(comments)).shouldBe(not(visible));
-                }catch (ElementNotFound e){
-                    return false;
-                }
-                break;
+    default boolean isExistComments(String comments, boolean show){
+        if(show) {
+            try {
+                itemsListChat.find(Condition.text(comments)).shouldBe(visible);
+            } catch (ElementNotFound e) {
+                return false;
+            }
+        }else{
+            try {
+                itemsListChat.find(Condition.text(comments)).shouldBe(not(visible));
+            } catch (ElementShould e) {
+                return false;
+            }
         }
         return true;
     }

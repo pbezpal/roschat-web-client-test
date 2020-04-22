@@ -12,9 +12,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+
 import static chat.ros.testing2.data.ContactsData.*;
 import static chat.ros.testing2.data.LoginData.HOST_SERVER;
 import static data.CommentsData.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Epic(value = "Беседы")
@@ -33,11 +37,11 @@ public class TestChatsPage implements CommentsPage {
             "появилось ли сообщение у пользователя 7012")
     @Test
     void test_Get_New_Message_7012(){
-        Runnable getMessage = () -> {
-            assertTrue(chatsPage.isGetNewMessage(CONTACT_NUMBER_7013, CLIENT_CHATS_SEND_MESSAGE));
+        Runnable clientGetMessage = () -> {
+            assertTrue(chatsPage.isGetNewMessage(CONTACT_NUMBER_7013, CLIENT_CHATS_RECEIVED_MESSAGE));
         };
 
-        Thread sendMessage = new Thread() {
+        Thread socketSendMessage = new Thread() {
             @Override
             public void run() {
                 Selenide.sleep(3000);
@@ -45,14 +49,36 @@ public class TestChatsPage implements CommentsPage {
                         "user",
                         IDForReceivingMessageUser,
                         "text",
-                        CLIENT_CHATS_SEND_MESSAGE,
+                        CLIENT_CHATS_RECEIVED_MESSAGE,
                         60
                 );
                 apiToServer.disconnect();
             }
         };
 
-        sendMessage.start();
-        getMessage.run();
+        socketSendMessage.start();
+        clientGetMessage.run();
+    }
+
+    @Test
+    void test_Send_New_Message_7012() throws ExecutionException, InterruptedException {
+        String[] apiGetMessageResult;
+
+        Runnable clientSendMessage = () -> {
+            chatsPage.sendNewMessage(CONTACT_NUMBER_7013, CLIENT_CHATS_SEND_MESSAGE);
+        };
+
+        CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
+            String[] getMessageResult = apiToServer.GetTextMessageFromUser(60);
+            apiToServer.disconnect();
+            return getMessageResult;
+        });
+
+        clientSendMessage.run();
+        apiGetMessageResult = socketGetMessage.get();
+        assertEquals(apiGetMessageResult[0], IDForReceivingMessageUser, "Сообщение пришло " +
+                "не от пользователя " + CONTACT_NUMBER_7012);
+        assertEquals(apiGetMessageResult[1], CLIENT_CHATS_SEND_MESSAGE, "Текст сообщения не совпадает с тем," +
+                "которое отправил пользователь " + CONTACT_NUMBER_7012 );
     }
 }

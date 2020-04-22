@@ -52,15 +52,6 @@ public class TestChannelsPage extends chat.ros.testing2.server.administration.Ch
                 "Отсутствует статус Проверенный в заголовке канала");
     }
 
-    @Story(value = "Ищем на клиенте 7013 публичный канал")
-    @Description(value = "Авторизуемся на клиенте под учётной записью 7013 и вводим в поле поиска имя публичного канала. Проверяем, что у канала статус Проверенный")
-    @Order(4)
-    @Test
-    void test_Search_Public_Channel_7013(){
-        assertTrue(clientChannelsPage.searchChannel(CLIENT_NAME_CHANNEL_PUBLIC, CLIENT_TYPE_CHANNEL_PUBLIC),
-                "У канала отсутствует статус проверенный");
-    }
-
     @Story(value = "Создаём новый закрытый канал")
     @Description(value = "Авторизуемся под пользователем 7012 и создаём новый закрытый канал")
     @Order(5)
@@ -68,6 +59,15 @@ public class TestChannelsPage extends chat.ros.testing2.server.administration.Ch
     void test_Create_Closed_Channel_7012(){
         assertTrue(clientChannelsPage.createNewChannel(CLIENT_NAME_CHANNEL_CLOSED, CLIENT_ITEM_NEW_CHANNEL, CLIENT_TYPE_CHANNEL_CLOSED).isExistComments(CLIENT_NAME_CHANNEL_CLOSED, true),
                 "Канал не найден в списке бесед");
+    }
+
+    @Story(value = "Ищем на клиенте 7013 публичный канал")
+    @Description(value = "Авторизуемся на клиенте под учётной записью 7013 и вводим в поле поиска имя публичного канала. Проверяем, что у канала статус Проверенный")
+    @Order(4)
+    @Test
+    void test_Search_Public_Channel_7013(){
+        assertTrue(clientChannelsPage.searchChannel(CLIENT_NAME_CHANNEL_PUBLIC, CLIENT_TYPE_CHANNEL_PUBLIC),
+                "У канала отсутствует статус проверенный");
     }
 
     @Story(value = "Ищем на клиенте 7013 закрытый канал")

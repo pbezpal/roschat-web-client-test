@@ -1,5 +1,6 @@
 package client;
 
+import client.comments.ChatsPage;
 import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
@@ -19,8 +20,10 @@ public interface ClientPage {
     SelenideElement iStaySystem = $("i.fal.fa-check");
     SelenideElement buttonLogin = $("button#login-btn");
     SelenideElement buttonConfirmError = $("div.alert-confirn button");
+    SelenideElement inputSelectContacts = $("div.select-contact input.search-input");
+    ElementsCollection listContacts = $$("div.contact-list div.fio.name");
 
-    //Раздел инструментов(Рация, Контакты, Беседы, Вызовы)
+    //Раздел инструментов(Рация, Контакты, Беседы, Вызовы, Ещё)
     ElementsCollection itemsToolbar = $$("div.toolbar-wrapper span");
     SelenideElement divMainHeader = $("div.main-header");
     SelenideElement inputSearch = $("div.search-wrapper input");
@@ -83,6 +86,18 @@ public interface ClientPage {
             return false;
         }
         return true;
+    }
+
+    @Step(value = "Вводим имя пользователя в поле поиска")
+    default ClientPage searchContactForNewChat(String fio){
+        inputSelectContacts.sendKeys(fio);
+        return this;
+    }
+
+    @Step(value = "Выбираем найденный контакт")
+    default ClientPage selectFoundContact(String contact){
+        listContacts.findBy(Condition.text(contact)).shouldBe(Condition.visible).click();
+        return this;
     }
 
     @Step(value = "Вводим в поле поиска {text}")

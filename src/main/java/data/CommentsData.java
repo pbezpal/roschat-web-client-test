@@ -14,6 +14,8 @@ public interface CommentsData {
     /***** Параметры для проверки бесед ******/
     String CLIENT_ITEM_NEW_CHAT = "Новая беседа";
     String CLIENT_CHATS_RECEIVED_MESSAGE = "Это тестовое сообщение от пользователя 7013 отправленное пользователю 7012";
+    String CLIENT_CHATS_SEND_EVENT = "message-event";
     String CLIENT_CHATS_SEND_MESSAGE = "Это тестовое сообщение от пользователя 7012 отправленное пользователю 7013";
+
 
 }

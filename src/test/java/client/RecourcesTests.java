@@ -98,7 +98,6 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback {
         if(ClientPage.isLoginWindow()) {
             assertTrue(ClientPage.loginClient(login, USER_ACCOUNT_PASSWORD, false), "Ошибка при " +
                     "авторизации");
-
         }
     }
 

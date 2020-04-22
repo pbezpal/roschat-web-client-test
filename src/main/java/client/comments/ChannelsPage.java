@@ -18,6 +18,7 @@ public class ChannelsPage implements CommentsPage {
     private SelenideElement buttonCreateChannel = $("div.footer button.btn.btn-primary");
     private SelenideElement spanItemChannel = $("div.filter.channels span");
     private ElementsCollection radioTypeChannel = $$("form.custom-radio label");
+    private SelenideElement divAddUser = $("div.btn-list-item.list-item");
     private String statusTestedChannel = "i.fa-check";
 
     public ChannelsPage(){}

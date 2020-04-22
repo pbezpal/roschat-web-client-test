@@ -16,8 +16,6 @@ public class ChatsPage implements CommentsPage {
     private ElementsCollection spanMessage = $$("#message-list div.message-list-item span");
     private SelenideElement divInputMessage = $("#message-input div.custom-textarea");
     private SelenideElement buttonSendMessage = $("i.fa.fa-paper-plane");
-    private SelenideElement inputSelectContacts = $("div.select-contact input.search-input");
-    private ElementsCollection listContacts = $$("div.contact-list div.fio.name");
 
     public ChatsPage() {}
 
@@ -35,18 +33,6 @@ public class ChatsPage implements CommentsPage {
     @Step(value = "Нажимаем на участника новой беседы")
     protected ChatsPage clickNewChat(String user){
         itemsListChat.findBy(Condition.text(user)).waitUntil(Condition.visible, 10000).click();
-        return this;
-    }
-
-    @Step(value = "Ищем контакт для новой беседы")
-    private ChatsPage searchContactForNewChat(String fio){
-        inputSelectContacts.sendKeys(fio);
-        return this;
-    }
-
-    @Step(value = "Выбираем контакт для беседы")
-    private ChatsPage clickContactForChat(String contact){
-        listContacts.findBy(Condition.text(contact)).shouldBe(Condition.visible).click();
         return this;
     }
 
@@ -74,7 +60,8 @@ public class ChatsPage implements CommentsPage {
         clickItemComments();
         if(isExistComments(contact, false)){
             clickContextMenu().clickItemContextMenu(CLIENT_ITEM_NEW_CHAT);
-            searchContactForNewChat(contact).clickContactForChat(contact);
+            searchContactForNewChat(contact);
+            selectFoundContact(contact);
         }else clickNewChat(contact);
         sendInputMessage(message).clickButtonSendMessage();
     }

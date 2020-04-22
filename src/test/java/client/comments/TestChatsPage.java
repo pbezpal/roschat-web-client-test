@@ -27,12 +27,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(RecourcesTests.class)
 public class TestChatsPage implements CommentsPage {
 
-    private static APIToServer apiToServer = new APIToServer("https://" + HOST_SERVER + ":8080", CONTACT_NUMBER_7013 + "@ros.chat", USER_ACCOUNT_PASSWORD);
+    private static APIToServer apiToServer = new APIToServer("https://" + HOST_SERVER + ":8080", CONTACT_NUMBER_7013 + "@ros.chat", USER_ACCOUNT_PASSWORD);;
     private static String IDForReceivingMessageUser = apiToServer.getContactIDBySurnameFromListOfContacts(CONTACT_NUMBER_7012, 60);
 
     private static ChatsPage chatsPage = new ChatsPage();
 
-    @Story(value = "Проверка приёма сообщений")
+    @Story(value = "Проверка получения сообщения")
     @Description(value = "Авторизуемся под пользователем 7012, пользователь 7013 отправляет сообщение, проверяем, " +
             "появилось ли сообщение у пользователя 7012")
     @Test
@@ -42,20 +42,24 @@ public class TestChatsPage implements CommentsPage {
         };
 
         CompletableFuture.runAsync(() -> {
-                Selenide.sleep(3000);
-                apiToServer.SendTextMessageToUser(
-                        "user",
-                        IDForReceivingMessageUser,
-                        "text",
-                        CLIENT_CHATS_RECEIVED_MESSAGE,
-                        60
-                );
-                apiToServer.disconnect();
+            apiToServer = new APIToServer("https://" + HOST_SERVER + ":8080", CONTACT_NUMBER_7013 + "@ros.chat", USER_ACCOUNT_PASSWORD);
+            Selenide.sleep(3000);
+            apiToServer.SendTextMessageToUser(
+                    "user",
+                    IDForReceivingMessageUser,
+                    "text",
+                    CLIENT_CHATS_RECEIVED_MESSAGE,
+                    60
+            );
+            apiToServer.disconnect();
             });
 
         clientGetMessage.run();
     }
 
+    @Story(value = "Проверка отправки сообщения")
+    @Description(value = "Авторизуемся под пользователем 7012, пользователь 7013 отправляет сообщение, проверяем, " +
+            "появилось ли сообщение у пользователя 7012")
     @Test
     void test_Send_New_Message_7012() throws ExecutionException, InterruptedException {
         String[] apiGetMessageResult;
@@ -65,6 +69,7 @@ public class TestChatsPage implements CommentsPage {
         };
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
+            apiToServer = new APIToServer("https://" + HOST_SERVER + ":8080", CONTACT_NUMBER_7013 + "@ros.chat", USER_ACCOUNT_PASSWORD);
             String[] getMessageResult = apiToServer.GetTextMessageFromUser(60);
             apiToServer.disconnect();
             return getMessageResult;

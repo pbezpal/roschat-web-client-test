@@ -41,9 +41,7 @@ public class TestChatsPage implements CommentsPage {
             assertTrue(chatsPage.isGetNewMessage(CONTACT_NUMBER_7013, CLIENT_CHATS_RECEIVED_MESSAGE));
         };
 
-        Thread socketSendMessage = new Thread() {
-            @Override
-            public void run() {
+        CompletableFuture.runAsync(() -> {
                 Selenide.sleep(3000);
                 apiToServer.SendTextMessageToUser(
                         "user",
@@ -53,10 +51,8 @@ public class TestChatsPage implements CommentsPage {
                         60
                 );
                 apiToServer.disconnect();
-            }
-        };
+            });
 
-        socketSendMessage.start();
         clientGetMessage.run();
     }
 

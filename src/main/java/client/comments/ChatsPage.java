@@ -30,12 +30,6 @@ public class ChatsPage implements CommentsPage {
         return true;
     }
 
-    @Step(value = "Нажимаем на участника новой беседы")
-    protected ChatsPage clickNewChat(String user){
-        itemsListChat.findBy(Condition.text(user)).waitUntil(Condition.visible, 10000).click();
-        return this;
-    }
-
     @Step(value = "Вводим сообщение")
     protected ChatsPage sendInputMessage(String message){
         divInputMessage.sendKeys(Keys.CONTROL + "a");
@@ -52,7 +46,7 @@ public class ChatsPage implements CommentsPage {
 
     public boolean isGetNewMessage(String contact, String message){
         clickItemComments();
-        clickNewChat(contact);
+        clickChat(contact);
         return isExistMessage(message);
     }
 
@@ -62,7 +56,7 @@ public class ChatsPage implements CommentsPage {
             clickContextMenu().clickItemContextMenu(CLIENT_ITEM_NEW_CHAT);
             searchContactForNewChat(contact);
             selectFoundContact(contact);
-        }else clickNewChat(contact);
+        }else clickChat(contact);
         sendInputMessage(message).clickButtonSendMessage();
     }
 

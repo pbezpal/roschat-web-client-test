@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Epic(value = "Беседы")
-@Feature(value = "Чаты")
+@Feature(value = "Беседа")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ExtendWith(RecourcesTests.class)
 public class TestChatsPage implements CommentsPage {

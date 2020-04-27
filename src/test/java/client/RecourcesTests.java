@@ -3,6 +3,7 @@ package client;
 import chat.ros.testing2.helpers.SSHManager;
 import chat.ros.testing2.server.LoginPage;
 import chat.ros.testing2.server.contacts.ContactsPage;
+import client.still.ProfilePage;
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.WebDriverRunner;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
@@ -75,12 +76,15 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback {
     @Override
     public void beforeEach(ExtensionContext context){
         sleep(5000);
-        if(String.valueOf(context.getRequiredTestMethod()).contains("Do_Tested_Channel")) openMS("/admin/channels");
+        if(String.valueOf(context.getRequiredTestMethod()).contains("Do_Proven_Channel") ||
+                String.valueOf(context.getRequiredTestMethod()).contains("test_Show_Closed_Channel_In_MS")){
+            openMS("/admin/channels");
+        }
         else if (String.valueOf(context.getRequiredTestMethod()).contains(CONTACT_NUMBER_7012)){
-            openClient(CONTACT_NUMBER_7012 + "@ros.chat");
+            openClient(CONTACT_NUMBER_7012 + "@ros.chat", false);
         }
         else if (String.valueOf(context.getRequiredTestMethod()).contains(CONTACT_NUMBER_7013)){
-            openClient(CONTACT_NUMBER_7013 + "@ros.chat");
+            openClient(CONTACT_NUMBER_7013 + "@ros.chat", false);
         }
     }
 
@@ -92,11 +96,11 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback {
         open(page);
     }
 
-    private void openClient(String login){
+    private void openClient(String login, boolean staySystem){
         Configuration.baseUrl = hostClient;
         open("/");
         if(ClientPage.isLoginWindow()) {
-            assertTrue(ClientPage.loginClient(login, USER_ACCOUNT_PASSWORD, false), "Ошибка при " +
+            assertTrue(ClientPage.loginClient(login, USER_ACCOUNT_PASSWORD, staySystem), "Ошибка при " +
                     "авторизации");
         }
     }

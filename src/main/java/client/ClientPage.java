@@ -29,6 +29,11 @@ public interface ClientPage {
     SelenideElement inputSearch = $("div.search-wrapper input");
     SelenideElement divSuccessLogin = $("div.side div.section-header h4.header-text");
 
+    //Раздел инфо
+    SelenideElement divInfoWrapper = $("div.info-wrapper");
+    SelenideElement iEditName = $("i.fas.fa-pencil-alt");
+    SelenideElement divCommonText = $("div.common-text");
+
     @Step(value = "Проверяем, появилось ли окно авторизации на WEB-клиенте")
     static boolean isLoginWindow(){
         try{
@@ -59,7 +64,7 @@ public interface ClientPage {
         inputPassword.sendKeys(password);
     }
 
-    @Step(value = "Нажимаем челбокс, чтобы оставаться в системе")
+    @Step(value = "Нажимаем чекбокс, чтобы оставаться в системе")
     static void clickCheckboxStaySystem(){
         iStaySystem.click();
     }
@@ -88,10 +93,45 @@ public interface ClientPage {
         return true;
     }
 
+    @Step(value = "Нажимаем на заголовок контакта/группы/канала")
+    default ClientPage clickMainHeaderText(){
+        divMainHeader.find("div.header-user-block").click();
+        return this;
+    }
+
     @Step(value = "Вводим имя пользователя в поле поиска")
     default ClientPage searchContactForNewChat(String fio){
         inputSelectContacts.sendKeys(fio);
         return this;
+    }
+
+    /** Раздел информации **/
+
+    @Step(value = "Проверяем, отображается ли раздел информации")
+    default boolean isDivInfoWrapper(boolean show){
+        if(show){
+            try{
+                divInfoWrapper.shouldBe(Condition.visible);
+            }catch (ElementNotFound e){
+                return false;
+            }
+        } else {
+            try{
+                divInfoWrapper.shouldBe(Condition.not(Condition.visible));
+            }catch (ElementShould e){
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Step(value = "Нажимаем карандаш для редактирования")
+    default void clickPencilEdit(){ iEditName.click(); }
+
+    @Step(value = "Проверяем название/имени {name} в разделе информации")
+    default String getTitleName(String name){
+        return $("div[title='" + name + "']").text();
     }
 
     @Step(value = "Выбираем найденный контакт")

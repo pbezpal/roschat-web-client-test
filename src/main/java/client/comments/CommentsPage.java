@@ -48,7 +48,7 @@ public interface CommentsPage extends ClientPage {
             } catch (ElementNotFound e) {
                 return false;
             }
-        }else{
+        } else {
             try {
                 itemsListChat.find(Condition.text(comments)).shouldBe(not(visible));
             } catch (ElementShould e) {
@@ -56,6 +56,12 @@ public interface CommentsPage extends ClientPage {
             }
         }
         return true;
+    }
+
+    @Step(value = "Выбираем чат {chat}")
+    default CommentsPage clickChat(String chat){
+        itemsListChat.findBy(Condition.text(chat)).waitUntil(Condition.visible, 10000).click();
+        return this;
     }
 
 

@@ -1,6 +1,6 @@
 package client;
 
-import com.codeborne.selenide.Selenide;
+import io.qameta.allure.Step;
 import io.socket.client.Ack;
 import io.socket.client.IO;
 import io.socket.client.Socket;
@@ -10,9 +10,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class APIToServer {
 
@@ -127,6 +124,7 @@ public class APIToServer {
     /**
      * Отправка сообщения
      */
+    @Step(value = "Отправляем сообщение {data} полльзователю с id {cid}")
     private void sendMessage(String cidType, String cid, String dataType, String data) {
         JSONObject obj = new JSONObject();
         try {
@@ -153,8 +151,9 @@ public class APIToServer {
     /**
      * Приём сообщения
      */
-    private void receivingMessage(){
-        socket.on("message-event", new Emitter.Listener() {
+    @Step(value = "Получаем сообщение по событию {event}")
+    private void receivingMessage(String event){
+        socket.on(event, new Emitter.Listener() {
             @Override
             public void call(final Object... args) {
                 JSONObject obj = (JSONObject)args[0];
@@ -255,10 +254,10 @@ public class APIToServer {
 
     }
 
-    public String[] GetTextMessageFromUser(int maxIntervalInSecToDoThisActions) {
+    public String[] GetTextMessageFromUser(String event, int maxIntervalInSecToDoThisActions) {
         isActionFinish = false;
         Thread connectionThread = new Thread(() -> {
-            receivingMessage();
+            receivingMessage(event);
         });
 
         connectionThread.start();

@@ -7,6 +7,7 @@ import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -22,14 +23,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Epic(value = "Беседы")
-@Feature(value = "Чаты")
+@Feature(value = "Беседа")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ExtendWith(RecourcesTests.class)
 public class TestChatsPage implements CommentsPage {
 
     private static APIToServer apiToServer = new APIToServer("https://" + HOST_SERVER + ":8080", CONTACT_NUMBER_7013 + "@ros.chat", USER_ACCOUNT_PASSWORD);;
     private static String IDForReceivingMessageUser = apiToServer.getContactIDBySurnameFromListOfContacts(CONTACT_NUMBER_7012, 60);
-
     private static ChatsPage chatsPage = new ChatsPage();
 
     @Story(value = "Проверка получения сообщения")
@@ -42,7 +42,6 @@ public class TestChatsPage implements CommentsPage {
         };
 
         CompletableFuture.runAsync(() -> {
-            apiToServer = new APIToServer("https://" + HOST_SERVER + ":8080", CONTACT_NUMBER_7013 + "@ros.chat", USER_ACCOUNT_PASSWORD);
             Selenide.sleep(3000);
             apiToServer.SendTextMessageToUser(
                     "user",
@@ -51,8 +50,7 @@ public class TestChatsPage implements CommentsPage {
                     CLIENT_CHATS_RECEIVED_MESSAGE,
                     60
             );
-            apiToServer.disconnect();
-            });
+        });
 
         clientGetMessage.run();
     }
@@ -69,9 +67,7 @@ public class TestChatsPage implements CommentsPage {
         };
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
-            apiToServer = new APIToServer("https://" + HOST_SERVER + ":8080", CONTACT_NUMBER_7013 + "@ros.chat", USER_ACCOUNT_PASSWORD);
-            String[] getMessageResult = apiToServer.GetTextMessageFromUser(60);
-            apiToServer.disconnect();
+            String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_CHATS_SEND_EVENT,60);
             return getMessageResult;
         });
 
@@ -81,5 +77,10 @@ public class TestChatsPage implements CommentsPage {
                 "не от пользователя " + CONTACT_NUMBER_7012);
         assertEquals(apiGetMessageResult[1], CLIENT_CHATS_SEND_MESSAGE, "Текст сообщения не совпадает с тем," +
                 "которое отправил пользователь " + CONTACT_NUMBER_7012 );
+    }
+
+    @AfterAll
+    static void afterAllTests(){
+        apiToServer.disconnect();
     }
 }

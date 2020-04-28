@@ -85,9 +85,49 @@ allure {
     }
 }
 
+task chats(type: Test){
+
+    useJUnitPlatform()
+
+    dependsOn 'cleanTest'
+
+    filter{
+        includeTestsMatching "*comments.TestChatsPage"
+    }
+
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
+
+task channels(type: Test){
+
+    useJUnitPlatform()
+
+    dependsOn chats
+
+    filter{
+        includeTestsMatching "*comments.TestClosedChannel"
+        includeTestsMatching "*comments.TestProvenPublicChannel"
+        includeTestsMatching "*comments.TestPublicChannel"
+    }
+
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
+
 test {
 
     useJUnitPlatform()
+
+    doFirst {
+        chats
+    }
+
+    doLast {
+        channels
+    }
 
     dependsOn 'cleanTest'
 

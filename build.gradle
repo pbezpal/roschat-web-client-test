@@ -86,36 +86,30 @@ allure {
 }
 
 task chats(type: Test){
-
     useJUnitPlatform()
-
-    dependsOn 'cleanTest'
-
     filter{
-        includeTestsMatching "*comments.TestChatsPage"
+        includeTestsMatching "**.TestChatsPage"
     }
-
     testLogging {
         events "passed", "skipped", "failed"
     }
 }
 
-task channels(type: Test, dependsOn: chats){
-
+task channels(type: Test){
     useJUnitPlatform()
-
     filter{
-        includeTestsMatching "*comments.TestClosedChannel"
-        includeTestsMatching "*comments.TestProvenPublicChannel"
-        includeTestsMatching "*comments.TestPublicChannel"
+        includeTestsMatching "**.TestClosedChannel"
+        includeTestsMatching "**.TestProvenPublicChannel"
+        includeTestsMatching "**.TestPublicChannel"
     }
-
     testLogging {
         events "passed", "skipped", "failed"
     }
 }
 
-test {
+channels.mustRunAfter chats
+
+/*test {
 
     useJUnitPlatform()
 
@@ -125,4 +119,4 @@ test {
     testLogging {
         events "passed", "skipped", "failed"
     }
-}
+}*/

@@ -41,17 +41,22 @@ public class Test_A_ChatsPage implements CommentsPage {
             assertTrue(chatsPage.isGetNewMessage(CONTACT_NUMBER_7013, CLIENT_CHATS_RECEIVED_MESSAGE));
         };
 
-        CompletableFuture.runAsync(() -> {
-            Selenide.sleep(3000);
-            apiToServer.SendTextMessageToUser(
-                    "user",
-                    IDForReceivingMessageUser,
-                    "text",
-                    CLIENT_CHATS_RECEIVED_MESSAGE,
-                    60
-            );
-        });
+        Thread apiSendMessage = new Thread() {
+            @Override
+            public void run() {
+                Selenide.sleep(3000);
+                apiToServer.SendTextMessageToUser(
+                        "user",
+                        IDForReceivingMessageUser,
+                        "text",
+                        CLIENT_CHATS_RECEIVED_MESSAGE,
+                        60
+                );
+                apiToServer.disconnect();
+            }
+        };
 
+        apiSendMessage.start();
         clientGetMessage.run();
     }
 

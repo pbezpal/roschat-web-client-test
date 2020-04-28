@@ -106,4 +106,4 @@ task channels(type: Test){
     }
 }
 
-channels.dependsOn chats
+channels.mustRunAfter chats

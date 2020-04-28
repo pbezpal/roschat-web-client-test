@@ -103,7 +103,7 @@ test {
 
     useJUnitPlatform()
 
-    chats.dependsOn(channels)
+    chats.mustRunAfter(channels)
 
     // Show test results.
     testLogging {

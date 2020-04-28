@@ -33,7 +33,7 @@ pipeline{
             steps{
                 script{
                     try{
-                        sh './gradlew clean -q channels chats'
+                        sh './gradlew clean -q channels'
                     }catch(err){
                         STATUS="Провал";
                     }

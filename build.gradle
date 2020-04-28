@@ -85,25 +85,11 @@ allure {
     }
 }
 
-task chats(type: Test){
-    filter{
-        includeTestsMatching "*comments.TestChatsPage"
-    }
-}
-
-task channels(type: Test){
-    filter{
-        includeTestsMatching "*comments.TestClosedChannel"
-        includeTestsMatching "*comments.TestProvenPublicChannel"
-        includeTestsMatching "*comments.TestPublicChannel"
-    }
-}
-
 test {
 
     useJUnitPlatform()
 
-    chats.mustRunAfter(channels)
+    dependsOn 'cleanTest'
 
     // Show test results.
     testLogging {

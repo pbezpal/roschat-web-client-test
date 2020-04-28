@@ -100,11 +100,9 @@ task chats(type: Test){
     }
 }
 
-task channels(type: Test){
+task channels(type: Test, dependsOn: chats){
 
     useJUnitPlatform()
-
-    dependsOn chats
 
     filter{
         includeTestsMatching "*comments.TestClosedChannel"
@@ -121,15 +119,11 @@ test {
 
     useJUnitPlatform()
 
-    doFirst {
-        chats
+    chats {
+        doLast {
+            channels
+        }
     }
-
-    doLast {
-        channels
-    }
-
-    dependsOn 'cleanTest'
 
     // Show test results.
     testLogging {

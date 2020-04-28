@@ -85,7 +85,21 @@ allure {
     }
 }
 
-test {
+task chats(type: Test){
+    useJUnitPlatform()
+    filter{
+        includeTestsMatching("**/Test_A_ChatsPage")
+    }
+}
+
+task channels(type: Test, dependsOn: [chats]){
+    useJUnitPlatform()
+    filter{
+        includeTestsMatching("**/Test_B_PublicChannel_Proven")
+    }
+}
+
+/*test {
 
     useJUnitPlatform()
 
@@ -95,4 +109,4 @@ test {
     testLogging {
         events "passed", "skipped", "failed"
     }
-}
+}*/

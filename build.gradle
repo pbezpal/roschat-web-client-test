@@ -85,7 +85,7 @@ allure {
     }
 }
 
-task chats(type: Test){
+/*task chats(type: Test){
     useJUnitPlatform()
     filter{
         includeTestsMatching "Test_A_ChatsPage"
@@ -107,3 +107,13 @@ task channels(type: Test){
 }
 
 channels.mustRunAfter chats
+*/
+test{
+    useJUnitPlatform()
+
+    dependsOn 'cleanTest'
+
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}

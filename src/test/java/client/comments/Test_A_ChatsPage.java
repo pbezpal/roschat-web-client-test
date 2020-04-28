@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Feature(value = "Беседа")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ExtendWith(RecourcesTests.class)
-public class TestChatsPage implements CommentsPage {
+public class Test_A_ChatsPage implements CommentsPage {
 
     private static APIToServer apiToServer = new APIToServer("https://" + HOST_SERVER + ":8080", CONTACT_NUMBER_7013 + "@ros.chat", USER_ACCOUNT_PASSWORD);;
     private static String IDForReceivingMessageUser = apiToServer.getContactIDBySurnameFromListOfContacts(CONTACT_NUMBER_7012, 60);

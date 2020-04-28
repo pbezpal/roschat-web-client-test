@@ -35,7 +35,7 @@ public class Test_B_PublicChannel extends chat.ros.testing2.server.administratio
     @Description(value = "Авторизуемся под пользователем 7012 и создаём новый публичный канал")
     @Order(1)
     @Test
-    void test_Create_Public_Proven_Channel_7012(){
+    void test_Create_Public_Channel_7012(){
         assertTrue(
                 clientChannelsPage.createNewChannel(
                         CLIENT_NAME_CHANNEL_PUBLIC_PROVEN,
@@ -51,7 +51,7 @@ public class Test_B_PublicChannel extends chat.ros.testing2.server.administratio
             " и правим название и описание канала. Проверяем, что сохранения применились.")
     @Order(2)
     @Test
-    void test_Edit_Name_And_Description_Public_Proven_Channel_7012(){
+    void test_Edit_Name_And_Description_Public_Channel_7012(){
         clientChannelsPage.editNameAndDescriptionChannel(
                 CLIENT_NAME_CHANNEL_PUBLIC_PROVEN,
                 CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN,
@@ -79,17 +79,14 @@ public class Test_B_PublicChannel extends chat.ros.testing2.server.administratio
 
     @Story(value = "Делимся ссылкой на канал")
     @Description(value = "Авторизуемся на клиенте под учётной записью 7012, переходим в раздел информации о канале" +
-            " и нажимаем 'Поделиться ссылкой'. Проверяем, что сохранения применились.")
+            " и нажимаем 'Поделиться ссылкой'. Проверяем, что ссылка дошла до адресата.")
     @Order(3)
     @Test
-    void test_Share_Link_Closed_Channel_7012() throws ExecutionException, InterruptedException {
+    void test_Share_Link_Public_Channel_7012() throws ExecutionException, InterruptedException {
         String[] apiGetMessageResult;
 
         Runnable clientShareLinkChannel = () -> {
-            assertTrue(clientChannelsPage.
-                            shareLinkChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN, CONTACT_NUMBER_7013).
-                            isIconShareChannel(),
-                    "Нет иконки 'Поделиться каналом'");
+            clientChannelsPage.shareLinkChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN, CONTACT_NUMBER_7013);
         };
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
@@ -105,10 +102,34 @@ public class Test_B_PublicChannel extends chat.ros.testing2.server.administratio
                 "Ссылка на канал " + CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN + " не пришла");
     }
 
+    @Story(value = "Копируем и делимся ссылкой на канал")
+    @Description(value = "Авторизуемся на клиенте под учётной записью 7012, переходим в раздел информации о канале," +
+            "нажимаем 'Копировать ссылку' и делимся ссылкой. Проверяем, что ссылка дошла до адресата.")
+    @Order(4)
+    @Test
+    void test_Copy_And_Paste_Link_Public_Channel_7012() throws ExecutionException, InterruptedException {
+        String[] apiGetMessageResult;
+
+        Runnable clientShareLinkChannel = () -> {
+            clientChannelsPage.copyLinkChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN, CONTACT_NUMBER_7013);
+        };
+
+        CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
+            String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_CHATS_SEND_EVENT,60);
+            return getMessageResult;
+        });
+
+        clientShareLinkChannel.run();
+        apiGetMessageResult = socketGetMessage.get();
+        assertEquals(apiGetMessageResult[0], IDForReceivingMessageUser, "Сообщение пришло " +
+                "не от пользователя " + CONTACT_NUMBER_7012);
+        assertTrue(apiGetMessageResult[1].contains(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
+                "Ссылка на канал " + CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN + " не пришла");
+    }
 
     @Story(value = "Делаем проверенным публичный канал")
     @Description(value = "Авторизуемся в СУ, переходим в раздел Администрирование->Каналы, делаем публичный канал проверенным")
-    @Order(4)
+    @Order(5)
     @Test
     void test_Do_Proven_Channel(){
         assertTrue(isShowChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN, true));
@@ -117,9 +138,9 @@ public class Test_B_PublicChannel extends chat.ros.testing2.server.administratio
 
     @Story(value = "Проверяем статус публичного канала под учётной записью 7012")
     @Description(value = "Авторизуемся на клиенте под учётной записью 7012. Проверяем, что у канала появился статус Проверенный")
-    @Order(5)
+    @Order(6)
     @Test
-    void test_Check_Status_Public_Proven_Channel_7012(){
+    void test_Check_Status_Public_Channel_7012(){
         clientChannelsPage.clickItemComments();
         assertTrue(clientChannelsPage.isStatusTestedChannelListChat(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
                 "Отсутствует статус Проверенный у канала в разделе Беседы");
@@ -132,9 +153,9 @@ public class Test_B_PublicChannel extends chat.ros.testing2.server.administratio
     @Story(value = "Ищем на клиенте 7013 публичный канал")
     @Description(value = "Авторизуемся на клиенте под учётной записью 7013 и вводим в поле поиска имя публичного канала." +
             " Проверяем, что у канала статус Проверенный")
-    @Order(6)
+    @Order(7)
     @Test
-    void test_Search_Public_Proven_Channel_7013(){
+    void test_Search_Public_Channel_7013(){
         assertTrue(
                 clientChannelsPage.searchChannel(
                         CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN,

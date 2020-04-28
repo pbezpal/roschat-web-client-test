@@ -105,10 +105,32 @@ public class Test_B_ClosedChannel extends chat.ros.testing2.server.administratio
         String[] apiGetMessageResult;
 
         Runnable clientShareLinkChannel = () -> {
-            assertTrue(clientChannelsPage.
-                            shareLinkChannel(CLIENT_NEW_NAME_CHANNEL_CLOSED, CONTACT_NUMBER_7013).
-                            isIconShareChannel(),
-                    "Нет иконки 'Поделиться каналом'");
+            clientChannelsPage.shareLinkChannel(CLIENT_NEW_NAME_CHANNEL_CLOSED, CONTACT_NUMBER_7013);
+        };
+
+        CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
+            String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_CHATS_SEND_EVENT,60);
+            return getMessageResult;
+        });
+
+        clientShareLinkChannel.run();
+        apiGetMessageResult = socketGetMessage.get();
+        assertEquals(apiGetMessageResult[0], IDForReceivingMessageUser, "Сообщение пришло " +
+                "не от пользователя " + CONTACT_NUMBER_7012);
+        assertTrue(apiGetMessageResult[1].contains(CLIENT_NEW_NAME_CHANNEL_CLOSED),
+                "Ссылка на канал " + CLIENT_NEW_NAME_CHANNEL_CLOSED + " не пришла");
+    }
+
+    @Story(value = "Копируем и делимся ссылкой на канал")
+    @Description(value = "Авторизуемся на клиенте под учётной записью 7012, переходим в раздел информации о канале," +
+                         "нажимаем 'Копировать ссылку' и делимся ссылкой. Проверяем, что ссылка дошла до адресата.")
+    @Order(6)
+    @Test
+    void test_Copy_And_Paste_Link_Closed_Channel_7012() throws ExecutionException, InterruptedException {
+        String[] apiGetMessageResult;
+
+        Runnable clientShareLinkChannel = () -> {
+            clientChannelsPage.copyLinkChannel(CLIENT_NEW_NAME_CHANNEL_CLOSED, CONTACT_NUMBER_7013);
         };
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{

@@ -27,6 +27,7 @@ public class ChannelsPage implements CommentsPage {
     private ElementsCollection listChats = $$("div.select-chat div.fio.name");
     private ElementsCollection selectedChat = $$("div.selected span");
     private ElementsCollection buttonFooter = $$("div.footer button");
+    private SelenideElement iCopyLinkChannel = $("i.fal.fa-external-link");
     private String statusTestedChannel = "i.fa-check";
 
     public ChannelsPage(){}
@@ -180,6 +181,16 @@ public class ChannelsPage implements CommentsPage {
         return this;
     }
 
+    @Step(value = "Проверяем, что есть иконка 'Копировать ссылку'")
+    public boolean isIconCopyLinkChannel(){
+        try{
+            iCopyLinkChannel.shouldBe(Condition.visible);
+        }catch (ElementNotFound e){
+            return false;
+        }
+        return true;
+    }
+
     //Создаём канал
     public ChannelsPage createNewChannel(String name, String description, String item, String type){
         clickItemComments();
@@ -213,6 +224,17 @@ public class ChannelsPage implements CommentsPage {
                 sendInputSearchChat(chat).
                 selectChat(chat).isSelectChat(chat);
         clickButtonFooter(CLIENT_BUTTON_SHARE_LINK_CHANNEL);
+        return this;
+    }
+
+    //Копируем ссылку
+    public ChannelsPage copyLinkChannel(String channel, String contact){
+        ChatsPage chatsPage = new ChatsPage();
+        clickItemComments();
+        clickChat(channel);
+        if(isDivInfoWrapper(false)) clickMainHeaderText();
+        actionChannel(CLIENT_COPY_LINK_CHANNEL);
+        chatsPage.sendNewMessage(contact, Keys.CONTROL + "v");
         return this;
     }
 }

@@ -86,32 +86,16 @@ allure {
 }
 
 task chats(type: Test){
-
-    useJUnitPlatform()
-
-    dependsOn 'cleanTest'
-
     filter{
         includeTestsMatching "*comments.TestChatsPage"
     }
-
-    testLogging {
-        events "passed", "skipped", "failed"
-    }
 }
 
-task channels(type: Test, dependsOn: chats){
-
-    useJUnitPlatform()
-
+task channels(type: Test){
     filter{
         includeTestsMatching "*comments.TestClosedChannel"
         includeTestsMatching "*comments.TestProvenPublicChannel"
         includeTestsMatching "*comments.TestPublicChannel"
-    }
-
-    testLogging {
-        events "passed", "skipped", "failed"
     }
 }
 

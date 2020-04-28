@@ -1,5 +1,6 @@
 package client.comments;
 
+import client.APIToServer;
 import client.RecourcesTests;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
@@ -11,6 +12,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+
+import static chat.ros.testing2.data.ContactsData.*;
+import static chat.ros.testing2.data.LoginData.HOST_SERVER;
 import static data.CommentsData.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -21,6 +27,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(RecourcesTests.class)
 public class TestProvenPublicChannel extends chat.ros.testing2.server.administration.ChannelsPage implements CommentsPage{
 
+    private static APIToServer apiToServer = new APIToServer("https://" + HOST_SERVER + ":8080", CONTACT_NUMBER_7013 + "@ros.chat", USER_ACCOUNT_PASSWORD);;
+    private static String IDForReceivingMessageUser = apiToServer.getContactIDBySurnameFromListOfContacts(CONTACT_NUMBER_7012, 60);
     private ChannelsPage clientChannelsPage = new ChannelsPage();
 
     @Story(value = "Создаём новый публичный канал")
@@ -109,5 +117,33 @@ public class TestProvenPublicChannel extends chat.ros.testing2.server.administra
                 clientChannelsPage.getDescriptionChannel(),
                 CLIENT_NEW_DESCRIPTION_PUBLIC_CHANNEL_PROVEN,
                 "Новое описание канала не найдено в разделе информация о канале");
+    }
+
+    @Story(value = "Делимся ссылкой на канал")
+    @Description(value = "Авторизуемся на клиенте под учётной записью 7012, переходим в раздел информации о канале" +
+            " и нажимаем 'Поделиться ссылкой'. Проверяем, что сохранения применились.")
+    @Order(6)
+    @Test
+    void test_Share_Link_Closed_Channel_7012() throws ExecutionException, InterruptedException {
+        String[] apiGetMessageResult;
+
+        Runnable clientShareLinkChannel = () -> {
+            assertTrue(clientChannelsPage.
+                            shareLinkChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN, CONTACT_NUMBER_7013).
+                            isIconShareChannel(),
+                    "Нет иконки 'Поделиться каналом'");
+        };
+
+        CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
+            String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_CHATS_SEND_EVENT,60);
+            return getMessageResult;
+        });
+
+        clientShareLinkChannel.run();
+        apiGetMessageResult = socketGetMessage.get();
+        assertEquals(apiGetMessageResult[0], IDForReceivingMessageUser, "Сообщение пришло " +
+                "не от пользователя " + CONTACT_NUMBER_7012);
+        assertTrue(apiGetMessageResult[1].contains(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
+                "Ссылка на канал " + CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN + " не пришла");
     }
 }

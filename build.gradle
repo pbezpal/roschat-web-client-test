@@ -119,11 +119,11 @@ test {
 
     useJUnitPlatform()
 
-    chats {
-        doLast {
-            channels
-        }
+    def tasks = [chats, channels]
+    for(int i = 0; i < tasks.size(); i++) {
+        tasks[i + 1].mustRunAfter(tasks[i])
     }
+    dependsOn(tasks)
 
     // Show test results.
     testLogging {

@@ -24,6 +24,10 @@ public interface CommentsData {
     String CLIENT_NEW_DESCRIPTION_CHANNEL_CLOSED = "Новое описание закрытого тестового канала";
     String CLIENT_TYPE_CHANNEL_CLOSED = "Закрытый";
 
+    /***** Поделиться ссылкой ******/
+    String CLIENT_SHARE_LINK_CHANNEL = "Поделиться ссылкой";
+    String CLIENT_COPY_LINK_CHANNEL = "Копировать ссылку";
+    String CLIENT_BUTTON_SHARE_LINK_CHANNEL = "Поделиться";
 
     /***** Параметры для проверки бесед ******/
     String CLIENT_ITEM_NEW_CHAT = "Новая беседа";

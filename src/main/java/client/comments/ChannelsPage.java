@@ -10,8 +10,7 @@ import org.openqa.selenium.Keys;
 
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
-import static data.CommentsData.CLIENT_TYPE_CHANNEL_CLOSED;
-import static data.CommentsData.CLIENT_TYPE_CHANNEL_PUBLIC;
+import static data.CommentsData.*;
 
 public class ChannelsPage implements CommentsPage {
 
@@ -21,10 +20,14 @@ public class ChannelsPage implements CommentsPage {
     private SelenideElement spanItemChannel = $("div.filter.channels span");
     private ElementsCollection radioTypeChannel = $$("form.custom-radio label");
     private SelenideElement divAddUser = $("div.btn-list-item.list-item");
-    private SelenideElement divActionContainer = $("div.action-container");
+    private ElementsCollection spansInfoChannel = $$("div.channel-info.info-content.sections span");
     private SelenideElement pDescriptionChannel = $("div.additional-text p");
+    private SelenideElement iShareChannel = $("i.fal.fa-share");
+    private SelenideElement inputSearchChat = $("div.select-chat input.search-input");
+    private ElementsCollection listChats = $$("div.select-chat div.fio.name");
+    private ElementsCollection selectedChat = $$("div.selected span");
+    private ElementsCollection buttonFooter = $$("div.footer button");
     private String statusTestedChannel = "i.fa-check";
-    private String iShareChannel = "i.fal.fa-share";
 
     public ChannelsPage(){}
 
@@ -106,7 +109,7 @@ public class ChannelsPage implements CommentsPage {
         return this;
     }
 
-    //Ищем канал
+    @Step(value = "Ищем канал {channel}")
     public boolean searchChannel(String channel, String type){
         clickItemChannels();
         sendInputSearch(channel);
@@ -133,6 +136,50 @@ public class ChannelsPage implements CommentsPage {
         return pDescriptionChannel.text();
     }
 
+    @Step(value = "Проверяем, что есть иконка 'Поделиться каналом'")
+    public boolean isIconShareChannel(){
+        try{
+            iShareChannel.shouldBe(Condition.visible);
+        }catch (ElementNotFound e){
+            return false;
+        }
+        return true;
+    }
+
+    @Step(value = "Выбираем действие с каналом {action}")
+    private ChannelsPage actionChannel(String action){
+        spansInfoChannel.findBy(Condition.text(action)).click();
+        return this;
+    }
+
+    @Step(value = "Вводим в поле поиска беседу {chat}")
+    private ChannelsPage sendInputSearchChat(String chat){
+        inputSearchChat.sendKeys(chat);
+        return this;
+    }
+
+    @Step(value = "Выбираем беседу {chat}")
+    private ChannelsPage selectChat(String chat){
+        listChats.findBy(Condition.text(chat)).click();
+        return this;
+    }
+
+    @Step(value = "Проверяем, что беседа {chat} была успешно выбрана")
+    private boolean isSelectChat(String chat){
+        try{
+            selectedChat.findBy(Condition.text(chat)).shouldBe(Condition.visible);
+        }catch (ElementNotFound e){
+            return false;
+        }
+        return true;
+    }
+
+    @Step(value = "Нажимаем кнопку {button}")
+    private ChannelsPage clickButtonFooter(String button){
+        buttonFooter.findBy(Condition.text(button)).click();
+        return this;
+    }
+
     //Создаём канал
     public ChannelsPage createNewChannel(String name, String description, String item, String type){
         clickItemComments();
@@ -145,6 +192,7 @@ public class ChannelsPage implements CommentsPage {
         return this;
     }
 
+    //Редактируем название и описание канала
     public ChannelsPage editNameAndDescriptionChannel(String channel, String name, String description){
         clickItemComments();
         clickChat(channel);
@@ -153,6 +201,18 @@ public class ChannelsPage implements CommentsPage {
         sendInputNameChannel(name).
                 sendDivDescriptionChannel(description).
                 clickButtonCreateOrSaveChannel();
+        return this;
+    }
+
+    //Делимся ссылкой
+    public ChannelsPage shareLinkChannel(String channel, String chat){
+        clickItemComments();
+        clickChat(channel);
+        if(isDivInfoWrapper(false)) clickMainHeaderText();
+        actionChannel(CLIENT_SHARE_LINK_CHANNEL).
+                sendInputSearchChat(chat).
+                selectChat(chat).isSelectChat(chat);
+        clickButtonFooter(CLIENT_BUTTON_SHARE_LINK_CHANNEL);
         return this;
     }
 }

@@ -111,8 +111,8 @@ public class Test_B_PublicChannel extends chat.ros.testing2.server.administratio
     @Order(4)
     @Test
     void test_Do_Proven_Channel(){
-        assertTrue(isShowChannel(CLIENT_NAME_CHANNEL_PUBLIC_PROVEN, true));
-        doTestedChannel(CLIENT_NAME_CHANNEL_PUBLIC_PROVEN);
+        assertTrue(isShowChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN, true));
+        doTestedChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN);
     }
 
     @Story(value = "Проверяем статус публичного канала под учётной записью 7012")
@@ -121,11 +121,11 @@ public class Test_B_PublicChannel extends chat.ros.testing2.server.administratio
     @Test
     void test_Check_Status_Public_Proven_Channel_7012(){
         clientChannelsPage.clickItemComments();
-        assertTrue(clientChannelsPage.isStatusTestedChannelListChat(CLIENT_NAME_CHANNEL_PUBLIC_PROVEN),
+        assertTrue(clientChannelsPage.isStatusTestedChannelListChat(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
                 "Отсутствует статус Проверенный у канала в разделе Беседы");
-        assertTrue(clientChannelsPage.isStatusTestedChannelMainHeader(CLIENT_NAME_CHANNEL_PUBLIC_PROVEN),
+        assertTrue(clientChannelsPage.isStatusTestedChannelMainHeader(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
                 "Отсутствует статус Проверенный в заголовке канала");
-        assertTrue(clientChannelsPage.isStatusTestedInfoChannel(CLIENT_NAME_CHANNEL_PUBLIC_PROVEN),
+        assertTrue(clientChannelsPage.isStatusTestedInfoChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
                 "Отсутствует статус Проверенный в разделе информация о канале");
     }
 
@@ -137,14 +137,14 @@ public class Test_B_PublicChannel extends chat.ros.testing2.server.administratio
     void test_Search_Public_Proven_Channel_7013(){
         assertTrue(
                 clientChannelsPage.searchChannel(
-                        CLIENT_NAME_CHANNEL_PUBLIC_PROVEN,
+                        CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN,
                         CLIENT_TYPE_CHANNEL_PUBLIC),
                 "Канал не найден");
-        assertTrue(clientChannelsPage.isStatusTestedChannelListChat(CLIENT_NAME_CHANNEL_PUBLIC_PROVEN),
+        assertTrue(clientChannelsPage.isStatusTestedChannelListChat(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
                 "Отсутствует статус Проверенный у канала в разделе Беседы");
-        assertTrue(clientChannelsPage.isStatusTestedChannelMainHeader(CLIENT_NAME_CHANNEL_PUBLIC_PROVEN),
+        assertTrue(clientChannelsPage.isStatusTestedChannelMainHeader(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
                 "Отсутствует статус Проверенный в заголовке канала");
-        assertTrue(clientChannelsPage.isStatusTestedInfoChannel(CLIENT_NAME_CHANNEL_PUBLIC_PROVEN),
+        assertTrue(clientChannelsPage.isStatusTestedInfoChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
                 "Отсутствует статус Проверенный в разделе информация о канале");
     }
 }

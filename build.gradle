@@ -85,29 +85,6 @@ allure {
     }
 }
 
-/*task chats(type: Test){
-    useJUnitPlatform()
-    filter{
-        includeTestsMatching "Test_A_ChatsPage"
-    }
-
-    testLogging {
-        events "passed", "skipped", "failed"
-    }
-}
-
-task channels(type: Test){
-    useJUnitPlatform()
-    filter{
-        includeTestsMatching "Test_B*"
-    }
-    testLogging {
-        events "passed", "skipped", "failed"
-    }
-}
-
-channels.mustRunAfter chats
-*/
 test{
     useJUnitPlatform()
 

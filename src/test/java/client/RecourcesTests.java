@@ -3,7 +3,6 @@ package client;
 import chat.ros.testing2.helpers.SSHManager;
 import chat.ros.testing2.server.LoginPage;
 import chat.ros.testing2.server.contacts.ContactsPage;
-import client.still.ProfilePage;
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.WebDriverRunner;
 import org.junit.jupiter.api.extension.BeforeAllCallback;

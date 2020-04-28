@@ -88,7 +88,7 @@ allure {
 task chats(type: Test){
     useJUnitPlatform()
     filter{
-        includeTestsMatching "**.TestChatsPage"
+        includeTestsMatching "**/*TestChatsPage"
     }
     testLogging {
         events "passed", "skipped", "failed"
@@ -98,9 +98,9 @@ task chats(type: Test){
 task channels(type: Test){
     useJUnitPlatform()
     filter{
-        includeTestsMatching "**.TestClosedChannel"
-        includeTestsMatching "**.TestProvenPublicChannel"
-        includeTestsMatching "**.TestPublicChannel"
+        includeTestsMatching "**/*TestClosedChannel"
+        includeTestsMatching "**/*TestProvenPublicChannel"
+        includeTestsMatching "**/*TestPublicChannel"
     }
     testLogging {
         events "passed", "skipped", "failed"
@@ -108,15 +108,3 @@ task channels(type: Test){
 }
 
 channels.mustRunAfter chats
-
-/*test {
-
-    useJUnitPlatform()
-
-    chats.mustRunAfter(channels)
-
-    // Show test results.
-    testLogging {
-        events "passed", "skipped", "failed"
-    }
-}*/

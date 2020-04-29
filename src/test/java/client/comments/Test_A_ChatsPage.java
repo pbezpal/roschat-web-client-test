@@ -53,11 +53,13 @@ public class Test_A_ChatsPage implements CommentsPage {
                         60
                 );
                 apiToServer.disconnect();
+                System.out.println("Поток завершился");
             }
         };
 
         apiSendMessage.start();
         clientGetMessage.run();
+
     }
 
     @Story(value = "Проверка отправки сообщения")

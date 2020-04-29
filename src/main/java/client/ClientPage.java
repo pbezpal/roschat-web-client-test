@@ -1,6 +1,5 @@
 package client;
 
-import client.comments.ChatsPage;
 import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
@@ -47,7 +46,7 @@ public interface ClientPage {
 
     @Step(value = "Нажимаем кнопку 'Ввести логин и пароль'")
     static void clickButtonPencil(){
-        buttonPencil.click();
+        buttonPencil.shouldBe(Condition.visible).click();
     }
 
     @Step(value = "Вводим адрес электронной почты {email}")

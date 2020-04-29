@@ -74,17 +74,14 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback {
 
     @Override
     public void beforeEach(ExtensionContext context){
-        sleep(5000);
-        if(String.valueOf(context.getRequiredTestMethod()).contains("Do_Proven_Channel") ||
-                String.valueOf(context.getRequiredTestMethod()).contains("test_Show_Closed_Channel_In_MS")){
-            openMS("/admin/channels");
-        }
-        else if (String.valueOf(context.getRequiredTestMethod()).contains(CONTACT_NUMBER_7012)){
+        sleep(3000);
+        if (String.valueOf(context.getRequiredTestMethod()).contains(CONTACT_NUMBER_7012)){
             openClient(CONTACT_NUMBER_7012 + "@ros.chat", false);
         }
         else if (String.valueOf(context.getRequiredTestMethod()).contains(CONTACT_NUMBER_7013)){
             openClient(CONTACT_NUMBER_7013 + "@ros.chat", false);
         }
+        else openMS("/admin/channels");
     }
 
     private void openMS(String page){

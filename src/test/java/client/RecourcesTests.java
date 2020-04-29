@@ -70,6 +70,7 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback {
 
         addContactAndAccount(CONTACT_NUMBER_7012);
         addContactAndAccount(CONTACT_NUMBER_7013);
+        sleep(5000);
     }
 
     @Override

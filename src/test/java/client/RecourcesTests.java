@@ -24,6 +24,7 @@ import static chat.ros.testing2.data.ContactsData.*;
 import static chat.ros.testing2.data.LoginData.*;
 import static com.codeborne.selenide.Selenide.open;
 import static com.codeborne.selenide.Selenide.sleep;
+import static data.CommentsData.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback {
@@ -32,7 +33,9 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback {
     private String hostServer;
     private String hostClient;
     private String classTest = "";
-    private String sshCommandIsContact = "/var/db/roschat-db/userlist.sh | grep ";
+    private String sshCommandIsContact = "sudo -u roschat psql -c \"select cid, login from users;\" | grep ";
+    private String[] users = {CLIENT_USER_A, CLIENT_USER_B, CLIENT_USER_C, CLIENT_USER_D, CLIENT_USER_E, CLIENT_USER_F,
+    CONTACT_NUMBER_7012, CONTACT_NUMBER_7013};
 
     public RecourcesTests() {
         hostServer = "https://" + HOST_SERVER + ":" + PORT_SERVER;
@@ -68,9 +71,9 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback {
 
         Configuration.screenshots = false;
 
-        addContactAndAccount(CONTACT_NUMBER_7012);
-        addContactAndAccount(CONTACT_NUMBER_7013);
-        sleep(5000);
+        for(int i = 0; i < users.length; i++){
+            addContactAndAccount(users[i]);
+        }
     }
 
     @Override

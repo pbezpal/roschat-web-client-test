@@ -54,7 +54,7 @@ public class ChatsPage implements CommentsPage {
         clickItemComments();
         if(isExistComments(contact, false)){
             clickContextMenu().clickItemContextMenu(CLIENT_ITEM_NEW_CHAT);
-            searchContactForNewChat(contact);
+            searchContactForAction(contact);
             selectFoundContact(contact);
         }else clickChat(contact);
         sendInputMessage(message).clickButtonSendMessage();

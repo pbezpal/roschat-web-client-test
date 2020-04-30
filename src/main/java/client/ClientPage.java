@@ -99,7 +99,9 @@ public interface ClientPage {
     }
 
     @Step(value = "Вводим имя пользователя в поле поиска")
-    default ClientPage searchContactForNewChat(String fio){
+    default ClientPage searchContactForAction(String fio){
+        inputSelectContacts.sendKeys(Keys.CONTROL + "a");
+        inputSelectContacts.sendKeys(Keys.BACK_SPACE);
         inputSelectContacts.sendKeys(fio);
         return this;
     }

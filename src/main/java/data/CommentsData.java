@@ -4,19 +4,19 @@ public interface CommentsData {
 
     /***** Параметры для создания канала на клиенте ******/
     String CLIENT_ITEM_NEW_CHANNEL = "Новый канал";
-
-    /***** Публичный канал ******/
-    String CLIENT_NAME_CHANNEL_PUBLIC = "Публичный тестовый канал";
-    String CLIENT_DESCRIPTION_CHANNEL_PUBLIC = "Описание публичного тестового канала";
-    String CLIENT_NEW_NAME_PUBLIC_CHANNEL = "Новое название публичного тестового канала";
-    String CLIENT_NEW_DESCRIPTION_PUBLIC_CHANNEL = "Новое описание публичного тестового канала";
-    String CLIENT_TYPE_CHANNEL_PUBLIC = "Публичный";
+    String CLIENT_USER_A = "7000";
+    String CLIENT_USER_B = "7001";
+    String CLIENT_USER_C = "7002";
+    String CLIENT_USER_D = "7003";
+    String CLIENT_USER_E = "7004";
+    String CLIENT_USER_F = "7005";
 
     /***** Публичный проверенный канал ******/
     String CLIENT_NAME_CHANNEL_PUBLIC_PROVEN = "Публичный проверенный канал";
     String CLIENT_DESCRIPTION_CHANNEL_PUBLIC_PROVEN = "Описание публичного проверенного канала";
     String CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN = "Новое название публичного проверенного канала";
     String CLIENT_NEW_DESCRIPTION_PUBLIC_CHANNEL_PROVEN = "Новое описание публичного проверенного канала";
+    String CLIENT_TYPE_CHANNEL_PUBLIC = "Публичный";
 
     String CLIENT_NAME_CHANNEL_CLOSED = "Закрытый тестовый канал";
     String CLIENT_DESCRIPTION_CHANNEL_CLOSED = "Описание закрытого тестового канала";
@@ -25,9 +25,17 @@ public interface CommentsData {
     String CLIENT_TYPE_CHANNEL_CLOSED = "Закрытый";
 
     /***** Поделиться ссылкой ******/
-    String CLIENT_SHARE_LINK_CHANNEL = "Поделиться ссылкой";
-    String CLIENT_COPY_LINK_CHANNEL = "Копировать ссылку";
+    String CLIENT_INFO_SHARE_LINK_CHANNEL = "Поделиться ссылкой";
+    String CLIENT_INFO_COPY_LINK_CHANNEL = "Копировать ссылку";
+    String CLIENT_SHARE_LINK_CHANNEL_CONTEXT_MENU = "Поделиться";
     String CLIENT_BUTTON_SHARE_LINK_CHANNEL = "Поделиться";
+
+    /****** Добавление подписчиков ******/
+    String CLIENT_INFO_ITEM_ADMIN_CHANNEL = "Администраторы";
+    String CLIENT_INFO_ITEM_USER_CHANNEL = "Подписчики";
+    String CLIENT_ADD_USER_CHANNEL = "Добавить";
+    String CLIENT_INFO_SUBSCRIBER_CHANNEL = "Подписаться на канал";
+    String CLIENT_INFO_EXIT_CHANNEL = "Выйти из канала";
 
     /***** Параметры для проверки бесед ******/
     String CLIENT_ITEM_NEW_CHAT = "Новая беседа";

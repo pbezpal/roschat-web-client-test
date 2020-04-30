@@ -1,6 +1,7 @@
 package client.comments;
 
 import client.ClientPage;
+import com.codeborne.selenide.CollectionCondition;
 import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
@@ -28,6 +29,12 @@ public class ChannelsPage implements CommentsPage {
     private ElementsCollection selectedChat = $$("div.selected span");
     private ElementsCollection buttonFooter = $$("div.footer button");
     private SelenideElement iCopyLinkChannel = $("i.fal.fa-external-link");
+    private SelenideElement divHeaderInfo = $("div[title='Информация']");
+    private ElementsCollection divContextMenu = $$("div#context-menu li");
+    private SelenideElement iUserPlus = $("i.fa-user-plus");
+    private SelenideElement divAddUserChannel = $("div.btns.info-section");
+    private ElementsCollection listUsersChannel = $$("div.members.info-section div.fio.name");
+    private SelenideElement iFaArrowLeft = $("i.far.fa-arrow-left");
     private String statusTestedChannel = "i.fa-check";
 
     public ChannelsPage(){}
@@ -147,10 +154,28 @@ public class ChannelsPage implements CommentsPage {
         return true;
     }
 
-    @Step(value = "Выбираем действие с каналом {action}")
-    private ChannelsPage actionChannel(String action){
-        spansInfoChannel.findBy(Condition.text(action)).click();
+    @Step(value = "Нажимаем {action} в Информационном разделе канала")
+    public ChannelsPage actionInfoWrapper(String action){
+        spansInfoChannel.findBy(Condition.text(action)).shouldBe(Condition.visible).click();
         return this;
+    }
+
+    @Step(value = "Проверяем, есть ли элемент в Информационном разделе канала")
+    public boolean isActionInfoWrapper(String span, boolean show){
+        if(show) {
+            try {
+                spansInfoChannel.findBy(Condition.text(span)).shouldBe(Condition.visible);
+            } catch (ElementNotFound e) {
+                return false;
+            }
+        } else {
+            try {
+                spansInfoChannel.findBy(Condition.text(span)).shouldBe(Condition.not(Condition.visible));
+            } catch (ElementNotFound e) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Step(value = "Вводим в поле поиска беседу {chat}")
@@ -191,6 +216,26 @@ public class ChannelsPage implements CommentsPage {
         return true;
     }
 
+    @Step(value = "Выбираем элемент контекстного меню {item}")
+    private ChannelsPage selectItemContextMenu(String item){
+        divHeaderInfo.shouldBe(Condition.visible).click();
+        divContextMenu.findBy(Condition.text(item)).shouldBe(Condition.visible).click();
+        return this;
+    }
+
+    @Step(value = "Добавляем подписчиков в канал")
+    private ChannelsPage clickAddUsersChannel(){
+        divAddUserChannel.shouldBe(Condition.visible).click();
+        return this;
+    }
+
+    @Step(value = "Проверяем, что количество подписчиков = {users}")
+    public int isCountUsersChannel(){
+        int count = listUsersChannel.shouldBe(CollectionCondition.sizeNotEqual(0)).size();
+        iFaArrowLeft.shouldBe(Condition.visible).click();
+        return count;
+    }
+
     //Создаём канал
     public ChannelsPage createNewChannel(String name, String description, String item, String type){
         clickItemComments();
@@ -220,7 +265,18 @@ public class ChannelsPage implements CommentsPage {
         clickItemComments();
         clickChat(channel);
         if(isDivInfoWrapper(false)) clickMainHeaderText();
-        actionChannel(CLIENT_SHARE_LINK_CHANNEL).
+        actionInfoWrapper(CLIENT_INFO_SHARE_LINK_CHANNEL).
+                sendInputSearchChat(chat).
+                selectChat(chat).isSelectChat(chat);
+        clickButtonFooter(CLIENT_BUTTON_SHARE_LINK_CHANNEL);
+        return this;
+    }
+
+    //Делимся ссылкой через контекстное меню
+    public ChannelsPage shareLinkChannelContextMenu(String channel, String chat){
+        clickItemComments();
+        clickChat(channel);
+        selectItemContextMenu(CLIENT_SHARE_LINK_CHANNEL_CONTEXT_MENU).
                 sendInputSearchChat(chat).
                 selectChat(chat).isSelectChat(chat);
         clickButtonFooter(CLIENT_BUTTON_SHARE_LINK_CHANNEL);
@@ -233,8 +289,31 @@ public class ChannelsPage implements CommentsPage {
         clickItemComments();
         clickChat(channel);
         if(isDivInfoWrapper(false)) clickMainHeaderText();
-        actionChannel(CLIENT_COPY_LINK_CHANNEL);
+        actionInfoWrapper(CLIENT_INFO_COPY_LINK_CHANNEL);
         chatsPage.sendNewMessage(contact, Keys.CONTROL + "v");
+        return this;
+    }
+
+    //Добавляем подписчиков
+    public ChannelsPage addUsersChannel(String channel, String typeUsers, String[] contacts){
+        clickItemComments();
+        clickChat(channel);
+        if(isDivInfoWrapper(false)) clickMainHeaderText();
+        actionInfoWrapper(typeUsers).clickAddUsersChannel();
+        for(int i = 0; i < contacts.length; i++) {
+            searchContactForAction(contacts[i]);
+            selectFoundContact(contacts[i]);
+        }
+        clickButtonFooter(CLIENT_ADD_USER_CHANNEL);
+        return this;
+    }
+
+    //Подпись на канал
+    public ChannelsPage userSubscriberChannel(String channel){
+        clickItemComments();
+        clickChat(channel);
+        if(isDivInfoWrapper(false)) clickMainHeaderText();
+        actionInfoWrapper(CLIENT_INFO_SUBSCRIBER_CHANNEL);
         return this;
     }
 }

@@ -52,7 +52,6 @@ public class Test_A_ChatsPage implements CommentsPage {
                         CLIENT_CHATS_RECEIVED_MESSAGE,
                         60
                 );
-                apiToServer.disconnect();
                 interrupt();
             }
         };

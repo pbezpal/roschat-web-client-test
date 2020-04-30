@@ -6,10 +6,7 @@ import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.concurrent.CompletableFuture;
@@ -18,8 +15,7 @@ import java.util.concurrent.ExecutionException;
 import static chat.ros.testing2.data.ContactsData.*;
 import static chat.ros.testing2.data.LoginData.HOST_SERVER;
 import static data.CommentsData.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Epic(value = "Каналы")
 @Feature(value = "Публичный проверенный канал")
@@ -56,56 +52,34 @@ public class Test_B_PublicChannel extends chat.ros.testing2.server.administratio
                 CLIENT_NAME_CHANNEL_PUBLIC_PROVEN,
                 CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN,
                 CLIENT_NEW_DESCRIPTION_PUBLIC_CHANNEL_PROVEN);
-        assertTrue(isExistComments(
-                CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN, true),
-                "Новое название не найдено в списке бесед");
-        assertEquals(
-                clientChannelsPage.getNameMainHeaderChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
-                CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN,
-                "Новое название канала не найдено в заголовке канала");
-        assertEquals(
-                clientChannelsPage.getDescriptionMainHeaderChannel(CLIENT_NEW_DESCRIPTION_PUBLIC_CHANNEL_PROVEN),
-                CLIENT_NEW_DESCRIPTION_PUBLIC_CHANNEL_PROVEN,
-                "Новое описание канала не найдено в заголовке канала");
-        assertEquals(
-                clientChannelsPage.getTitleName(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
-                CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN,
-                "Новое название канала не найдено в разделе информация о канале");
-        assertEquals(
-                clientChannelsPage.getDescriptionChannel(),
-                CLIENT_NEW_DESCRIPTION_PUBLIC_CHANNEL_PROVEN,
-                "Новое описание канала не найдено в разделе информация о канале");
-    }
+        assertAll("Проверяем новое название и описание канала",
+                () -> assertTrue(isExistComments(
+                        CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN, true),
+                        "Новое название не найдено в списке бесед"),
+                () -> assertEquals(
+                        clientChannelsPage.getNameMainHeaderChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
+                        CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN,
+                        "Новое название канала не найдено в заголовке канала"),
+                () -> assertEquals(
+                        clientChannelsPage.getDescriptionMainHeaderChannel(CLIENT_NEW_DESCRIPTION_PUBLIC_CHANNEL_PROVEN),
+                        CLIENT_NEW_DESCRIPTION_PUBLIC_CHANNEL_PROVEN,
+                        "Новое описание канала не найдено в заголовке канала"),
+                () -> assertEquals(
+                        clientChannelsPage.getTitleName(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
+                        CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN,
+                        "Новое название канала не найдено в разделе информация о канале"),
+                () -> assertEquals(
+                        clientChannelsPage.getDescriptionChannel(),
+                        CLIENT_NEW_DESCRIPTION_PUBLIC_CHANNEL_PROVEN,
+                        "Новое описание канала не найдено в разделе информация о канале")
+        );
 
-    @Story(value = "Делимся ссылкой на канал")
-    @Description(value = "Авторизуемся на клиенте под учётной записью 7012, переходим в раздел информации о канале" +
-            " и нажимаем 'Поделиться ссылкой'. Проверяем, что ссылка дошла до адресата.")
-    @Order(3)
-    @Test
-    void test_Share_Link_Public_Channel_7012() throws ExecutionException, InterruptedException {
-        String[] apiGetMessageResult;
-
-        Runnable clientShareLinkChannel = () -> {
-            clientChannelsPage.shareLinkChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN, CONTACT_NUMBER_7013);
-        };
-
-        CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
-            String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_CHATS_SEND_EVENT,60);
-            return getMessageResult;
-        });
-
-        clientShareLinkChannel.run();
-        apiGetMessageResult = socketGetMessage.get();
-        assertEquals(apiGetMessageResult[0], IDForReceivingMessageUser, "Сообщение пришло " +
-                "не от пользователя " + CONTACT_NUMBER_7012);
-        assertTrue(apiGetMessageResult[1].contains(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
-                "Ссылка на канал " + CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN + " не пришла");
     }
 
     @Story(value = "Копируем и делимся ссылкой на канал")
     @Description(value = "Авторизуемся на клиенте под учётной записью 7012, переходим в раздел информации о канале," +
             "нажимаем 'Копировать ссылку' и делимся ссылкой. Проверяем, что ссылка дошла до адресата.")
-    @Order(4)
+    @Order(3)
     @Test
     void test_Copy_And_Paste_Link_Public_Channel_7012() throws ExecutionException, InterruptedException {
         String[] apiGetMessageResult;
@@ -121,10 +95,39 @@ public class Test_B_PublicChannel extends chat.ros.testing2.server.administratio
 
         clientShareLinkChannel.run();
         apiGetMessageResult = socketGetMessage.get();
-        assertEquals(apiGetMessageResult[0], IDForReceivingMessageUser, "Сообщение пришло " +
-                "не от пользователя " + CONTACT_NUMBER_7012);
-        assertTrue(apiGetMessageResult[1].contains(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
-                "Ссылка на канал " + CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN + " не пришла");
+        assertAll("Проверяем пришла ли ссылка на канал и от какого пользователя",
+                () -> assertEquals(apiGetMessageResult[0], IDForReceivingMessageUser, "Сообщение пришло " +
+                        "не от пользователя " + CONTACT_NUMBER_7012),
+                () -> assertTrue(apiGetMessageResult[1].contains(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
+                        "Ссылка на канал " + CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN + " не пришла")
+        );
+    }
+
+    @Story(value = "Делимся ссылкой на канал")
+    @Description(value = "Авторизуемся на клиенте под учётной записью 7012, переходим в раздел информации о канале" +
+            " и нажимаем 'Поделиться ссылкой'. Проверяем, что ссылка дошла до адресата.")
+    @Order(4)
+    @Test
+    void test_Share_Link_Public_Channel_7012() throws ExecutionException, InterruptedException {
+        String[] apiGetMessageResult;
+
+        Runnable clientShareLinkChannel = () -> {
+            clientChannelsPage.shareLinkChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN, CONTACT_NUMBER_7013);
+        };
+
+        CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
+            String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_CHATS_SEND_EVENT,60);
+            return getMessageResult;
+        });
+
+        clientShareLinkChannel.run();
+        apiGetMessageResult = socketGetMessage.get();
+        assertAll("Проверяем пришла ли ссылка на канал и от какого пользователя",
+                () -> assertEquals(apiGetMessageResult[0], IDForReceivingMessageUser, "Сообщение пришло " +
+                        "не от пользователя " + CONTACT_NUMBER_7012),
+                () -> assertTrue(apiGetMessageResult[1].contains(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
+                        "Ссылка на канал " + CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN + " не пришла")
+        );
     }
 
     @Story(value = "Делаем проверенным публичный канал")
@@ -142,12 +145,14 @@ public class Test_B_PublicChannel extends chat.ros.testing2.server.administratio
     @Test
     void test_Check_Status_Public_Channel_7012(){
         clientChannelsPage.clickItemComments();
-        assertTrue(clientChannelsPage.isStatusTestedChannelListChat(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
-                "Отсутствует статус Проверенный у канала в разделе Беседы");
-        assertTrue(clientChannelsPage.isStatusTestedChannelMainHeader(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
-                "Отсутствует статус Проверенный в заголовке канала");
-        assertTrue(clientChannelsPage.isStatusTestedInfoChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
-                "Отсутствует статус Проверенный в разделе информация о канале");
+        assertAll("Проверяем статус канала - проверенный",
+                () -> assertTrue(clientChannelsPage.isStatusTestedChannelListChat(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
+                        "Отсутствует статус Проверенный у канала в разделе Беседы"),
+                () -> assertTrue(clientChannelsPage.isStatusTestedChannelMainHeader(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
+                        "Отсутствует статус Проверенный в заголовке канала"),
+                () -> assertTrue(clientChannelsPage.isStatusTestedInfoChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
+                        "Отсутствует статус Проверенный в разделе информация о канале")
+        );
     }
 
     @Story(value = "Ищем на клиенте 7013 публичный канал")
@@ -161,11 +166,18 @@ public class Test_B_PublicChannel extends chat.ros.testing2.server.administratio
                         CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN,
                         CLIENT_TYPE_CHANNEL_PUBLIC),
                 "Канал не найден");
-        assertTrue(clientChannelsPage.isStatusTestedChannelListChat(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
-                "Отсутствует статус Проверенный у канала в разделе Беседы");
-        assertTrue(clientChannelsPage.isStatusTestedChannelMainHeader(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
-                "Отсутствует статус Проверенный в заголовке канала");
-        assertTrue(clientChannelsPage.isStatusTestedInfoChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
-                "Отсутствует статус Проверенный в разделе информация о канале");
+        assertAll("Проверяем статус канала - проверенный",
+                () -> assertTrue(clientChannelsPage.isStatusTestedChannelListChat(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
+                        "Отсутствует статус Проверенный у канала в разделе Беседы"),
+                () -> assertTrue(clientChannelsPage.isStatusTestedChannelMainHeader(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
+                        "Отсутствует статус Проверенный в заголовке канала"),
+                () -> assertTrue(clientChannelsPage.isStatusTestedInfoChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
+                        "Отсутствует статус Проверенный в разделе информация о канале")
+        );
+    }
+
+    @AfterAll
+    static void afterAllTests(){
+        apiToServer.disconnect();
     }
 }

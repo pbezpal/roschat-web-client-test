@@ -2,6 +2,7 @@ package client.comments;
 
 import client.APIToServer;
 import client.RecourcesTests;
+import client.WatcherTests;
 import com.codeborne.selenide.Selenide;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
@@ -26,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Feature(value = "Беседа")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ExtendWith(RecourcesTests.class)
+@ExtendWith(WatcherTests.class)
 public class Test_A_ChatsPage implements CommentsPage {
 
     private static APIToServer apiToServer = new APIToServer("https://" + HOST_SERVER + ":8080", CONTACT_NUMBER_7013 + "@ros.chat", USER_ACCOUNT_PASSWORD);;

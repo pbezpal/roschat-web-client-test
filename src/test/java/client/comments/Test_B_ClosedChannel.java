@@ -2,6 +2,7 @@ package client.comments;
 
 import client.APIToServer;
 import client.RecourcesTests;
+import client.WatcherTests;
 import io.qameta.allure.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Feature(value = "Закрытый канал")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ExtendWith(RecourcesTests.class)
+@ExtendWith(WatcherTests.class)
 public class Test_B_ClosedChannel extends chat.ros.testing2.server.administration.ChannelsPage implements CommentsPage{
 
     private static APIToServer apiToServer = new APIToServer("https://" + HOST_SERVER + ":8080", CONTACT_NUMBER_7013 + "@ros.chat", USER_ACCOUNT_PASSWORD);;

@@ -26,6 +26,8 @@ public class Test_B_PublicChannel extends chat.ros.testing2.server.administratio
     private static APIToServer apiToServer = new APIToServer("https://" + HOST_SERVER + ":8080", CONTACT_NUMBER_7013 + "@ros.chat", USER_ACCOUNT_PASSWORD);;
     private static String IDForReceivingMessageUser = apiToServer.getContactIDBySurnameFromListOfContacts(CONTACT_NUMBER_7012, 60);
     private ChannelsPage clientChannelsPage = new ChannelsPage();
+    private String[] admins = {CLIENT_USER_A, CLIENT_USER_B, CLIENT_USER_C};
+    private String[] subscribers = {CLIENT_USER_D, CLIENT_USER_E, CLIENT_USER_F, CONTACT_NUMBER_7013};
 
     @Story(value = "Создаём новый публичный канал")
     @Description(value = "Авторизуемся под пользователем 7012 и создаём новый публичный канал")
@@ -173,6 +175,51 @@ public class Test_B_PublicChannel extends chat.ros.testing2.server.administratio
                         "Отсутствует статус Проверенный в заголовке канала"),
                 () -> assertTrue(clientChannelsPage.isStatusTestedInfoChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
                         "Отсутствует статус Проверенный в разделе информация о канале")
+        );
+    }
+
+    @Story(value = "Добавляем администраторов и подписчиков")
+    @Description(value = "Авторизуемся на клиенте под учётной записью 7012, переходим в раздел информации о канале," +
+            "нажимаем 'Администраторы' и добавляем администраторов в канал. Проверяем, что администарторы добавились." +
+            " Затем нажимаем 'Подписчики' и добавляем подписчиков в канал. Проверяем, что подписчики добавились.")
+    @Order(8)
+    @Test
+    void test_Add_User_Public_Proven_Channel_7012() {
+        assertAll("Проверяем, что добавляются администраторы и подписчики",
+                () -> assertTrue(clientChannelsPage.
+                                addUsersChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN,
+                                        CLIENT_INFO_ITEM_ADMIN_CHANNEL,
+                                        admins).
+                                isCountUsersChannel() == admins.length + 1,
+                        "Количество добавленных администраторов меньше " + admins.length),
+                () -> assertTrue(clientChannelsPage.
+                                addUsersChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN,
+                                        CLIENT_INFO_ITEM_USER_CHANNEL,
+                                        subscribers).
+                                isCountUsersChannel() == subscribers.length,
+                        "Количество добавленных подписчиков меньше " + subscribers.length)
+        );
+    }
+
+    @Story(value = "Пользователь подписывается на канал")
+    @Description(value = "Авторизуемся на клиенте под учётной записью 7013, переходим в раздел информации о канале," +
+            "нажимаем 'Подписаться на канал'. Проверяем, что пользователь подписался на канал. Проверяем сколько" +
+            "администраторов и подписчиков в канале отображается у подписчика")
+    @Order(9)
+    @Test
+    void test_Subscriber_Public_Proven_Channel_7013() {
+        assertAll("Подписываемся на канал и проверяем сколько администраторов и подписчиков" +
+                        " отображается у подписчика",
+                () -> assertTrue(clientChannelsPage.
+                                userSubscriberChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN).
+                                isActionInfoWrapper(CLIENT_INFO_EXIT_CHANNEL, true),
+                        "Пользователь не подписался на закрытый канал"),
+                () -> assertTrue(clientChannelsPage.actionInfoWrapper(CLIENT_INFO_ITEM_ADMIN_CHANNEL).
+                                isCountUsersChannel() == admins.length + 1,
+                        "Количество администраторов у пользователя отображается меньше " + admins.length + 1),
+                () -> assertTrue(clientChannelsPage.actionInfoWrapper(CLIENT_INFO_ITEM_USER_CHANNEL).
+                                isCountUsersChannel() == subscribers.length,
+                        "Количество подписчиков у пользователя отображается меньше " + subscribers.length)
         );
     }
 

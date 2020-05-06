@@ -147,13 +147,14 @@ public class Test_B_ClosedChannel extends chat.ros.testing2.server.administratio
         );
     }
 
-    @Story(value = "Добавляем подписчиков")
+    @Story(value = "Добавляем администраторов и подписчиков")
     @Description(value = "Авторизуемся на клиенте под учётной записью 7012, переходим в раздел информации о канале," +
-            "нажимаем 'Подписчики' и добавляем подписчиков в канал. Проверяем, что подписчики добавились.")
+            "нажимаем 'Администраторы' и добавляем администраторов в канал. Проверяем, что администарторы добавились." +
+            " Затем нажимаем 'Подписчики' и добавляем подписчиков в канал. Проверяем, что подписчики добавились.")
     @Order(7)
     @Test
     void test_Add_User_Closed_Channel_7012() {
-        assertAll("",
+        assertAll("Проверяем, что добавляются администраторы и подписчики",
                 () -> assertTrue(clientChannelsPage.
                             addUsersChannel(CLIENT_NEW_NAME_CHANNEL_CLOSED, CLIENT_INFO_ITEM_ADMIN_CHANNEL, admins).
                             isCountUsersChannel() == admins.length + 1,
@@ -167,7 +168,8 @@ public class Test_B_ClosedChannel extends chat.ros.testing2.server.administratio
 
     @Story(value = "Пользователь подписывается на канал")
     @Description(value = "Авторизуемся на клиенте под учётной записью 7013, переходим в раздел информации о канале," +
-            "нажимаем 'Подписаться на канал'. Проверяем, что пользователь подписался на канал.")
+            "нажимаем 'Подписаться на канал'. Проверяем, что пользователь подписался на канал. Проверяем сколько" +
+            "администраторов и подписчиков в канале отображается у подписчика")
     @Order(8)
     @Test
     void test_Subscriber_Closed_Channel_7013() {

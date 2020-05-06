@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -54,9 +55,14 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback {
         capabilities.setCapability("enableVideo", false);
         capabilities.setCapability("acceptInsecureCerts", true);
 
+
         LoggingPreferences logPrefs = new LoggingPreferences();
         logPrefs.enable(LogType.PERFORMANCE, Level.ALL);
         capabilities.setCapability("goog:loggingPrefs", logPrefs);
+
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--disable-notifications");
+        capabilities.setCapability(ChromeOptions.CAPABILITY, options);
 
         WebDriver driver = null;
         try {

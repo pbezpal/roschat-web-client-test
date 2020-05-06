@@ -33,7 +33,7 @@ pipeline{
             steps{
                 script{
                     try{
-                        sh './gradlew clean test --info'
+                        sh './gradlew clean test'
                     }catch(err){
                         STATUS="Провал";
                     }

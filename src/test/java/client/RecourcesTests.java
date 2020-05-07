@@ -5,6 +5,7 @@ import chat.ros.testing2.server.LoginPage;
 import chat.ros.testing2.server.contacts.ContactsPage;
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.WebDriverRunner;
+import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -34,6 +35,7 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback {
     private String hostServer;
     private String hostClient;
     private String classTest = "";
+    private WebDriver driver = null;
     private String sshCommandIsContact = "sudo -u roschat psql -c \"select cid, login from users;\" | grep ";
     private String[] users = {CLIENT_USER_A, CLIENT_USER_B, CLIENT_USER_C, CLIENT_USER_D, CLIENT_USER_E, CLIENT_USER_F,
     CONTACT_NUMBER_7012, CONTACT_NUMBER_7013};
@@ -64,7 +66,6 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback {
         options.addArguments("--disable-notifications");
         capabilities.setCapability(ChromeOptions.CAPABILITY, options);
 
-        WebDriver driver = null;
         try {
             driver = WebDriverPool.DEFAULT.getDriver(URI.create("http://" + HOST_HUB + ":4444/wd/hub").toURL(), capabilities);
         } catch (MalformedURLException e) {
@@ -84,7 +85,7 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback {
 
     @Override
     public void beforeEach(ExtensionContext context){
-        sleep(3000);
+        sleep(5000);
         if (String.valueOf(context.getRequiredTestMethod()).contains(CONTACT_NUMBER_7012)){
             openClient(CONTACT_NUMBER_7012 + "@ros.chat", false);
         }

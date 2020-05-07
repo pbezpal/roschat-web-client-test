@@ -1,7 +1,6 @@
 package client.comments;
 
 import client.APIToServer;
-import client.ApiToServerGetMessage;
 import client.RecourcesTests;
 import client.WatcherTests;
 import io.qameta.allure.*;
@@ -12,6 +11,7 @@ import java.util.concurrent.*;
 
 import static chat.ros.testing2.data.ContactsData.*;
 import static chat.ros.testing2.data.LoginData.HOST_SERVER;
+import static com.codeborne.selenide.Selenide.sleep;
 import static data.CommentsData.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,11 +20,12 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ExtendWith(RecourcesTests.class)
 @ExtendWith(WatcherTests.class)
-public class Test_B_ClosedChannel extends chat.ros.testing2.server.administration.ChannelsPage implements CommentsPage{
+public class TestClosedChannel extends chat.ros.testing2.server.administration.ChannelsPage implements CommentsPage{
 
-    private ApiToServerGetMessage apiToServerGetMessage;
-    private String apiHost = "https://" + HOST_SERVER + ":8080";
-    private String apiUser = CONTACT_NUMBER_7013 + "@ros.chat";
+    private static String apiHost = "https://" + HOST_SERVER + ":8080";
+    private static String apiUser = CONTACT_NUMBER_7013 + "@ros.chat";
+    private static APIToServer apiToServer = new APIToServer(apiHost, apiUser, USER_ACCOUNT_PASSWORD);;
+    private static String IDForReceivingMessageUser = apiToServer.getContactIDBySurnameFromListOfContacts(CONTACT_NUMBER_7012, 60);
     private ChannelsPage clientChannelsPage = new ChannelsPage();
     private String[] admins = {CLIENT_USER_A, CLIENT_USER_B, CLIENT_USER_C};
     private String[] subscribers = {CLIENT_USER_D, CLIENT_USER_E, CLIENT_USER_F, CONTACT_NUMBER_7013};
@@ -102,17 +103,28 @@ public class Test_B_ClosedChannel extends chat.ros.testing2.server.administratio
             "нажимаем 'Копировать ссылку' и делимся ссылкой. Проверяем, что ссылка дошла до адресата.")
     @Order(5)
     @Test
-    void test_Copy_And_Paste_Link_Closed_Channel_7012() {
-        apiToServerGetMessage = new ApiToServerGetMessage(
-                apiHost,
-                apiUser,
-                CONTACT_NUMBER_7012,
-                USER_ACCOUNT_PASSWORD,
-                CLIENT_CHATS_SEND_EVENT,
-                CLIENT_NEW_NAME_CHANNEL_CLOSED
+    void test_Copy_And_Paste_Link_Closed_Channel_7012() throws ExecutionException, InterruptedException {
+        String[] apiGetMessageResult;
+
+        Runnable clientShareLinkChannel = () -> {
+            clientChannelsPage.copyLinkChannel(CLIENT_NEW_NAME_CHANNEL_CLOSED, CONTACT_NUMBER_7013);
+        };
+
+        CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
+            String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_CHATS_SEND_EVENT,60);
+            return getMessageResult;
+        });
+
+        clientShareLinkChannel.run();
+        apiGetMessageResult = socketGetMessage.get();
+        assertAll("Проверяем, совпадает ли ID и сообщение с ссылкой на канал",
+                () -> assertEquals(apiGetMessageResult[0], IDForReceivingMessageUser, "Сообщение пришло " +
+                        "не от пользователя " + CONTACT_NUMBER_7012),
+                () -> assertTrue(apiGetMessageResult[1].contains(CLIENT_NEW_NAME_CHANNEL_CLOSED),
+                        "Ссылка на канал " + CLIENT_NEW_NAME_CHANNEL_CLOSED + " не пришла")
         );
-        apiToServerGetMessage.start();
-        clientChannelsPage.copyLinkChannel(CLIENT_NEW_NAME_CHANNEL_CLOSED, CONTACT_NUMBER_7013);
+
+        //sleep(60000);
     }
 
     @Story(value = "Делимся ссылкой на канал")
@@ -121,17 +133,27 @@ public class Test_B_ClosedChannel extends chat.ros.testing2.server.administratio
     @Order(6)
     @Test
     void test_Share_Link_Closed_Channel_7012() throws ExecutionException, InterruptedException {
-        apiToServerGetMessage = new ApiToServerGetMessage(
-                apiHost,
-                apiUser,
-                CONTACT_NUMBER_7012,
-                USER_ACCOUNT_PASSWORD,
-                CLIENT_CHATS_SEND_EVENT,
-                CLIENT_NEW_NAME_CHANNEL_CLOSED
-        );
-        apiToServerGetMessage.start();
+        String[] apiGetMessageResult;
 
-        clientChannelsPage.shareLinkChannel(CLIENT_NEW_NAME_CHANNEL_CLOSED, CONTACT_NUMBER_7013);
+        Runnable clientShareLinkChannel = () -> {
+            clientChannelsPage.shareLinkChannel(CLIENT_NEW_NAME_CHANNEL_CLOSED, CONTACT_NUMBER_7013);
+        };
+
+        CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
+            String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_CHATS_SEND_EVENT,60);
+            return getMessageResult;
+        });
+
+        clientShareLinkChannel.run();
+        apiGetMessageResult = socketGetMessage.get();
+        assertAll("Проверяем, совпадает ли ID и сообщение с ссылкой на канал",
+                () -> assertEquals(apiGetMessageResult[0], IDForReceivingMessageUser, "Сообщение пришло " +
+                        "не от пользователя " + CONTACT_NUMBER_7012),
+                () -> assertTrue(apiGetMessageResult[1].contains(CLIENT_NEW_NAME_CHANNEL_CLOSED),
+                        "Ссылка на канал " + CLIENT_NEW_NAME_CHANNEL_CLOSED + " не пришла")
+        );
+
+        //sleep(60000);
     }
 
     @Story(value = "Добавляем администраторов и подписчиков")
@@ -173,5 +195,10 @@ public class Test_B_ClosedChannel extends chat.ros.testing2.server.administratio
                         isCountUsersChannel() == subscribers.length,
                         "Количество подписчиков у пользователя отображается меньше " + subscribers.length)
         );
+    }
+
+    @AfterAll
+    static void tearDown(){
+        apiToServer.disconnect();
     }
 }

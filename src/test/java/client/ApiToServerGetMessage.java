@@ -28,6 +28,7 @@ public class ApiToServerGetMessage extends Thread  {
                 () -> assertTrue(getMessage[1].contains(this.message), "Текст сообщения не совпадает с тем," +
                 "которое отправил пользователь " + this.clientUser)
         );
+        interrupt();
     }
 
 }

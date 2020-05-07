@@ -1,6 +1,7 @@
 package client.comments;
 
 import client.APIToServer;
+import client.ApiToServerGetMessage;
 import client.RecourcesTests;
 import client.WatcherTests;
 import io.qameta.allure.Description;
@@ -25,8 +26,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(WatcherTests.class)
 public class Test_B_PublicChannel extends chat.ros.testing2.server.administration.ChannelsPage implements CommentsPage{
 
-    private static APIToServer apiToServer = new APIToServer("https://" + HOST_SERVER + ":8080", CONTACT_NUMBER_7013 + "@ros.chat", USER_ACCOUNT_PASSWORD);;
-    private static String IDForReceivingMessageUser = apiToServer.getContactIDBySurnameFromListOfContacts(CONTACT_NUMBER_7012, 60);
+    private ApiToServerGetMessage apiToServerGetMessage;
+    private String apiHost = "https://" + HOST_SERVER + ":8080";
+    private String apiUser = CONTACT_NUMBER_7013 + "@ros.chat";
     private ChannelsPage clientChannelsPage = new ChannelsPage();
     private String[] admins = {CLIENT_USER_A, CLIENT_USER_B, CLIENT_USER_C};
     private String[] subscribers = {CLIENT_USER_D, CLIENT_USER_E, CLIENT_USER_F, CONTACT_NUMBER_7013};
@@ -86,25 +88,16 @@ public class Test_B_PublicChannel extends chat.ros.testing2.server.administratio
     @Order(3)
     @Test
     void test_Copy_And_Paste_Link_Public_Channel_7012() throws ExecutionException, InterruptedException {
-        String[] apiGetMessageResult;
-
-        Runnable clientShareLinkChannel = () -> {
-            clientChannelsPage.copyLinkChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN, CONTACT_NUMBER_7013);
-        };
-
-        CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
-            String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_CHATS_SEND_EVENT,60);
-            return getMessageResult;
-        });
-
-        clientShareLinkChannel.run();
-        apiGetMessageResult = socketGetMessage.get();
-        assertAll("Проверяем пришла ли ссылка на канал и от какого пользователя",
-                () -> assertEquals(apiGetMessageResult[0], IDForReceivingMessageUser, "Сообщение пришло " +
-                        "не от пользователя " + CONTACT_NUMBER_7012),
-                () -> assertTrue(apiGetMessageResult[1].contains(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
-                        "Ссылка на канал " + CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN + " не пришла")
+        apiToServerGetMessage = new ApiToServerGetMessage(
+                apiHost,
+                apiUser,
+                CONTACT_NUMBER_7012,
+                USER_ACCOUNT_PASSWORD,
+                CLIENT_CHATS_SEND_EVENT,
+                CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN
         );
+        apiToServerGetMessage.start();
+        clientChannelsPage.copyLinkChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN, CONTACT_NUMBER_7013);
     }
 
     @Story(value = "Делимся ссылкой на канал")
@@ -113,25 +106,16 @@ public class Test_B_PublicChannel extends chat.ros.testing2.server.administratio
     @Order(4)
     @Test
     void test_Share_Link_Public_Channel_7012() throws ExecutionException, InterruptedException {
-        String[] apiGetMessageResult;
-
-        Runnable clientShareLinkChannel = () -> {
-            clientChannelsPage.shareLinkChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN, CONTACT_NUMBER_7013);
-        };
-
-        CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
-            String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_CHATS_SEND_EVENT,60);
-            return getMessageResult;
-        });
-
-        clientShareLinkChannel.run();
-        apiGetMessageResult = socketGetMessage.get();
-        assertAll("Проверяем пришла ли ссылка на канал и от какого пользователя",
-                () -> assertEquals(apiGetMessageResult[0], IDForReceivingMessageUser, "Сообщение пришло " +
-                        "не от пользователя " + CONTACT_NUMBER_7012),
-                () -> assertTrue(apiGetMessageResult[1].contains(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
-                        "Ссылка на канал " + CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN + " не пришла")
+        apiToServerGetMessage = new ApiToServerGetMessage(
+                apiHost,
+                apiUser,
+                CONTACT_NUMBER_7012,
+                USER_ACCOUNT_PASSWORD,
+                CLIENT_CHATS_SEND_EVENT,
+                CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN
         );
+        apiToServerGetMessage.start();
+        clientChannelsPage.shareLinkChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN, CONTACT_NUMBER_7013);
     }
 
     @Story(value = "Делаем проверенным публичный канал")
@@ -223,10 +207,5 @@ public class Test_B_PublicChannel extends chat.ros.testing2.server.administratio
                                 isCountUsersChannel() == subscribers.length,
                         "Количество подписчиков у пользователя отображается меньше " + subscribers.length)
         );
-    }
-
-    @AfterAll
-    static void afterAllTests(){
-        apiToServer.disconnect();
     }
 }

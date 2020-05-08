@@ -86,6 +86,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
     @Description(value = "Авторизуемся на клиенте под учётной записью 7012, переходим в раздел информации о канале," +
             "нажимаем 'Копировать ссылку' и делимся ссылкой. Проверяем, что ссылка дошла до адресата.")
     @Order(3)
+    @Disabled
     @Test
     void test_Copy_And_Paste_Link_Public_Channel_7012() throws ExecutionException, InterruptedException {
         String[] apiGetMessageResult;
@@ -115,6 +116,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
     @Description(value = "Авторизуемся на клиенте под учётной записью 7012, переходим в раздел информации о канале" +
             " и нажимаем 'Поделиться ссылкой'. Проверяем, что ссылка дошла до адресата.")
     @Order(4)
+    @Disabled
     @Test
     void test_Share_Link_Public_Channel_7012() throws ExecutionException, InterruptedException {
         String[] apiGetMessageResult;

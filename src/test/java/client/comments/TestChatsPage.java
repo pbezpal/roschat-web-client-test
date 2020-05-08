@@ -36,6 +36,7 @@ public class TestChatsPage implements CommentsPage {
     @Story(value = "Проверка получения сообщения")
     @Description(value = "Авторизуемся под пользователем 7012, пользователь 7013 отправляет сообщение, проверяем, " +
             "появилось ли сообщение у пользователя 7012")
+    @Disabled
     @Test
     void test_Get_New_Message_7012(){
         Runnable clientGetMessage = () -> {
@@ -63,6 +64,7 @@ public class TestChatsPage implements CommentsPage {
     @Story(value = "Проверка отправки сообщения")
     @Description(value = "Авторизуемся под пользователем 7012, пользователь 7013 отправляет сообщение, проверяем, " +
             "появилось ли сообщение у пользователя 7012")
+    @Disabled
     @Test
     void test_Send_New_Message_7012() throws ExecutionException, InterruptedException {
         String[] apiGetMessageResult;

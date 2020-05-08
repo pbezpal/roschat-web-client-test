@@ -91,6 +91,7 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback, Af
     @Override
     public void beforeEach(ExtensionContext context){
         sleep(5000);
+        System.out.println("beforeEach");
         if (String.valueOf(context.getRequiredTestMethod()).contains(CONTACT_NUMBER_7012)){
             openClient(CONTACT_NUMBER_7012 + "@ros.chat", false);
         }

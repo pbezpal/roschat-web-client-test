@@ -203,13 +203,13 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
                                 addUsersChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN,
                                         CLIENT_INFO_ITEM_ADMIN_CHANNEL,
                                         admins).
-                                isCountUsersChannel() == admins.length + 1,
+                                getCountUsersChannel() == admins.length + 1,
                         "Количество добавленных администраторов меньше " + admins.length),
                 () -> assertTrue(clientChannelsPage.
                                 addUsersChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN,
                                         CLIENT_INFO_ITEM_USER_CHANNEL,
                                         subscribers).
-                                isCountUsersChannel() == subscribers.length,
+                                getCountUsersChannel() == subscribers.length,
                         "Количество добавленных подписчиков меньше " + subscribers.length)
         );
     }
@@ -228,10 +228,10 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
                                 isActionInfoWrapper(CLIENT_INFO_EXIT_CHANNEL, true),
                         "Пользователь не подписался на закрытый канал"),
                 () -> assertTrue(clientChannelsPage.actionInfoWrapper(CLIENT_INFO_ITEM_ADMIN_CHANNEL).
-                                isCountUsersChannel() == admins.length + 1,
+                                getCountUsersChannel() == admins.length + 1,
                         "Количество администраторов у пользователя отображается меньше " + admins.length + 1),
                 () -> assertTrue(clientChannelsPage.actionInfoWrapper(CLIENT_INFO_ITEM_USER_CHANNEL).
-                                isCountUsersChannel() == subscribers.length,
+                                getCountUsersChannel() == subscribers.length,
                         "Количество подписчиков у пользователя отображается меньше " + subscribers.length)
         );
     }

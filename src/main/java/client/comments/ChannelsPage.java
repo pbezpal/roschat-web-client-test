@@ -229,8 +229,8 @@ public class ChannelsPage implements CommentsPage {
         return this;
     }
 
-    @Step(value = "Проверяем, что количество подписчиков = {users}")
-    public int isCountUsersChannel(){
+    @Step(value = "Получаем количество подписчиков/администраторов")
+    public int getCountUsersChannel(){
         int count = listUsersChannel.shouldBe(CollectionCondition.sizeNotEqual(0)).size();
         iFaArrowLeft.shouldBe(Condition.visible).click();
         return count;

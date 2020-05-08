@@ -27,8 +27,8 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
 
     private static String apiHost = "https://" + HOST_SERVER + ":8080";
     private static String apiUser = CONTACT_NUMBER_7013 + "@ros.chat";
-    private static APIToServer apiToServer = new APIToServer(apiHost, apiUser, USER_ACCOUNT_PASSWORD);;
-    private static String IDForReceivingMessageUser = apiToServer.getContactIDBySurnameFromListOfContacts(CONTACT_NUMBER_7012, 60);
+    private static APIToServer apiToServer = null;
+    private static String IDForReceivingMessageUser;
     private ChannelsPage clientChannelsPage = new ChannelsPage();
     private String[] admins = {CLIENT_USER_A, CLIENT_USER_B, CLIENT_USER_C};
     private String[] subscribers = {CLIENT_USER_D, CLIENT_USER_E, CLIENT_USER_F, CONTACT_NUMBER_7013};
@@ -86,7 +86,6 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
     @Description(value = "Авторизуемся на клиенте под учётной записью 7012, переходим в раздел информации о канале," +
             "нажимаем 'Копировать ссылку' и делимся ссылкой. Проверяем, что ссылка дошла до адресата.")
     @Order(3)
-    @Disabled
     @Test
     void test_Copy_And_Paste_Link_Public_Channel_7012() throws ExecutionException, InterruptedException {
         String[] apiGetMessageResult;
@@ -96,6 +95,8 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
         };
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
+            apiToServer = getApiToServer(apiToServer);
+            IDForReceivingMessageUser = apiToServer.getContactIDBySurnameFromListOfContacts(CONTACT_NUMBER_7012, 60);
             String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_CHATS_SEND_EVENT,60);
             return getMessageResult;
         });
@@ -116,7 +117,6 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
     @Description(value = "Авторизуемся на клиенте под учётной записью 7012, переходим в раздел информации о канале" +
             " и нажимаем 'Поделиться ссылкой'. Проверяем, что ссылка дошла до адресата.")
     @Order(4)
-    @Disabled
     @Test
     void test_Share_Link_Public_Channel_7012() throws ExecutionException, InterruptedException {
         String[] apiGetMessageResult;
@@ -126,6 +126,8 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
         };
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
+            apiToServer = getApiToServer(apiToServer);
+            IDForReceivingMessageUser = apiToServer.getContactIDBySurnameFromListOfContacts(CONTACT_NUMBER_7012, 60);
             String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_CHATS_SEND_EVENT,60);
             return getMessageResult;
         });
@@ -231,6 +233,12 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
                                 isCountUsersChannel() == subscribers.length,
                         "Количество подписчиков у пользователя отображается меньше " + subscribers.length)
         );
+    }
+
+    private APIToServer getApiToServer(APIToServer apiToServer){
+        if(apiToServer == null){
+            return new APIToServer(apiHost, apiUser, USER_ACCOUNT_PASSWORD);
+        }else return apiToServer;
     }
 
     @AfterAll

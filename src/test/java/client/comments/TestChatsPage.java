@@ -89,7 +89,5 @@ public class TestChatsPage implements CommentsPage {
     @AfterAll
     static void tearDown(){
         apiToServer.disconnect();
-        Selenide.close();
-        WebDriverPool.DEFAULT.dismissAll();
     }
 }

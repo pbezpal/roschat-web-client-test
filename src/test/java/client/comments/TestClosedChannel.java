@@ -202,7 +202,5 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
     @AfterAll
     static void tearDown(){
         apiToServer.disconnect();
-        Selenide.close();
-        WebDriverPool.DEFAULT.dismissAll();
     }
 }

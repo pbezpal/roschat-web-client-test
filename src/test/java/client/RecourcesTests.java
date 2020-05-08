@@ -4,6 +4,7 @@ import chat.ros.testing2.helpers.SSHManager;
 import chat.ros.testing2.server.LoginPage;
 import chat.ros.testing2.server.contacts.ContactsPage;
 import com.codeborne.selenide.Configuration;
+import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.WebDriverRunner;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.extension.AfterAllCallback;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
@@ -30,7 +32,7 @@ import static com.codeborne.selenide.Selenide.sleep;
 import static data.CommentsData.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback {
+public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback, AfterAllCallback {
 
     private LoginPage loginPage = new LoginPage();
     private String hostServer;
@@ -94,6 +96,17 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback {
             openClient(CONTACT_NUMBER_7013 + "@ros.chat", false);
         }
         else openMS("/admin/channels");
+    }
+
+    @Override
+    public void afterAll(ExtensionContext context) {
+        Selenide.close();
+        try{
+            WebDriverPool.DEFAULT.dismissAll();
+        }catch (WebDriverException e){
+            driver = null;
+        }
+        WebDriverRunner.setWebDriver(driver);
     }
 
     private void openMS(String page){

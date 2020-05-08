@@ -74,7 +74,6 @@ public class TestChatsPage implements CommentsPage {
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
             apiToServer = getApiToServer(apiToServer);
-            CIDUser = apiToServer.getContactIDBySurnameFromListOfContacts(CONTACT_NUMBER_7012, 60);
             String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_CHATS_SEND_EVENT,60);
             return getMessageResult;
         });

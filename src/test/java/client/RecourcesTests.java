@@ -32,7 +32,7 @@ import static com.codeborne.selenide.Selenide.sleep;
 import static data.CommentsData.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback, AfterAllCallback {
+public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback{
 
     private LoginPage loginPage = new LoginPage();
     private String hostServer;
@@ -101,7 +101,7 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback, Af
         else openMS("/admin/channels");
     }
 
-    @Override
+    /*@Override
     public void afterAll(ExtensionContext context) {
         Selenide.close();
         try{
@@ -110,7 +110,7 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback, Af
             driver = null;
         }
         WebDriverRunner.setWebDriver(driver);
-    }
+    }*/
 
     private void openMS(String page){
         Configuration.baseUrl = hostServer;

@@ -3,6 +3,7 @@ package client.comments;
 import client.APIToServer;
 import client.RecourcesTests;
 import client.WatcherTests;
+import client.helper.SSHGetCommand;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
@@ -28,7 +29,9 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
     private static String apiHost = "https://" + HOST_SERVER + ":8080";
     private static String apiUser = CONTACT_NUMBER_7013 + "@ros.chat";
     private static APIToServer apiToServer = null;
-    private static String IDForReceivingMessageUser;
+    private static String CIDUser = SSHGetCommand.isCheckQuerySSH(
+            "sudo -u roschat psql -c \"select cid, login from users;\" | grep " + CONTACT_NUMBER_7012 + " | awk '{print $1}'"
+    );;
     private ChannelsPage clientChannelsPage = new ChannelsPage();
     private String[] admins = {CLIENT_USER_A, CLIENT_USER_B, CLIENT_USER_C};
     private String[] subscribers = {CLIENT_USER_D, CLIENT_USER_E, CLIENT_USER_F, CONTACT_NUMBER_7013};
@@ -96,7 +99,6 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
             apiToServer = getApiToServer(apiToServer);
-            IDForReceivingMessageUser = apiToServer.getContactIDBySurnameFromListOfContacts(CONTACT_NUMBER_7012, 60);
             String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_CHATS_SEND_EVENT,60);
             return getMessageResult;
         });
@@ -104,7 +106,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
         clientShareLinkChannel.run();
         apiGetMessageResult = socketGetMessage.get();
         assertAll("Проверяем пришла ли ссылка на канал и от какого пользователя",
-                () -> assertEquals(apiGetMessageResult[0], IDForReceivingMessageUser, "Сообщение пришло " +
+                () -> assertEquals(apiGetMessageResult[0], CIDUser, "Сообщение пришло " +
                         "не от пользователя " + CONTACT_NUMBER_7012),
                 () -> assertTrue(apiGetMessageResult[1].contains(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
                         "Ссылка на канал " + CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN + " не пришла")
@@ -127,7 +129,6 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
             apiToServer = getApiToServer(apiToServer);
-            IDForReceivingMessageUser = apiToServer.getContactIDBySurnameFromListOfContacts(CONTACT_NUMBER_7012, 60);
             String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_CHATS_SEND_EVENT,60);
             return getMessageResult;
         });
@@ -135,7 +136,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
         clientShareLinkChannel.run();
         apiGetMessageResult = socketGetMessage.get();
         assertAll("Проверяем пришла ли ссылка на канал и от какого пользователя",
-                () -> assertEquals(apiGetMessageResult[0], IDForReceivingMessageUser, "Сообщение пришло " +
+                () -> assertEquals(apiGetMessageResult[0], CIDUser, "Сообщение пришло " +
                         "не от пользователя " + CONTACT_NUMBER_7012),
                 () -> assertTrue(apiGetMessageResult[1].contains(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
                         "Ссылка на канал " + CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN + " не пришла")

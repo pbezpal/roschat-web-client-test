@@ -1,8 +1,8 @@
 package client.comments;
 
 import client.*;
+import client.helper.SSHGetCommand;
 import com.codeborne.selenide.Selenide;
-import com.codeborne.selenide.WebDriverRunner;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
@@ -28,7 +28,9 @@ public class TestChatsPage implements CommentsPage {
     private static String apiHost = "https://" + HOST_SERVER + ":8080";
     private static String apiUser = CONTACT_NUMBER_7013 + "@ros.chat";
     private static APIToServer apiToServer = null;
-    private static String IDForReceivingMessageUser;
+    private static String CIDUser = SSHGetCommand.isCheckQuerySSH(
+            "sudo -u roschat psql -c \"select cid, login from users;\" | grep " + CONTACT_NUMBER_7012 + " | awk '{print $1}'"
+    );
     private ChatsPage chatsPage = new ChatsPage();
 
     @Story(value = "Проверка получения сообщения")
@@ -44,11 +46,10 @@ public class TestChatsPage implements CommentsPage {
             @Override
             public void run() {
                 apiToServer = getApiToServer(apiToServer);
-                IDForReceivingMessageUser = apiToServer.getContactIDBySurnameFromListOfContacts(CONTACT_NUMBER_7012, 60);
                 Selenide.sleep(3000);
                 apiToServer.SendTextMessageToUser(
                         "user",
-                        IDForReceivingMessageUser,
+                        CIDUser,
                         "text",
                         CLIENT_CHATS_RECEIVED_MESSAGE,
                         30
@@ -73,7 +74,7 @@ public class TestChatsPage implements CommentsPage {
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
             apiToServer = getApiToServer(apiToServer);
-            IDForReceivingMessageUser = apiToServer.getContactIDBySurnameFromListOfContacts(CONTACT_NUMBER_7012, 60);
+            CIDUser = apiToServer.getContactIDBySurnameFromListOfContacts(CONTACT_NUMBER_7012, 60);
             String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_CHATS_SEND_EVENT,60);
             return getMessageResult;
         });
@@ -81,7 +82,7 @@ public class TestChatsPage implements CommentsPage {
         clientSendMessage.run();
         apiGetMessageResult = socketGetMessage.get();
         assertAll("Проверяем, совпадает ли ID и сообщение с ссылкой на канал",
-                () -> assertEquals(apiGetMessageResult[0], IDForReceivingMessageUser, "Сообщение пришло " +
+                () -> assertEquals(apiGetMessageResult[0], CIDUser, "Сообщение пришло " +
                         "не от пользователя " + CONTACT_NUMBER_7012),
                 () -> assertEquals(apiGetMessageResult[1], CLIENT_CHATS_SEND_MESSAGE, "Текст сообщения не совпадает с тем," +
                         "которое отправил пользователь " + CONTACT_NUMBER_7012)

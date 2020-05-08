@@ -75,6 +75,8 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback, Af
             e.printStackTrace();
         }
 
+        System.out.println(driver);
+
         driver.manage().window().setSize(new Dimension(1920, 1080));
         driver.manage().window().setPosition(new Point(2,2));
         WebDriverRunner.setWebDriver(driver);

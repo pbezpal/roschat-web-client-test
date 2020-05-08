@@ -2,12 +2,14 @@ package client.comments;
 
 import client.*;
 import com.codeborne.selenide.Selenide;
+import com.codeborne.selenide.WebDriverRunner;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import ru.stqa.selenium.factory.WebDriverPool;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -87,6 +89,7 @@ public class TestChatsPage implements CommentsPage {
     @AfterAll
     static void tearDown(){
         apiToServer.disconnect();
-        //sleep(60000);
+        Selenide.close();
+        WebDriverPool.DEFAULT.dismissAll();
     }
 }

@@ -3,12 +3,14 @@ package client.comments;
 import client.APIToServer;
 import client.RecourcesTests;
 import client.WatcherTests;
+import com.codeborne.selenide.Selenide;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import ru.stqa.selenium.factory.WebDriverPool;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -235,5 +237,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
     @AfterAll
     static void tearDown(){
         apiToServer.disconnect();
+        Selenide.close();
+        WebDriverPool.DEFAULT.dismissAll();
     }
 }

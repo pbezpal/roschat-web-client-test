@@ -30,8 +30,9 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
     private static String apiUser = CONTACT_NUMBER_7013 + "@ros.chat";
     private static APIToServer apiToServer = null;
     private static String CIDUser = SSHGetCommand.isCheckQuerySSH(
-            "sudo -u roschat psql -c \"select cid, login from users;\" | grep " + CONTACT_NUMBER_7012 + " | awk '{print $1}'"
-    );;
+            "sudo -u roschat psql -c \"select cid, login from users;\" " +
+                    "| grep " + CONTACT_NUMBER_7012 + " | awk '{print $1}'"
+    );
     private ChannelsPage clientChannelsPage = new ChannelsPage();
     private String[] admins = {CLIENT_USER_A, CLIENT_USER_B, CLIENT_USER_C};
     private String[] subscribers = {CLIENT_USER_D, CLIENT_USER_E, CLIENT_USER_F, CONTACT_NUMBER_7013};
@@ -221,12 +222,17 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
     @Order(9)
     @Test
     void test_Subscriber_Public_Channel_7013() {
-        assertAll("Подписываемся на канал и проверяем сколько администраторов и подписчиков" +
-                        " отображается у подписчика",
+        assertAll("Проверяем, что есть иконка," +
+                        "подписываемся на канал," +
+                        "проверяем сколько администраторов и подписчиков отображается у подписчика",
+                () -> assertTrue(clientChannelsPage.isIconSignOut(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
+                        "Нет иконки Подписаться на канал"),
                 () -> assertTrue(clientChannelsPage.
                                 userSubscriberChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN).
                                 isActionInfoWrapper(CLIENT_INFO_EXIT_CHANNEL, true),
-                        "Пользователь не подписался на закрытый канал"),
+                        "Пользователь не подписался на публичный канал"),
+                () -> assertTrue(clientChannelsPage.isIconSignOut(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
+                        "Нет иконки Выйти из канала"),
                 () -> assertTrue(clientChannelsPage.actionInfoWrapper(CLIENT_INFO_ITEM_ADMIN_CHANNEL).
                                 getCountUsersChannel() == admins.length + 1,
                         "Количество администраторов у пользователя отображается меньше " + admins.length + 1),
@@ -264,8 +270,14 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
                         "не от пользователя " + CONTACT_NUMBER_7012),
                 () -> assertEquals(apiGetMessageResult[1], CLIENT_TITLE_PUBLICATION_CHANNEL,"Текст заголовка " +
                         "публикации не совпадает с эталоном "  + CLIENT_TITLE_PUBLICATION_CHANNEL),
-                () -> assertTrue(clientChannelsPage.isShowPublication(),
-                        CLIENT_TITLE_PUBLICATION_CHANNEL + " не видна у автора")
+                () -> assertEquals(clientChannelsPage.getAuthorPublication("1"),
+                        CONTACT_NUMBER_7012,
+                        "В публикации указан неправильный автор"),
+                () -> assertTrue(clientChannelsPage.isShowTitlePublication("1", CLIENT_TITLE_PUBLICATION_CHANNEL),
+                        "Заголовок публикации не совпадает с " + CLIENT_TITLE_PUBLICATION_CHANNEL),
+                () -> assertTrue(clientChannelsPage.
+                                isShowDescriptionPublication("1", CLIENT_DESCRIPTION_PUBLICATION_PUBLIC_CHANNEL),
+                        "Описание публикации не совпадает с " + CLIENT_DESCRIPTION_PUBLICATION_PUBLIC_CHANNEL)
         );
     }
 
@@ -277,8 +289,16 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
     void test_Check_New_Publication_Public_Channel_7013(){
         clientChannelsPage.clickItemComments();
         clientChannelsPage.clickChat(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN);
-        assertTrue(clientChannelsPage.isShowPublication(),
-                CLIENT_TITLE_PUBLICATION_CHANNEL + " не видна у подписчика");
+        assertAll("Проверяем, отображается ли публикация у подписчика",
+                () -> assertEquals(clientChannelsPage.getAuthorPublication("1"),
+                        CONTACT_NUMBER_7012,
+                        "В публикации указан неправильный автор"),
+                () -> assertTrue(clientChannelsPage.isShowTitlePublication("1", CLIENT_TITLE_PUBLICATION_CHANNEL),
+                        "Заголовок публикации не совпадает с " + CLIENT_TITLE_PUBLICATION_CHANNEL),
+                () -> assertTrue(clientChannelsPage.
+                                isShowDescriptionPublication("1", CLIENT_DESCRIPTION_PUBLICATION_PUBLIC_CHANNEL),
+                        "Описание публикации не совпадает с " + CLIENT_DESCRIPTION_PUBLICATION_PUBLIC_CHANNEL)
+        );
     }
 
     private APIToServer getApiToServer(APIToServer apiToServer){

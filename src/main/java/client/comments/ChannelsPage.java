@@ -5,13 +5,6 @@ import com.codeborne.selenide.*;
 import com.codeborne.selenide.ex.ElementNotFound;
 import io.qameta.allure.Step;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.interactions.Action;
-import org.openqa.selenium.interactions.Actions;
-
-import javax.swing.*;
-
-import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeListener;
 
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
@@ -258,8 +251,9 @@ public class ChannelsPage implements CommentsPage {
 
     @Step(value = "Вводим заголовок публикации {title}")
     private ChannelsPage sendInputTitlePublication(String title){
-        inputTitlePublication.shouldBe(Condition.visible).click();
-        inputTitlePublication.shouldBe(Condition.visible).sendKeys(title);
+        for (Character c: title.toCharArray()) {
+            inputTitlePublication.sendKeys(c.toString());
+        }
         return this;
     }
 

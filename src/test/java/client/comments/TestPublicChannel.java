@@ -99,20 +99,20 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
             apiToServer = getApiToServer(apiToServer);
-            String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_CHATS_SEND_EVENT,60);
+            String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_CHATS_SEND_EVENT, "data",60);
             return getMessageResult;
         });
 
         clientShareLinkChannel.run();
         apiGetMessageResult = socketGetMessage.get();
-        assertAll("Проверяем пришла ли ссылка на канал и от какого пользователя",
+        assertAll("Проверяем, есть ли иконка, совпадает ли ID и сообщение с ссылкой на канал",
+                () -> assertTrue(clientChannelsPage.isIconCopyLinkChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
+                        "Нет иконки 'Копировать ссылку'"),
                 () -> assertEquals(apiGetMessageResult[0], CIDUser, "Сообщение пришло " +
                         "не от пользователя " + CONTACT_NUMBER_7012),
                 () -> assertTrue(apiGetMessageResult[1].contains(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
                         "Ссылка на канал " + CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN + " не пришла")
         );
-
-        //sleep(60000);
     }
 
     @Story(value = "Делимся ссылкой на канал")
@@ -129,20 +129,20 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
             apiToServer = getApiToServer(apiToServer);
-            String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_CHATS_SEND_EVENT,60);
+            String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_CHATS_SEND_EVENT, "data",60);
             return getMessageResult;
         });
 
         clientShareLinkChannel.run();
         apiGetMessageResult = socketGetMessage.get();
         assertAll("Проверяем пришла ли ссылка на канал и от какого пользователя",
+                () -> assertTrue(clientChannelsPage.isIconShareChannel(),
+                        "Нет иконки 'Поделиться каналом'"),
                 () -> assertEquals(apiGetMessageResult[0], CIDUser, "Сообщение пришло " +
                         "не от пользователя " + CONTACT_NUMBER_7012),
                 () -> assertTrue(apiGetMessageResult[1].contains(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
                         "Ссылка на канал " + CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN + " не пришла")
         );
-
-        //sleep(60000);
     }
 
     @Story(value = "Делаем проверенным публичный канал")
@@ -197,20 +197,20 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
             " Затем нажимаем 'Подписчики' и добавляем подписчиков в канал. Проверяем, что подписчики добавились.")
     @Order(8)
     @Test
-    void test_Add_User_Public_Proven_Channel_7012() {
-        assertAll("Проверяем, что добавляются администраторы и подписчики",
-                () -> assertTrue(clientChannelsPage.
-                                addUsersChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN,
-                                        CLIENT_INFO_ITEM_ADMIN_CHANNEL,
-                                        admins).
-                                getCountUsersChannel() == admins.length + 1,
-                        "Количество добавленных администраторов меньше " + admins.length),
-                () -> assertTrue(clientChannelsPage.
-                                addUsersChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN,
-                                        CLIENT_INFO_ITEM_USER_CHANNEL,
-                                        subscribers).
-                                getCountUsersChannel() == subscribers.length,
-                        "Количество добавленных подписчиков меньше " + subscribers.length)
+    void test_Add_User_Public_Channel_7012() {
+        clientChannelsPage.addUsersChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN, CLIENT_INFO_ITEM_ADMIN_CHANNEL, admins);
+        assertAll("Проверяем, что есть иконка и добавляются администраторы",
+                () -> assertTrue(clientChannelsPage.isIconUserPlus(),
+                        "Нет иконки добавления добавления администраторов"),
+                () -> assertTrue(clientChannelsPage.getCountUsersChannel() == admins.length + 1,
+                        "Количество добавленных администраторов меньше " + admins.length)
+        );
+        clientChannelsPage.addUsersChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN, CLIENT_INFO_ITEM_USER_CHANNEL, subscribers);
+        assertAll("Проверяем, что есть иконка и добавляются подписчики",
+                () -> assertTrue(clientChannelsPage.isIconUserPlus(),
+                        "Нет иконки добавления добавления подписчиков"),
+                () -> assertTrue(clientChannelsPage.getCountUsersChannel() == subscribers.length,
+                        "Количество добавленных администраторов меньше " + subscribers.length)
         );
     }
 
@@ -220,7 +220,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
             "администраторов и подписчиков в канале отображается у подписчика")
     @Order(9)
     @Test
-    void test_Subscriber_Public_Proven_Channel_7013() {
+    void test_Subscriber_Public_Channel_7013() {
         assertAll("Подписываемся на канал и проверяем сколько администраторов и подписчиков" +
                         " отображается у подписчика",
                 () -> assertTrue(clientChannelsPage.
@@ -234,6 +234,51 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
                                 getCountUsersChannel() == subscribers.length,
                         "Количество подписчиков у пользователя отображается меньше " + subscribers.length)
         );
+    }
+
+    @Story(value = "Новая публикация")
+    @Description(value = "Авторизуемся на клиенте под учётной записью 7012, в контекстном меню выбираем 'Новая публикация'" +
+            " опубликовываем публикацию. Проверяем, что публикация была успешно опубликована.")
+    @Order(10)
+    @Test
+    void test_New_Publication_Public_Channel_7012() throws ExecutionException, InterruptedException {
+        String[] apiGetMessageResult;
+
+        Runnable clientNewPublicationChannel = () -> {
+            clientChannelsPage.isNewPublication(
+                    CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN,
+                    CLIENT_TITLE_PUBLICATION_CHANNEL,
+                    CLIENT_DESCRIPTION_PUBLICATION_PUBLIC_CHANNEL);
+        };
+
+        CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
+            apiToServer = getApiToServer(apiToServer);
+            String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_PUBLICATION_EVENT, "title",60);
+            return getMessageResult;
+        });
+
+        clientNewPublicationChannel.run();
+        apiGetMessageResult = socketGetMessage.get();
+        assertAll("Проверяем, опубликована ли новая публикация",
+                () -> assertEquals(apiGetMessageResult[0], CIDUser, "Сообщение пришло " +
+                        "не от пользователя " + CONTACT_NUMBER_7012),
+                () -> assertEquals(apiGetMessageResult[1], CLIENT_TITLE_PUBLICATION_CHANNEL,"Текст заголовка " +
+                        "публикации не совпадает с эталоном "  + CLIENT_TITLE_PUBLICATION_CHANNEL),
+                () -> assertTrue(clientChannelsPage.isShowPublication(),
+                        CLIENT_TITLE_PUBLICATION_CHANNEL + " не видна у автора")
+        );
+    }
+
+    @Story(value = "Проверяем, видна ли публикация у подписчика")
+    @Description(value = "Авторизуемся на клиенте под учётной записью 7013 и проверяем, что новая публикация" +
+            "видна у подписчика")
+    @Order(11)
+    @Test
+    void test_Check_New_Publication_Public_Channel_7013(){
+        clientChannelsPage.clickItemComments();
+        clientChannelsPage.clickChat(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN);
+        assertTrue(clientChannelsPage.isShowPublication(),
+                CLIENT_TITLE_PUBLICATION_CHANNEL + " не видна у подписчика");
     }
 
     private APIToServer getApiToServer(APIToServer apiToServer){

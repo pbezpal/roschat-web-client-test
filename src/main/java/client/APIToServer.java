@@ -11,6 +11,9 @@ import org.json.JSONObject;
 
 import java.net.URISyntaxException;
 
+import static data.CommentsData.CLIENT_CHATS_SEND_EVENT;
+import static data.CommentsData.CLIENT_PUBLICATION_EVENT;
+
 public class APIToServer {
 
     //Параметры для подключения по soket-io
@@ -152,17 +155,24 @@ public class APIToServer {
      * Приём сообщения
      */
     @Step(value = "Получаем сообщение по событию {event}")
-    private void receivingMessage(String event){
+    private void receivingMessage(String event, String typeData){
         socket.on(event, new Emitter.Listener() {
             @Override
             public void call(final Object... args) {
                 JSONObject obj = (JSONObject)args[0];
-                if(obj.optString("dataType").equals("unstored")) return;
-                else if(obj.optString("dataType").equals("text")) {
-                    receivingMessageData[0] = obj.optString("senderId");
-                    receivingMessageData[1] = obj.optString("data");
-                    isActionFinish = true;
+                switch (event){
+                    case CLIENT_CHATS_SEND_EVENT:
+                        if(obj.optString("dataType").equals("unstored")) return;
+                        else if(obj.optString("dataType").equals("text")) {
+                            receivingMessageData[0] = obj.optString("senderId");
+                            receivingMessageData[1] = obj.optString(typeData);
+
+                        }
+                    case CLIENT_PUBLICATION_EVENT:
+                        receivingMessageData[0] = obj.optString("cid");
+                        receivingMessageData[1] = obj.optString(typeData);
                 }
+                isActionFinish = true;
             }
         });
     }
@@ -254,10 +264,10 @@ public class APIToServer {
 
     }
 
-    public String[] GetTextMessageFromUser(String event, int maxIntervalInSecToDoThisActions) {
+    public String[] GetTextMessageFromUser(String event, String typeData, int maxIntervalInSecToDoThisActions) {
         isActionFinish = false;
         Thread connectionThread = new Thread(() -> {
-            receivingMessage(event);
+            receivingMessage(event, typeData);
         });
 
         connectionThread.start();

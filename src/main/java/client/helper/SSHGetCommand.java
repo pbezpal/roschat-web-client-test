@@ -39,9 +39,6 @@ public class SSHGetCommand {
             ce.disconnect();
             s.disconnect();
 
-            /*if(line != null) return true;
-            return false;*/
-
             return line;
 
         } catch (JSchException e) {

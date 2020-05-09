@@ -90,8 +90,6 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback{
 
     @Override
     public void beforeEach(ExtensionContext context){
-        sleep(5000);
-        System.out.println("beforeEach");
         if (String.valueOf(context.getRequiredTestMethod()).contains(CONTACT_NUMBER_7012)){
             openClient(CONTACT_NUMBER_7012 + "@ros.chat", false);
         }
@@ -100,17 +98,6 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback{
         }
         else openMS("/admin/channels");
     }
-
-    /*@Override
-    public void afterAll(ExtensionContext context) {
-        Selenide.close();
-        try{
-            WebDriverPool.DEFAULT.dismissAll();
-        }catch (WebDriverException e){
-            driver = null;
-        }
-        WebDriverRunner.setWebDriver(driver);
-    }*/
 
     private void openMS(String page){
         Configuration.baseUrl = hostServer;

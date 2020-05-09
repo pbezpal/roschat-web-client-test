@@ -24,6 +24,13 @@ public interface CommentsData {
     String CLIENT_NEW_DESCRIPTION_CHANNEL_CLOSED = "Новое описание закрытого тестового канала";
     String CLIENT_TYPE_CHANNEL_CLOSED = "Закрытый";
 
+    /***** Публикации в канале ******/
+    String CLIENT_NEW_PUBLICATION_CHANNEL_CONTEXT_MENU = "Новая публикация";
+    String CLIENT_TITLE_PUBLICATION_CHANNEL = "Тестовая публикация";
+    String CLIENT_DESCRIPTION_PUBLICATION_CLOSED_CHANNEL = "Текст описания первой публикации закрытого канала";
+    String CLIENT_DESCRIPTION_PUBLICATION_PUBLIC_CHANNEL = "Текст описания первой публикации публичного канала";
+    String CLIENT_PUBLICATION_EVENT = "publication-event";
+
     /***** Поделиться ссылкой ******/
     String CLIENT_INFO_SHARE_LINK_CHANNEL = "Поделиться ссылкой";
     String CLIENT_INFO_COPY_LINK_CHANNEL = "Копировать ссылку";

@@ -1,13 +1,17 @@
 package client.comments;
 
 import client.ClientPage;
-import com.codeborne.selenide.CollectionCondition;
-import com.codeborne.selenide.Condition;
-import com.codeborne.selenide.ElementsCollection;
-import com.codeborne.selenide.SelenideElement;
+import com.codeborne.selenide.*;
 import com.codeborne.selenide.ex.ElementNotFound;
 import io.qameta.allure.Step;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.interactions.Action;
+import org.openqa.selenium.interactions.Actions;
+
+import javax.swing.*;
+
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeListener;
 
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
@@ -35,6 +39,10 @@ public class ChannelsPage implements CommentsPage {
     private SelenideElement divAddUserChannel = $("div.btns.info-section");
     private ElementsCollection listUsersChannel = $$("div.members.info-section div.fio.name");
     private SelenideElement iFaArrowLeft = $("i.far.fa-arrow-left");
+    private SelenideElement inputTitlePublication = $("div.publication-editor input[type='text']");
+    private SelenideElement divDescriptionPublication = $("div.publication-editor div.info-input");
+    private SelenideElement buttonOkPublication = $("div.modal-footer button._btnOk");
+    private SelenideElement divPublication = $("div.publication");
     private String statusTestedChannel = "i.fa-check";
 
     public ChannelsPage(){}
@@ -207,8 +215,10 @@ public class ChannelsPage implements CommentsPage {
     }
 
     @Step(value = "Проверяем, что есть иконка 'Копировать ссылку'")
-    public boolean isIconCopyLinkChannel(){
+    public boolean isIconCopyLinkChannel(String channel){
         try{
+            clickItemComments().clickChat(channel);
+            if(isDivInfoWrapper(false)) clickMainHeaderText();
             iCopyLinkChannel.shouldBe(Condition.visible);
         }catch (ElementNotFound e){
             return false;
@@ -223,10 +233,21 @@ public class ChannelsPage implements CommentsPage {
         return this;
     }
 
-    @Step(value = "Добавляем подписчиков в канал")
+    @Step(value = "Добавляем подписчиков/администраторов в канал")
     private ChannelsPage clickAddUsersChannel(){
         divAddUserChannel.shouldBe(Condition.visible).click();
         return this;
+    }
+
+    @Step(value = "Проверяем, что есть иконка добавления подписчиков/администраторов")
+    public boolean isIconUserPlus(){
+        try {
+            iUserPlus.shouldBe(Condition.visible);
+        }catch (ElementNotFound e){
+            return false;
+        }
+
+        return true;
     }
 
     @Step(value = "Получаем количество подписчиков/администраторов")
@@ -236,58 +257,78 @@ public class ChannelsPage implements CommentsPage {
         return count;
     }
 
+    @Step(value = "Вводим заголовок публикации {title}")
+    private ChannelsPage sendInputTitlePublication(String title){
+        inputTitlePublication.shouldBe(Condition.visible).sendKeys(title);
+        return this;
+    }
+
+    @Step(value = "Вводим описание канала {description}")
+    private ChannelsPage sendDescriptionPublication(String description){
+        divDescriptionPublication.sendKeys(description);
+        return this;
+    }
+
+    @Step(value = "Нажимаем кнопку Опубликовать")
+    private ChannelsPage clickOkPublication(){
+        buttonOkPublication.click();
+        return this;
+    }
+
+    @Step(value = "Проверяем, что публикация была опубликована")
+    public boolean isShowPublication(){
+        try{
+            divPublication.shouldBe(Condition.visible);
+        }catch (ElementNotFound e){
+            return false;
+        }
+        return true;
+    }
+
     //Создаём канал
     public ChannelsPage createNewChannel(String name, String description, String item, String type){
         clickItemComments();
         clickContextMenu();
         clickItemContextMenu(item);
-        sendInputNameChannel(name).
+        return sendInputNameChannel(name).
                 sendDivDescriptionChannel(description).
                 clickTypeChannel(type).
                 clickButtonCreateOrSaveChannel();
-        return this;
     }
 
     //Редактируем название и описание канала
     public ChannelsPage editNameAndDescriptionChannel(String channel, String name, String description){
-        clickItemComments();
-        clickChat(channel);
+        clickItemComments().clickChat(channel);
         if(isDivInfoWrapper(false)) clickMainHeaderText();
         clickPencilEdit();
-        sendInputNameChannel(name).
+        return sendInputNameChannel(name).
                 sendDivDescriptionChannel(description).
                 clickButtonCreateOrSaveChannel();
-        return this;
     }
 
     //Делимся ссылкой
     public ChannelsPage shareLinkChannel(String channel, String chat){
-        clickItemComments();
-        clickChat(channel);
+        clickItemComments().clickChat(channel);
         if(isDivInfoWrapper(false)) clickMainHeaderText();
         actionInfoWrapper(CLIENT_INFO_SHARE_LINK_CHANNEL).
                 sendInputSearchChat(chat).
                 selectChat(chat).isSelectChat(chat);
-        clickButtonFooter(CLIENT_BUTTON_SHARE_LINK_CHANNEL);
-        return this;
+        return clickButtonFooter(CLIENT_BUTTON_SHARE_LINK_CHANNEL);
     }
 
     //Делимся ссылкой через контекстное меню
     public ChannelsPage shareLinkChannelContextMenu(String channel, String chat){
-        clickItemComments();
-        clickChat(channel);
+        clickItemComments().clickChat(channel);
         selectItemContextMenu(CLIENT_SHARE_LINK_CHANNEL_CONTEXT_MENU).
                 sendInputSearchChat(chat).
                 selectChat(chat).isSelectChat(chat);
-        clickButtonFooter(CLIENT_BUTTON_SHARE_LINK_CHANNEL);
-        return this;
+        return clickButtonFooter(CLIENT_BUTTON_SHARE_LINK_CHANNEL);
     }
 
     //Копируем ссылку
     public ChannelsPage copyLinkChannel(String channel, String contact){
         ChatsPage chatsPage = new ChatsPage();
-        clickItemComments();
-        clickChat(channel);
+        clickItemComments().clickChat(channel);
         if(isDivInfoWrapper(false)) clickMainHeaderText();
         actionInfoWrapper(CLIENT_INFO_COPY_LINK_CHANNEL);
         chatsPage.sendNewMessage(contact, Keys.CONTROL + "v");
@@ -296,24 +337,28 @@ public class ChannelsPage implements CommentsPage {
 
     //Добавляем подписчиков
     public ChannelsPage addUsersChannel(String channel, String typeUsers, String[] contacts){
-        clickItemComments();
-        clickChat(channel);
+        clickItemComments().clickChat(channel);
         if(isDivInfoWrapper(false)) clickMainHeaderText();
         actionInfoWrapper(typeUsers).clickAddUsersChannel();
         for(int i = 0; i < contacts.length; i++) {
             searchContactForAction(contacts[i]);
             selectFoundContact(contacts[i]);
         }
-        clickButtonFooter(CLIENT_ADD_USER_CHANNEL);
-        return this;
+        return clickButtonFooter(CLIENT_ADD_USER_CHANNEL);
     }
 
     //Подпись на канал
     public ChannelsPage userSubscriberChannel(String channel){
-        clickItemComments();
-        clickChat(channel);
+        clickItemComments().clickChat(channel);
         if(isDivInfoWrapper(false)) clickMainHeaderText();
-        actionInfoWrapper(CLIENT_INFO_SUBSCRIBER_CHANNEL);
-        return this;
+        return actionInfoWrapper(CLIENT_INFO_SUBSCRIBER_CHANNEL);
+    }
+
+    public ChannelsPage isNewPublication(String channel, String title, String description){
+        clickItemComments().clickChat(channel);
+        return selectItemContextMenu(CLIENT_NEW_PUBLICATION_CHANNEL_CONTEXT_MENU).
+                sendInputTitlePublication(title).
+                sendDescriptionPublication(description).
+                clickOkPublication();
     }
 }

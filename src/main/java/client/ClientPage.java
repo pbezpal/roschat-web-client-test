@@ -25,6 +25,7 @@ public interface ClientPage {
     //Раздел инструментов(Рация, Контакты, Беседы, Вызовы, Ещё)
     ElementsCollection itemsToolbar = $$("div.toolbar-wrapper span");
     SelenideElement divMainHeader = $("div.main-header");
+    SelenideElement divMainHeaderContextMenu = divMainHeader.find("div.circle-animation[title]");
     SelenideElement inputSearch = $("div.search-wrapper input");
     SelenideElement divSuccessLogin = $("div.side div.section-header h4.header-text");
 

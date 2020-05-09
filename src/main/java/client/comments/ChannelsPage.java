@@ -33,7 +33,6 @@ public class ChannelsPage implements CommentsPage {
     private ElementsCollection selectedChat = $$("div.selected span");
     private ElementsCollection buttonFooter = $$("div.footer button");
     private SelenideElement iCopyLinkChannel = $("i.fal.fa-external-link");
-    private SelenideElement divHeaderInfo = $("div[title='Информация']");
     private SelenideElement divContextMenu = $("div.v-context");
     private SelenideElement iUserPlus = $("i.fa-user-plus");
     private SelenideElement divAddUserChannel = $("div.btns.info-section");
@@ -228,7 +227,7 @@ public class ChannelsPage implements CommentsPage {
 
     @Step(value = "Выбираем элемент контекстного меню {item}")
     private ChannelsPage selectItemContextMenu(String item){
-        divHeaderInfo.shouldBe(Condition.visible).click();
+        divMainHeaderContextMenu.shouldBe(Condition.visible).click();
         divContextMenu.shouldBe(Condition.visible).$$("li").findBy(Condition.text(item)).click();
         return this;
     }

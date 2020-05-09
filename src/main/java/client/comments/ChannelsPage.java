@@ -218,9 +218,21 @@ public class ChannelsPage implements CommentsPage {
         return true;
     }
 
+    @Step(value = "Проверяем, появилось ли контекстное меню")
+    private boolean isDivContextMenu(){
+        try{
+            divContextMenu.shouldBe(Condition.visible);
+        }catch (ElementNotFound e){
+            return false;
+        }
+
+        return true;
+    }
+
     @Step(value = "Выбираем элемент контекстного меню {item}")
     private ChannelsPage selectItemContextMenu(String item){
         divMainHeaderContextMenu.shouldBe(Condition.visible).click();
+        if(!isDivContextMenu()) divMainHeaderContextMenu.shouldBe(Condition.visible).click();
         divContextMenu.shouldBe(Condition.visible).$$("li").findBy(Condition.text(item)).click();
         return this;
     }

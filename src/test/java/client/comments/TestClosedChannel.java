@@ -223,7 +223,7 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
         String[] apiGetMessageResult;
 
         Runnable clientNewPublicationChannel = () -> {
-            clientChannelsPage.isNewPublication(
+            clientChannelsPage.newPublication(
                     CLIENT_NEW_NAME_CHANNEL_CLOSED,
                     CLIENT_TITLE_PUBLICATION_CHANNEL,
                     CLIENT_DESCRIPTION_PUBLICATION_CLOSED_CHANNEL);

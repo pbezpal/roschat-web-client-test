@@ -4,17 +4,13 @@ import chat.ros.testing2.helpers.SSHManager;
 import chat.ros.testing2.server.LoginPage;
 import chat.ros.testing2.server.contacts.ContactsPage;
 import com.codeborne.selenide.Configuration;
-import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.WebDriverRunner;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
@@ -74,8 +70,6 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback{
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-
-        System.out.println(driver);
 
         driver.manage().window().setSize(new Dimension(1920, 1080));
         driver.manage().window().setPosition(new Point(2,2));

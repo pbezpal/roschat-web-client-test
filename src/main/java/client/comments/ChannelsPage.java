@@ -231,8 +231,8 @@ public class ChannelsPage implements CommentsPage {
 
     @Step(value = "Выбираем элемент контекстного меню {item}")
     private ChannelsPage selectItemContextMenu(String item){
-        divMainHeaderContextMenu.shouldBe(Condition.visible).click();
-        if(!isDivContextMenu()) divMainHeaderContextMenu.shouldBe(Condition.visible).click();
+        divMainHeaderContextMenu.click();
+        if(!isDivContextMenu()) divMainHeaderContextMenu.click();
         divContextMenu.shouldBe(Condition.visible).$$("li").findBy(Condition.text(item)).click();
         return this;
     }
@@ -397,7 +397,7 @@ public class ChannelsPage implements CommentsPage {
         return actionInfoWrapper(CLIENT_INFO_SUBSCRIBER_CHANNEL);
     }
 
-    public ChannelsPage isNewPublication(String channel, String title, String description){
+    public ChannelsPage newPublication(String channel, String title, String description){
         clickItemComments().clickChat(channel);
         return selectItemContextMenu(CLIENT_NEW_PUBLICATION_CHANNEL_CONTEXT_MENU).
                 sendInputTitlePublication(title).

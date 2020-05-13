@@ -251,7 +251,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
         String[] apiGetMessageResult;
 
         Runnable clientNewPublicationChannel = () -> {
-            clientChannelsPage.isNewPublication(
+            clientChannelsPage.newPublication(
                     CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN,
                     CLIENT_TITLE_PUBLICATION_CHANNEL,
                     CLIENT_DESCRIPTION_PUBLICATION_PUBLIC_CHANNEL);

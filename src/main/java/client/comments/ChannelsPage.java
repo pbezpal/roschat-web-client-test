@@ -231,8 +231,8 @@ public class ChannelsPage implements CommentsPage {
 
     @Step(value = "Выбираем элемент контекстного меню {item}")
     private ChannelsPage selectItemContextMenu(String item){
-        divMainHeaderContextMenu.click();
-        if(!isDivContextMenu()) divMainHeaderContextMenu.click();
+        divMainHeaderContextMenu.shouldBe(Condition.visible).click();
+        if(!isDivContextMenu()) divMainHeaderContextMenu.shouldBe(Condition.visible).click();
         divContextMenu.shouldBe(Condition.visible).$$("li").findBy(Condition.text(item)).click();
         return this;
     }

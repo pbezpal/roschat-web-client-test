@@ -34,6 +34,14 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
     private static ChannelsPage clientChannelsPage = new ChannelsPage();
     private String[] admins = {CLIENT_USER_A, CLIENT_USER_B, CLIENT_USER_C};
     private String[] subscribers = {CLIENT_USER_D, CLIENT_USER_E, CLIENT_USER_F, CONTACT_NUMBER_7013};
+    private static String nameChannel = "CHC%1$s";
+    private static String newNameChannel = null;
+
+    @BeforeAll
+    static void setUp(){
+        nameChannel = String.format(nameChannel,System.currentTimeMillis());
+        newNameChannel = nameChannel + System.currentTimeMillis();
+    }
 
     @Story(value = "Создаём новый закрытый канал")
     @Description(value = "Авторизуемся под пользователем 7012 и создаём новый закрытый канал")
@@ -41,13 +49,13 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
     @Test
     void test_Create_Closed_Channel_7012(){
         assertTrue(clientChannelsPage.createNewChannel(
-                CLIENT_NAME_CHANNEL_CLOSED,
+                nameChannel,
                 CLIENT_DESCRIPTION_CHANNEL_CLOSED,
                 CLIENT_ITEM_NEW_CHANNEL,
                 CLIENT_TYPE_CHANNEL_CLOSED).
-                        isExistComments(CLIENT_NAME_CHANNEL_CLOSED, true),
+                        isExistComments(nameChannel, true),
                 "Канал не найден в списке бесед");
-        clickChat(CLIENT_NAME_CHANNEL_CLOSED);
+        clickChat(nameChannel);
         assertTrue(clientChannelsPage.isTextInfoClosedChannel(true),"Отсутствует надпись Закрытый " +
                 "в разделе 'Информация о канале'");
     }
@@ -60,7 +68,7 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
     void test_Search_Closed_Channel_7013(){
         assertTrue(
                 clientChannelsPage.searchChannel(
-                        CLIENT_NAME_CHANNEL_CLOSED,
+                        nameChannel,
                         CLIENT_TYPE_CHANNEL_CLOSED),
                 "Канал отображается в списке бесед");
     }
@@ -72,22 +80,22 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
     @Test
     void test_Edit_Name_And_Description_Closed_Channel_7012(){
         clientChannelsPage.editNameAndDescriptionChannel(
-                CLIENT_NAME_CHANNEL_CLOSED,
-                CLIENT_NEW_NAME_CHANNEL_CLOSED,
+                nameChannel,
+                newNameChannel,
                 CLIENT_NEW_DESCRIPTION_CHANNEL_CLOSED);
         assertAll("Проверяем новое название и описание канала",
                 () -> assertTrue(isExistComments(
-                        CLIENT_NEW_NAME_CHANNEL_CLOSED, true),
+                        newNameChannel, true),
                         "Новое название не найдено в списке бесед"),
-                () -> assertEquals(clientChannelsPage.getNameMainHeaderChannel(CLIENT_NEW_NAME_CHANNEL_CLOSED),
-                        CLIENT_NEW_NAME_CHANNEL_CLOSED,
+                () -> assertEquals(clientChannelsPage.getNameMainHeaderChannel(newNameChannel),
+                        newNameChannel,
                         "Новое название канала не найдено в заголовке канала"),
                 () -> assertEquals(clientChannelsPage.
                                 getDescriptionMainHeaderChannel(CLIENT_NEW_DESCRIPTION_CHANNEL_CLOSED),
                         CLIENT_NEW_DESCRIPTION_CHANNEL_CLOSED,
                         "Новое описание канала не найдено в заголовке канала"),
-                () -> assertEquals(clientChannelsPage.getTitleName(CLIENT_NEW_NAME_CHANNEL_CLOSED),
-                        CLIENT_NEW_NAME_CHANNEL_CLOSED,
+                () -> assertEquals(clientChannelsPage.getTitleName(newNameChannel),
+                        newNameChannel,
                         "Новое название канала не найдено в разделе информация о канале"),
                 () -> assertEquals(clientChannelsPage.getDescriptionChannel(),
                         CLIENT_NEW_DESCRIPTION_CHANNEL_CLOSED,
@@ -106,7 +114,7 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
 
         Runnable clientShareLinkChannel = () -> {
             clientChannelsPage.copyLinkChannel(
-                    CLIENT_NEW_NAME_CHANNEL_CLOSED,
+                    newNameChannel,
                     CONTACT_NUMBER_7013
             );
         };
@@ -120,12 +128,12 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
         clientShareLinkChannel.run();
         apiGetMessageResult = socketGetMessage.get();
         assertAll("Проверяем, есть ли иконка, совпадает ли ID и сообщение с ссылкой на канал",
-                () -> assertTrue(clientChannelsPage.isIconCopyLinkChannel(CLIENT_NEW_NAME_CHANNEL_CLOSED),
+                () -> assertTrue(clientChannelsPage.isIconCopyLinkChannel(newNameChannel),
                         "Нет иконки 'Копировать ссылку'"),
                 () -> assertEquals(apiGetMessageResult[0], CIDUser, "Сообщение пришло " +
                         "не от пользователя " + CONTACT_NUMBER_7012),
-                () -> assertTrue(apiGetMessageResult[1].contains(CLIENT_NEW_NAME_CHANNEL_CLOSED),
-                        "Ссылка на канал " + CLIENT_NEW_NAME_CHANNEL_CLOSED + " не пришла")
+                () -> assertTrue(apiGetMessageResult[1].contains(newNameChannel),
+                        "Ссылка на канал " + newNameChannel + " не пришла")
         );
     }
 
@@ -138,7 +146,7 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
         String[] apiGetMessageResult;
 
         Runnable clientShareLinkChannel = () -> {
-            clientChannelsPage.shareLinkChannel(CLIENT_NEW_NAME_CHANNEL_CLOSED, CONTACT_NUMBER_7013);
+            clientChannelsPage.shareLinkChannel(newNameChannel, CONTACT_NUMBER_7013);
         };
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
@@ -154,8 +162,8 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
                         "Нет иконки 'Поделиться ссылкой'"),
                 () -> assertEquals(apiGetMessageResult[0], CIDUser, "Сообщение пришло " +
                         "не от пользователя " + CONTACT_NUMBER_7012),
-                () -> assertTrue(apiGetMessageResult[1].contains(CLIENT_NEW_NAME_CHANNEL_CLOSED),
-                        "Ссылка на канал " + CLIENT_NEW_NAME_CHANNEL_CLOSED + " не пришла")
+                () -> assertTrue(apiGetMessageResult[1].contains(newNameChannel),
+                        "Ссылка на канал " + newNameChannel + " не пришла")
         );
     }
 
@@ -166,14 +174,14 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
     @Order(6)
     @Test
     void test_Add_User_Closed_Channel_7012() {
-        clientChannelsPage.addUsersChannel(CLIENT_NEW_NAME_CHANNEL_CLOSED, CLIENT_INFO_ITEM_ADMIN_CHANNEL, admins);
+        clientChannelsPage.addUsersChannel(newNameChannel, CLIENT_INFO_ITEM_ADMIN_CHANNEL, admins);
         assertAll("Проверяем, что есть иконка и добавляются администраторы",
                 () -> assertTrue(clientChannelsPage.isIconUserPlus(),
                         "Нет иконки добавления добавления администраторов"),
                 () -> assertTrue(clientChannelsPage.getCountUsersChannel() == admins.length + 1,
                     "Количество добавленных администраторов меньше " + admins.length)
         );
-        clientChannelsPage.addUsersChannel(CLIENT_NEW_NAME_CHANNEL_CLOSED, CLIENT_INFO_ITEM_USER_CHANNEL, subscribers);
+        clientChannelsPage.addUsersChannel(newNameChannel, CLIENT_INFO_ITEM_USER_CHANNEL, subscribers);
         assertAll("Проверяем, что есть иконка и добавляются подписчики",
                 () -> assertTrue(clientChannelsPage.isIconUserPlus(),
                         "Нет иконки добавления добавления подписчиков"),
@@ -192,13 +200,13 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
         assertAll("Проверяем, что есть иконка," +
                           "подписываемся на канал," +
                           "проверяем сколько администраторов и подписчиков отображается у подписчика",
-                () -> assertTrue(clientChannelsPage.isIconSignOut(CLIENT_NEW_NAME_CHANNEL_CLOSED),
+                () -> assertTrue(clientChannelsPage.isIconSignOut(newNameChannel),
                         "Нет иконки Подписаться на канал"),
                 () -> assertTrue(clientChannelsPage.
-                                userSubscriberChannel(CLIENT_NEW_NAME_CHANNEL_CLOSED).
+                                userSubscriberChannel(newNameChannel).
                                 isActionInfoWrapper(CLIENT_INFO_EXIT_CHANNEL, true),
                         "Пользователь не подписался на закрытый канал"),
-                () -> assertTrue(clientChannelsPage.isIconSignOut(CLIENT_NEW_NAME_CHANNEL_CLOSED),
+                () -> assertTrue(clientChannelsPage.isIconSignOut(newNameChannel),
                         "Нет иконки Выйти из канала"),
                 () -> assertTrue(clientChannelsPage.actionInfoWrapper(CLIENT_INFO_ITEM_ADMIN_CHANNEL).
                                 getCountUsersChannel() == admins.length + 1,
@@ -219,7 +227,7 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
 
         Runnable clientNewPublicationChannel = () -> {
             clientChannelsPage.newPublication(
-                    CLIENT_NEW_NAME_CHANNEL_CLOSED,
+                    newNameChannel,
                     CLIENT_TITLE_PUBLICATION_CHANNEL,
                     CLIENT_DESCRIPTION_PUBLICATION_CLOSED_CHANNEL);
         };
@@ -259,7 +267,7 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
     @Test
     void test_Check_New_Publication_Closed_Channel_7013(){
         clientChannelsPage.clickItemComments();
-        clientChannelsPage.clickChat(CLIENT_NEW_NAME_CHANNEL_CLOSED);
+        clientChannelsPage.clickChat(newNameChannel);
         assertAll("Проверяем, отображается ли публикация у подписчика",
                 () -> assertEquals(clientChannelsPage.getAuthorPublication("1"),
                         CONTACT_NUMBER_7012,
@@ -278,12 +286,12 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
     @Order(10)
     @Test
     void test_Get_Share_Publication_Closed_channel_7012(){
-        String message = "{\"type\":\"publication\",\"chId\":" + getIDChannel(CLIENT_NEW_NAME_CHANNEL_CLOSED) + ",\"pubId\":1}";
+        String message = "{\"type\":\"publication\",\"chId\":" + getIDChannel(newNameChannel) + ",\"pubId\":1}";
 
         Runnable clientGetMessage = () -> {
             clientChannelsPage.clickItemComments();
             clientChannelsPage.clickChat(CONTACT_NUMBER_7013);
-            clientChannelsPage.clickSharePublicationChannel(CLIENT_NEW_NAME_CHANNEL_CLOSED);
+            clientChannelsPage.clickSharePublicationChannel(newNameChannel);
             assertAll("Проверяем, отображается ли публикация после перехода к публикации",
                     () -> assertEquals(clientChannelsPage.getAuthorPublication("1"),
                             CONTACT_NUMBER_7012,
@@ -322,11 +330,11 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
     @Test
     void test_Send_Share_Publication_Closed_Channel_7012() throws ExecutionException, InterruptedException {
         String[] apiGetMessageResult;
-        String message = "{\"type\":\"publication\",\"chId\":" + getIDChannel(CLIENT_NEW_NAME_CHANNEL_CLOSED) + ",\"pubId\":1}";
+        String message = "{\"type\":\"publication\",\"chId\":" + getIDChannel(newNameChannel) + ",\"pubId\":1}";
 
         Runnable clientSharePublicationChannel = () -> {
             clientChannelsPage.sharePublicationChannel(
-                    CLIENT_NEW_NAME_CHANNEL_CLOSED,
+                    newNameChannel,
                     "1",
                     CONTACT_NUMBER_7013);
         };
@@ -356,8 +364,8 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
     @Order(12)
     @Test
     void test_Delete_Channel_7012(){
-        assertTrue(clientChannelsPage.deleteChannel(CLIENT_NEW_NAME_CHANNEL_CLOSED).
-                isExistComments(CLIENT_NEW_NAME_CHANNEL_CLOSED, false),
+        assertTrue(clientChannelsPage.deleteChannel(newNameChannel).
+                isExistComments(newNameChannel, false),
                 "Канал найден в списке бесед после удаления");
     }
 

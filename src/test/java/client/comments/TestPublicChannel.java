@@ -52,6 +52,9 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
                         CLIENT_TYPE_CHANNEL_PUBLIC).
                         isExistComments(CLIENT_NAME_CHANNEL_PUBLIC_PROVEN, true),
                 "Канал не найден в списке бесед");
+        clickChat(CLIENT_NAME_CHANNEL_PUBLIC_PROVEN);
+        assertTrue(clientChannelsPage.isTextInfoClosedChannel(false),"Есть надпись Закрытый " +
+                "в разделе 'Информация о канале'");
     }
 
     @Story(value = "Меняем название и описание публичного проверенного канала")
@@ -338,6 +341,16 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
                 () -> assertEquals(apiGetMessageResult[1], message,"Сообщение не соответствует ожидаемому" +
                         "" + message)
         );
+    }
+
+    @Story(value = "Удаляем публичный канал")
+    @Description(value = "Авторизуемся под учётно записью администратора канала и удалем канал")
+    @Order(11)
+    @Test
+    void test_Delete_Channel_7012(){
+        assertTrue(clientChannelsPage.deleteChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN).
+                        isExistComments(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN, false),
+                "Канал найден в списке бесед после удаления");
     }
 
     @AfterAll

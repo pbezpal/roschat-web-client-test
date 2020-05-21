@@ -40,18 +40,16 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
     @Order(1)
     @Test
     void test_Create_Closed_Channel_7012(){
-        assertAll("",
-                () -> assertTrue(
-                        clientChannelsPage.createNewChannel(
-                                CLIENT_NAME_CHANNEL_CLOSED,
-                                CLIENT_DESCRIPTION_CHANNEL_CLOSED,
-                                CLIENT_ITEM_NEW_CHANNEL,
-                                CLIENT_TYPE_CHANNEL_CLOSED).
-                                isExistComments(CLIENT_NAME_CHANNEL_CLOSED, true),
-                        "Канал не найден в списке бесед"),
-                () -> assertTrue(clientChannelsPage.isTextInfoClosedChannel(true),
-                        "")
-        );
+        assertTrue(clientChannelsPage.createNewChannel(
+                CLIENT_NAME_CHANNEL_CLOSED,
+                CLIENT_DESCRIPTION_CHANNEL_CLOSED,
+                CLIENT_ITEM_NEW_CHANNEL,
+                CLIENT_TYPE_CHANNEL_CLOSED).
+                        isExistComments(CLIENT_NAME_CHANNEL_CLOSED, true),
+                "Канал не найден в списке бесед");
+        clickChat(CLIENT_NAME_CHANNEL_CLOSED);
+        assertTrue(clientChannelsPage.isTextInfoClosedChannel(true),"Отсутствует надпись Закрытый " +
+                "в разделе 'Информация о канале'");
     }
 
     @Story(value = "Ищем на клиенте 7013 закрытый канал")
@@ -351,6 +349,16 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
                 () -> assertEquals(apiGetMessageResult[1], message,"Сообщение не соответствует ожидаемому" +
                         "" + message)
         );
+    }
+
+    @Story(value = "Удаляем закрытый канал")
+    @Description(value = "Авторизуемся под учётно записью администратора канала и удалем канал")
+    @Order(12)
+    @Test
+    void test_Delete_Channel_7012(){
+        assertTrue(clientChannelsPage.deleteChannel(CLIENT_NEW_NAME_CHANNEL_CLOSED).
+                isExistComments(CLIENT_NEW_NAME_CHANNEL_CLOSED, false),
+                "Канал найден в списке бесед после удаления");
     }
 
     @AfterAll

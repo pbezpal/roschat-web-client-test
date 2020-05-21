@@ -8,8 +8,7 @@ import com.codeborne.selenide.ex.ElementNotFound;
 import com.codeborne.selenide.ex.ElementShould;
 import io.qameta.allure.Step;
 
-import static com.codeborne.selenide.Condition.not;
-import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
 
@@ -21,6 +20,7 @@ public interface CommentsPage extends ClientPage {
     ElementsCollection itemsListChat = $$("div.chat-list-item div.name");
 
     ElementsCollection itemsToolbar = $$("div.toolbar-wrapper span");
+    ElementsCollection buttonFooterConfirm = $$(".footer .btn");
 
     @Step(value = "Переходим в раздел Беседы")
     default CommentsPage clickItemComments(){
@@ -65,5 +65,9 @@ public interface CommentsPage extends ClientPage {
     }
 
 
-
+    @Step(value = "Нажимаем кнопку {button} в форме подтверждения")
+    default CommentsPage clickButtonFooterConfirm(String button){
+        buttonFooterConfirm.findBy(text(button)).click();
+        return this;
+    }
 }

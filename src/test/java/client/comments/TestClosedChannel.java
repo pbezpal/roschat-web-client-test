@@ -1,9 +1,11 @@
 package client.comments;
 
 import client.APIToServer;
+import client.Helper;
 import client.RecourcesTests;
 import client.WatcherTests;
 import client.helper.SSHGetCommand;
+import com.codeborne.selenide.Selenide;
 import io.qameta.allure.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ExtendWith(RecourcesTests.class)
 @ExtendWith(WatcherTests.class)
-public class TestClosedChannel extends chat.ros.testing2.server.administration.ChannelsPage implements CommentsPage{
+public class TestClosedChannel extends chat.ros.testing2.server.administration.ChannelsPage implements CommentsPage, Helper {
 
     private static String apiHost = "https://" + HOST_SERVER + ":8080";
     private static String apiUser = CONTACT_NUMBER_7013 + "@ros.chat";
@@ -29,7 +31,7 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
             "sudo -u roschat psql -c \"select cid, login from users;\" " +
                     "| grep " + CONTACT_NUMBER_7012 + " | awk '{print $1}'"
     );
-    private ChannelsPage clientChannelsPage = new ChannelsPage();
+    private static ChannelsPage clientChannelsPage = new ChannelsPage();
     private String[] admins = {CLIENT_USER_A, CLIENT_USER_B, CLIENT_USER_C};
     private String[] subscribers = {CLIENT_USER_D, CLIENT_USER_E, CLIENT_USER_F, CONTACT_NUMBER_7013};
 
@@ -38,29 +40,24 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
     @Order(1)
     @Test
     void test_Create_Closed_Channel_7012(){
-        assertTrue(
-                clientChannelsPage.createNewChannel(
-                        CLIENT_NAME_CHANNEL_CLOSED,
-                        CLIENT_DESCRIPTION_CHANNEL_CLOSED,
-                        CLIENT_ITEM_NEW_CHANNEL,
-                        CLIENT_TYPE_CHANNEL_CLOSED).
-                        isExistComments(CLIENT_NAME_CHANNEL_CLOSED, true),
-                "Канал не найден в списке бесед");
-    }
-
-    @Story(value = "Проверяем, отображается ли закрытый канал в СУ")
-    @Description(value = "Авторизуемся в СУ, переходим в раздел Администрирование->Каналы и проверяем, отображается ли " +
-            "закрытый канал в списке каналов")
-    @Order(2)
-    @Test
-    void test_Show_Closed_Channel_In_MS(){
-        assertTrue(isShowChannel(CLIENT_NAME_CHANNEL_CLOSED, false));
+        assertAll("",
+                () -> assertTrue(
+                        clientChannelsPage.createNewChannel(
+                                CLIENT_NAME_CHANNEL_CLOSED,
+                                CLIENT_DESCRIPTION_CHANNEL_CLOSED,
+                                CLIENT_ITEM_NEW_CHANNEL,
+                                CLIENT_TYPE_CHANNEL_CLOSED).
+                                isExistComments(CLIENT_NAME_CHANNEL_CLOSED, true),
+                        "Канал не найден в списке бесед"),
+                () -> assertTrue(clientChannelsPage.isTextInfoClosedChannel(true),
+                        "")
+        );
     }
 
     @Story(value = "Ищем на клиенте 7013 закрытый канал")
     @Description(value = "Авторизуемся на клиенте под учётной записью 7013 и вводим в поле поиска имя закрытого канала." +
             " Проверяем, что канал не отображается в списке каналов")
-    @Order(3)
+    @Order(2)
     @Test
     void test_Search_Closed_Channel_7013(){
         assertTrue(
@@ -73,7 +70,7 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
     @Story(value = "Меняем название и описание закрытого канала")
     @Description(value = "Авторизуемся на клиенте под учётной записью 7012, переходим в раздел информации о канале" +
             " и правим название и описание канала. Проверяем, что сохранения применились.")
-    @Order(4)
+    @Order(3)
     @Test
     void test_Edit_Name_And_Description_Closed_Channel_7012(){
         clientChannelsPage.editNameAndDescriptionChannel(
@@ -104,7 +101,7 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
     @Story(value = "Копируем и делимся ссылкой на канал")
     @Description(value = "Авторизуемся на клиенте под учётной записью 7012, переходим в раздел информации о канале," +
             "нажимаем 'Копировать ссылку' и делимся ссылкой. Проверяем, что ссылка дошла до адресата.")
-    @Order(5)
+    @Order(4)
     @Test
     void test_Copy_And_Paste_Link_Closed_Channel_7012() throws ExecutionException, InterruptedException {
         String[] apiGetMessageResult;
@@ -117,7 +114,7 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
         };
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
-            apiToServer = getApiToServer(apiToServer);
+            apiToServer = getApiToServer(apiHost, apiUser, apiToServer);
             String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_CHATS_SEND_EVENT, "data",60);
             return getMessageResult;
         });
@@ -137,7 +134,7 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
     @Story(value = "Делимся ссылкой на канал")
     @Description(value = "Авторизуемся на клиенте под учётной записью 7012, переходим в раздел информации о канале" +
             " и нажимаем 'Поделиться ссылкой'. Проверяем, что сохранения применились.")
-    @Order(6)
+    @Order(5)
     @Test
     void test_Share_Link_Closed_Channel_7012() throws ExecutionException, InterruptedException {
         String[] apiGetMessageResult;
@@ -147,7 +144,7 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
         };
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
-            apiToServer = getApiToServer(apiToServer);
+            apiToServer = getApiToServer(apiHost, apiUser, apiToServer);
             String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_CHATS_SEND_EVENT, "data",60);
             return getMessageResult;
         });
@@ -168,7 +165,7 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
     @Description(value = "Авторизуемся на клиенте под учётной записью 7012, переходим в раздел информации о канале," +
             "нажимаем 'Администраторы' и добавляем администраторов в канал. Проверяем, что администарторы добавились." +
             " Затем нажимаем 'Подписчики' и добавляем подписчиков в канал. Проверяем, что подписчики добавились.")
-    @Order(7)
+    @Order(6)
     @Test
     void test_Add_User_Closed_Channel_7012() {
         clientChannelsPage.addUsersChannel(CLIENT_NEW_NAME_CHANNEL_CLOSED, CLIENT_INFO_ITEM_ADMIN_CHANNEL, admins);
@@ -191,7 +188,7 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
     @Description(value = "Авторизуемся на клиенте под учётной записью 7013, переходим в раздел информации о канале," +
             "нажимаем 'Подписаться на канал'. Проверяем, что пользователь подписался на канал. Проверяем сколько" +
             "администраторов и подписчиков в канале отображается у подписчика")
-    @Order(8)
+    @Order(7)
     @Test
     void test_Subscriber_Closed_Channel_7013() {
         assertAll("Проверяем, что есть иконка," +
@@ -217,7 +214,7 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
     @Story(value = "Новая публикация")
     @Description(value = "Авторизуемся на клиенте под учётной записью 7012, в контекстном меню выбираем 'Новая публикация'" +
             " опубликовываем публикацию. Проверяем, что публикация была успешно опубликована.")
-    @Order(9)
+    @Order(8)
     @Test
     void test_New_Publication_Closed_Channel_7012() throws ExecutionException, InterruptedException {
         String[] apiGetMessageResult;
@@ -230,7 +227,7 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
         };
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
-            apiToServer = getApiToServer(apiToServer);
+            apiToServer = getApiToServer(apiHost, apiUser, apiToServer);
             String[] getMessageResult = apiToServer.GetTextMessageFromUser(
                     CLIENT_PUBLICATION_EVENT,
                     "title",
@@ -252,7 +249,7 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
                 () -> assertTrue(clientChannelsPage.isShowTitlePublication("1", CLIENT_TITLE_PUBLICATION_CHANNEL),
                         "Заголовок публикации не совпадает с " + CLIENT_TITLE_PUBLICATION_CHANNEL),
                 () -> assertTrue(clientChannelsPage.
-                                isShowDescriptionPublication("1", CLIENT_DESCRIPTION_PUBLICATION_CLOSED_CHANNEL),
+                                isShowDescriptionPublication("1", CLIENT_DESCRIPTION_PUBLICATION_CLOSED_CHANNEL, true),
                         "Описание публикации не совпадает с " + CLIENT_DESCRIPTION_PUBLICATION_CLOSED_CHANNEL)
         );
     }
@@ -260,7 +257,7 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
     @Story(value = "Проверяем, видна ли публикация у подписчика")
     @Description(value = "Авторизуемся на клиенте под учётной записью 7013 и проверяем, что новая публикация" +
             "видна у подписчика")
-    @Order(10)
+    @Order(9)
     @Test
     void test_Check_New_Publication_Closed_Channel_7013(){
         clientChannelsPage.clickItemComments();
@@ -272,19 +269,92 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
                 () -> assertTrue(clientChannelsPage.isShowTitlePublication("1", CLIENT_TITLE_PUBLICATION_CHANNEL),
                         "Заголовок публикации не совпадает с " + CLIENT_TITLE_PUBLICATION_CHANNEL),
                 () -> assertTrue(clientChannelsPage.
-                                isShowDescriptionPublication("1", CLIENT_DESCRIPTION_PUBLICATION_CLOSED_CHANNEL),
+                                isShowDescriptionPublication("1", CLIENT_DESCRIPTION_PUBLICATION_CLOSED_CHANNEL, true),
                         "Описание публикации не совпадает с " + CLIENT_DESCRIPTION_PUBLICATION_CLOSED_CHANNEL)
         );
     }
 
-    private APIToServer getApiToServer(APIToServer apiToServer){
-        if(apiToServer == null){
-            return new APIToServer(apiHost, apiUser, USER_ACCOUNT_PASSWORD);
-        }else return apiToServer;
+    @Story(value = "Переходим в публикацию, которой с нами поделились")
+    @Description(value = "Авторизуемся под кчётной записью 7012. Пользователь 7013 деится публикацией канала через API." +
+            "Проверяем, что пользователь 7012 видит публикацию и может перейти к ней")
+    @Order(10)
+    @Test
+    void test_Get_Share_Publication_Closed_channel_7012(){
+        String message = "{\"type\":\"publication\",\"chId\":" + getIDChannel(CLIENT_NEW_NAME_CHANNEL_CLOSED) + ",\"pubId\":1}";
+
+        Runnable clientGetMessage = () -> {
+            clientChannelsPage.clickItemComments();
+            clientChannelsPage.clickChat(CONTACT_NUMBER_7013);
+            clientChannelsPage.clickSharePublicationChannel(CLIENT_NEW_NAME_CHANNEL_CLOSED);
+            assertAll("Проверяем, отображается ли публикация после перехода к публикации",
+                    () -> assertEquals(clientChannelsPage.getAuthorPublication("1"),
+                            CONTACT_NUMBER_7012,
+                            "В публикации указан неправильный автор"),
+                    () -> assertTrue(clientChannelsPage.isShowTitlePublication("1", CLIENT_TITLE_PUBLICATION_CHANNEL),
+                            "Заголовок публикации не совпадает с " + CLIENT_TITLE_PUBLICATION_CHANNEL),
+                    () -> assertTrue(clientChannelsPage.
+                                    isShowDescriptionPublication("1", CLIENT_DESCRIPTION_PUBLICATION_CLOSED_CHANNEL, true),
+                            "Описание публикации не совпадает с " + CLIENT_DESCRIPTION_PUBLICATION_CLOSED_CHANNEL)
+            );
+        };
+
+        Thread apiSendMessage = new Thread() {
+            @Override
+            public void run() {
+                apiToServer = getApiToServer(apiHost, apiUser, apiToServer);
+                Selenide.sleep(3000);
+                apiToServer.SendTextMessageToUser(
+                        "user",
+                        CIDUser,
+                        "data",
+                        message,
+                        30
+                );
+            }
+        };
+
+        apiSendMessage.start();
+        clientGetMessage.run();
+    }
+
+    @Story(value = "Делимся публикацией")
+    @Description(value = "Авторизуемся под учётной записью 7012 и делимся публикацией канала с пользователем 7013." +
+            "Проверяем при помощи API, что успешно поделились публикацией.")
+    @Order(11)
+    @Test
+    void test_Send_Share_Publication_Closed_Channel_7012() throws ExecutionException, InterruptedException {
+        String[] apiGetMessageResult;
+        String message = "{\"type\":\"publication\",\"chId\":" + getIDChannel(CLIENT_NEW_NAME_CHANNEL_CLOSED) + ",\"pubId\":1}";
+
+        Runnable clientSharePublicationChannel = () -> {
+            clientChannelsPage.sharePublicationChannel(
+                    CLIENT_NEW_NAME_CHANNEL_CLOSED,
+                    "1",
+                    CONTACT_NUMBER_7013);
+        };
+
+        CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
+            apiToServer = getApiToServer(apiHost, apiUser, apiToServer);
+            String[] getMessageResult = apiToServer.GetTextMessageFromUser(
+                    CLIENT_CHATS_SEND_EVENT,
+                    "data",
+                    60
+            );
+            return getMessageResult;
+        });
+
+        clientSharePublicationChannel.run();
+        apiGetMessageResult = socketGetMessage.get();
+        assertAll("Проверяем, поделились ли публикацией",
+                () -> assertEquals(apiGetMessageResult[0], CIDUser, "Сообщение пришло " +
+                        "не от пользователя " + CONTACT_NUMBER_7012),
+                () -> assertEquals(apiGetMessageResult[1], message,"Сообщение не соответствует ожидаемому" +
+                        "" + message)
+        );
     }
 
     @AfterAll
     static void tearDown(){
-        apiToServer.disconnect();
+        if(apiToServer != null) apiToServer.disconnect();
     }
 }

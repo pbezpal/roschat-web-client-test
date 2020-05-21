@@ -3,6 +3,7 @@ package client.comments;
 import client.ClientPage;
 import com.codeborne.selenide.*;
 import com.codeborne.selenide.ex.ElementNotFound;
+import com.codeborne.selenide.ex.ElementShould;
 import io.qameta.allure.Step;
 import org.openqa.selenium.Keys;
 
@@ -10,7 +11,7 @@ import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
 import static data.CommentsData.*;
 
-public class ChannelsPage implements CommentsPage {
+public class ChannelsPage extends ChatsPage {
 
     private SelenideElement inputNameChannel = $("div.channel-create input[type='text']");
     private SelenideElement divDescriptionChannel = $("div.info.non-border-input.div-input");
@@ -19,6 +20,7 @@ public class ChannelsPage implements CommentsPage {
     private ElementsCollection radioTypeChannel = $$("form.custom-radio label");
     private SelenideElement divAddUser = $("div.btn-list-item.list-item");
     private ElementsCollection spansInfoChannel = $$("div.channel-info.info-content.sections span");
+    private SelenideElement spanTypeClosedChannel = $(".channel-type .text.color-red");
     private SelenideElement pDescriptionChannel = $("div.additional-text p");
     private SelenideElement iShareChannel = $("i.fal.fa-share");
     private SelenideElement inputSearchChat = $("div.select-chat input.search-input");
@@ -35,6 +37,7 @@ public class ChannelsPage implements CommentsPage {
     private SelenideElement divDescriptionPublication = $("div.publication-editor div.info-input");
     private SelenideElement buttonOkPublication = $("div.modal-footer button._btnOk");
     private SelenideElement iSignOut = $("i.fal.fa-sign-out");
+    private ElementsCollection listPublicationsMessage = $$("div.chat-publication-message .channel-name");
     private String statusTestedChannel = "i.fa-check";
 
     public ChannelsPage(){}
@@ -113,7 +116,7 @@ public class ChannelsPage implements CommentsPage {
 
     @Step(value = "Выбираем тип канала {type}")
     public ChannelsPage clickTypeChannel(String type){
-        if(isNotActiveRadioTypeChannel(type)) radioTypeChannel.findBy(Condition.text(type)).find("i").click();
+        radioTypeChannel.findBy(Condition.text(type)).find("i").click();
         return this;
     }
 
@@ -139,9 +142,29 @@ public class ChannelsPage implements CommentsPage {
         return true;
     }
 
-    @Step(value = "Проверяем правильное ли описание {description} канала в разделе информации")
+    @Step(value = "Получаем описание {description} канала в разделе информации")
     public String getDescriptionChannel(){
         return pDescriptionChannel.text();
+    }
+
+    @Step(value = "Проверяем, есть ли надпись закрытого канала в разделе информации")
+    public boolean isTextInfoClosedChannel(boolean show){
+        if(isDivInfoWrapper(false)) clickMainHeaderText();
+        if(show) {
+            try {
+                spanTypeClosedChannel.shouldBe(Condition.visible);
+            } catch (ElementNotFound e) {
+                return false;
+            }
+            return spanTypeClosedChannel.text().equals(CLIENT_TYPE_CHANNEL_CLOSED);
+        }else{
+            try {
+                spanTypeClosedChannel.shouldBe(Condition.not(Condition.visible));
+            } catch (ElementShould e) {
+                return false;
+            }
+            return true;
+        }
     }
 
     @Step(value = "Проверяем, что есть иконка 'Поделиться каналом'")
@@ -232,7 +255,6 @@ public class ChannelsPage implements CommentsPage {
     @Step(value = "Выбираем элемент контекстного меню {item}")
     private ChannelsPage selectItemContextMenu(String item){
         divMainHeaderContextMenu.shouldBe(Condition.visible).click();
-        if(!isDivContextMenu()) divMainHeaderContextMenu.shouldBe(Condition.visible).click();
         divContextMenu.shouldBe(Condition.visible).$$("li").findBy(Condition.text(item)).click();
         return this;
     }
@@ -269,7 +291,7 @@ public class ChannelsPage implements CommentsPage {
         return this;
     }
 
-    @Step(value = "Вводим описание канала {description}")
+    @Step(value = "Вводим описание публикации {description}")
     private ChannelsPage sendDescriptionPublication(String description){
         divDescriptionPublication.sendKeys(description);
         return this;
@@ -283,7 +305,7 @@ public class ChannelsPage implements CommentsPage {
 
     @Step(value = "Проверяем, что отображается правильно автор публикации")
     public String getAuthorPublication(String id){
-            return $("li#publication" + id).find("div.publisher-name").text();
+            return $(String.format(CLIENT_PUBLICATION, id)).find("div.publisher-name").text();
     }
 
     @Step(value = "Проверяем, что отображается текст заголовка публикации")
@@ -301,15 +323,26 @@ public class ChannelsPage implements CommentsPage {
     }
 
     @Step(value = "Проверяем, что отображается текст описания публикации")
-    public boolean isShowDescriptionPublication(String id, String description){
-        try{
+    public boolean isShowDescriptionPublication(String id, String description, boolean show){
+        if(show){try{
             $("li#publication" + id).
                     find("div.info-text").
                     $$("span").
                     findBy(Condition.text(description)).
                     shouldBe(Condition.visible);
-        }catch (ElementNotFound e){
-            return false;
+            } catch (ElementNotFound e) {
+                return false;
+            }
+        }else{
+            try{
+            $("li#publication" + id).
+                    find("div.info-text").
+                    $$("span").
+                    findBy(Condition.text(description)).
+                    shouldBe(Condition.not(Condition.visible));
+            } catch (ElementShould e) {
+                return false;
+            }
         }
         return true;
     }
@@ -317,7 +350,6 @@ public class ChannelsPage implements CommentsPage {
     @Step(value = "Проверяем, есть ли иконка Подписаться на канал/Выйти из канала")
     public boolean isIconSignOut(String channel){
         try {
-            ChatsPage chatsPage = new ChatsPage();
             clickItemComments().clickChat(channel);
             if(isDivInfoWrapper(false)) clickMainHeaderText();
             iSignOut.shouldBe(Condition.visible);
@@ -326,6 +358,18 @@ public class ChannelsPage implements CommentsPage {
         }
 
         return true;
+    }
+
+    @Step(value = "Нажимаем иконку поделиться публикацией")
+    private ChannelsPage clickIconSharePublication(String id){
+        $("li#publication" + id + " i.fal.fa-share").click();
+        return this;
+    }
+
+    @Step(value = "Переходим в публикацию канала {channel}, которой поделились")
+    public ChannelsPage clickSharePublicationChannel(String channel){
+        listPublicationsMessage.findBy(Condition.text(channel)).click();
+        return this;
     }
 
     //Создаём канал
@@ -349,6 +393,13 @@ public class ChannelsPage implements CommentsPage {
                 clickButtonCreateOrSaveChannel();
     }
 
+    public ChannelsPage editTypeChannel(String channel, String type){
+        clickItemComments().clickChat(channel);
+        if(isDivInfoWrapper(false)) clickMainHeaderText();
+        clickPencilEdit();
+        return clickTypeChannel(type).clickButtonCreateOrSaveChannel();
+    }
+
     //Делимся ссылкой
     public ChannelsPage shareLinkChannel(String channel, String chat){
         clickItemComments().clickChat(channel);
@@ -356,7 +407,7 @@ public class ChannelsPage implements CommentsPage {
         actionInfoWrapper(CLIENT_INFO_SHARE_LINK_CHANNEL).
                 sendInputSearchChat(chat).
                 selectChat(chat).isSelectChat(chat);
-        return clickButtonFooter(CLIENT_BUTTON_SHARE_LINK_CHANNEL);
+        return clickButtonFooter(CLIENT_BUTTON_SHARE_MESSAGE);
     }
 
     //Делимся ссылкой через контекстное меню
@@ -365,16 +416,15 @@ public class ChannelsPage implements CommentsPage {
         selectItemContextMenu(CLIENT_SHARE_LINK_CHANNEL_CONTEXT_MENU).
                 sendInputSearchChat(chat).
                 selectChat(chat).isSelectChat(chat);
-        return clickButtonFooter(CLIENT_BUTTON_SHARE_LINK_CHANNEL);
+        return clickButtonFooter(CLIENT_BUTTON_SHARE_MESSAGE);
     }
 
     //Копируем ссылку
     public ChannelsPage copyLinkChannel(String channel, String contact){
-        ChatsPage chatsPage = new ChatsPage();
         clickItemComments().clickChat(channel);
         if(isDivInfoWrapper(false)) clickMainHeaderText();
         actionInfoWrapper(CLIENT_INFO_COPY_LINK_CHANNEL);
-        chatsPage.sendNewMessage(contact, Keys.CONTROL + "v");
+        sendNewMessage(contact, Keys.CONTROL + "v");
         return this;
     }
 
@@ -403,5 +453,20 @@ public class ChannelsPage implements CommentsPage {
                 sendInputTitlePublication(title).
                 sendDescriptionPublication(description).
                 clickOkPublication();
+    }
+
+    public ChannelsPage sharePublicationChannel(String channel, String id, String chat){
+        clickItemComments().clickChat(channel);
+        clickIconSharePublication(id).
+                sendInputSearchChat(chat).
+                selectChat(chat).isSelectChat(chat);
+        return clickButtonFooter(CLIENT_BUTTON_SHARE_MESSAGE);
+    }
+
+    public ChannelsPage deleteChannel(String channel){
+        clickItemComments().clickChat(channel);
+        selectItemContextMenu(CLIENT_DELETE_CHANNEL_CONTEXT_MENU);
+        clickButtonFooterConfirm("Ок");
+        return this;
     }
 }

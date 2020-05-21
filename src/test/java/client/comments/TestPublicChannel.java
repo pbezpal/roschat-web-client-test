@@ -1,9 +1,11 @@
 package client.comments;
 
 import client.APIToServer;
+import client.Helper;
 import client.RecourcesTests;
 import client.WatcherTests;
 import client.helper.SSHGetCommand;
+import com.codeborne.selenide.Selenide;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
@@ -24,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ExtendWith(RecourcesTests.class)
 @ExtendWith(WatcherTests.class)
-public class TestPublicChannel extends chat.ros.testing2.server.administration.ChannelsPage implements CommentsPage{
+public class TestPublicChannel extends chat.ros.testing2.server.administration.ChannelsPage implements CommentsPage, Helper {
 
     private static String apiHost = "https://" + HOST_SERVER + ":8080";
     private static String apiUser = CONTACT_NUMBER_7013 + "@ros.chat";
@@ -99,7 +101,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
         };
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
-            apiToServer = getApiToServer(apiToServer);
+            apiToServer = getApiToServer(apiHost, apiUser, apiToServer);
             String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_CHATS_SEND_EVENT, "data",60);
             return getMessageResult;
         });
@@ -129,7 +131,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
         };
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
-            apiToServer = getApiToServer(apiToServer);
+            apiToServer = getApiToServer(apiHost, apiUser, apiToServer);
             String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_CHATS_SEND_EVENT, "data",60);
             return getMessageResult;
         });
@@ -146,57 +148,11 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
         );
     }
 
-    @Story(value = "Делаем проверенным публичный канал")
-    @Description(value = "Авторизуемся в СУ, переходим в раздел Администрирование->Каналы, делаем публичный канал проверенным")
-    @Order(5)
-    @Test
-    void test_Do_Proven_Channel(){
-        assertTrue(isShowChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN, true));
-        doTestedChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN);
-    }
-
-    @Story(value = "Проверяем статус публичного канала под учётной записью 7012")
-    @Description(value = "Авторизуемся на клиенте под учётной записью 7012. Проверяем, что у канала появился статус Проверенный")
-    @Order(6)
-    @Test
-    void test_Check_Status_Public_Channel_7012(){
-        clientChannelsPage.clickItemComments();
-        assertAll("Проверяем статус канала - проверенный",
-                () -> assertTrue(clientChannelsPage.isStatusTestedChannelListChat(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
-                        "Отсутствует статус Проверенный у канала в разделе Беседы"),
-                () -> assertTrue(clientChannelsPage.isStatusTestedChannelMainHeader(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
-                        "Отсутствует статус Проверенный в заголовке канала"),
-                () -> assertTrue(clientChannelsPage.isStatusTestedInfoChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
-                        "Отсутствует статус Проверенный в разделе информация о канале")
-        );
-    }
-
-    @Story(value = "Ищем на клиенте 7013 публичный канал")
-    @Description(value = "Авторизуемся на клиенте под учётной записью 7013 и вводим в поле поиска имя публичного канала." +
-            " Проверяем, что у канала статус Проверенный")
-    @Order(7)
-    @Test
-    void test_Search_Public_Channel_7013(){
-        assertTrue(
-                clientChannelsPage.searchChannel(
-                        CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN,
-                        CLIENT_TYPE_CHANNEL_PUBLIC),
-                "Канал не найден");
-        assertAll("Проверяем статус канала - проверенный",
-                () -> assertTrue(clientChannelsPage.isStatusTestedChannelListChat(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
-                        "Отсутствует статус Проверенный у канала в разделе Беседы"),
-                () -> assertTrue(clientChannelsPage.isStatusTestedChannelMainHeader(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
-                        "Отсутствует статус Проверенный в заголовке канала"),
-                () -> assertTrue(clientChannelsPage.isStatusTestedInfoChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN),
-                        "Отсутствует статус Проверенный в разделе информация о канале")
-        );
-    }
-
     @Story(value = "Добавляем администраторов и подписчиков")
     @Description(value = "Авторизуемся на клиенте под учётной записью 7012, переходим в раздел информации о канале," +
             "нажимаем 'Администраторы' и добавляем администраторов в канал. Проверяем, что администарторы добавились." +
             " Затем нажимаем 'Подписчики' и добавляем подписчиков в канал. Проверяем, что подписчики добавились.")
-    @Order(8)
+    @Order(5)
     @Test
     void test_Add_User_Public_Channel_7012() {
         clientChannelsPage.addUsersChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN, CLIENT_INFO_ITEM_ADMIN_CHANNEL, admins);
@@ -219,7 +175,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
     @Description(value = "Авторизуемся на клиенте под учётной записью 7013, переходим в раздел информации о канале," +
             "нажимаем 'Подписаться на канал'. Проверяем, что пользователь подписался на канал. Проверяем сколько" +
             "администраторов и подписчиков в канале отображается у подписчика")
-    @Order(9)
+    @Order(6)
     @Test
     void test_Subscriber_Public_Channel_7013() {
         assertAll("Проверяем, что есть иконка," +
@@ -245,7 +201,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
     @Story(value = "Новая публикация")
     @Description(value = "Авторизуемся на клиенте под учётной записью 7012, в контекстном меню выбираем 'Новая публикация'" +
             " опубликовываем публикацию. Проверяем, что публикация была успешно опубликована.")
-    @Order(10)
+    @Order(7)
     @Test
     void test_New_Publication_Public_Channel_7012() throws ExecutionException, InterruptedException {
         String[] apiGetMessageResult;
@@ -258,7 +214,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
         };
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
-            apiToServer = getApiToServer(apiToServer);
+            apiToServer = getApiToServer(apiHost, apiUser, apiToServer);
             String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_PUBLICATION_EVENT, "title",60);
             return getMessageResult;
         });
@@ -276,7 +232,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
                 () -> assertTrue(clientChannelsPage.isShowTitlePublication("1", CLIENT_TITLE_PUBLICATION_CHANNEL),
                         "Заголовок публикации не совпадает с " + CLIENT_TITLE_PUBLICATION_CHANNEL),
                 () -> assertTrue(clientChannelsPage.
-                                isShowDescriptionPublication("1", CLIENT_DESCRIPTION_PUBLICATION_PUBLIC_CHANNEL),
+                                isShowDescriptionPublication("1", CLIENT_DESCRIPTION_PUBLICATION_PUBLIC_CHANNEL, true),
                         "Описание публикации не совпадает с " + CLIENT_DESCRIPTION_PUBLICATION_PUBLIC_CHANNEL)
         );
     }
@@ -284,7 +240,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
     @Story(value = "Проверяем, видна ли публикация у подписчика")
     @Description(value = "Авторизуемся на клиенте под учётной записью 7013 и проверяем, что новая публикация" +
             "видна у подписчика")
-    @Order(11)
+    @Order(8)
     @Test
     void test_Check_New_Publication_Public_Channel_7013(){
         clientChannelsPage.clickItemComments();
@@ -296,15 +252,92 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
                 () -> assertTrue(clientChannelsPage.isShowTitlePublication("1", CLIENT_TITLE_PUBLICATION_CHANNEL),
                         "Заголовок публикации не совпадает с " + CLIENT_TITLE_PUBLICATION_CHANNEL),
                 () -> assertTrue(clientChannelsPage.
-                                isShowDescriptionPublication("1", CLIENT_DESCRIPTION_PUBLICATION_PUBLIC_CHANNEL),
+                                isShowDescriptionPublication("1",
+                                        CLIENT_DESCRIPTION_PUBLICATION_PUBLIC_CHANNEL,
+                                        true),
                         "Описание публикации не совпадает с " + CLIENT_DESCRIPTION_PUBLICATION_PUBLIC_CHANNEL)
         );
     }
 
-    private APIToServer getApiToServer(APIToServer apiToServer){
-        if(apiToServer == null){
-            return new APIToServer(apiHost, apiUser, USER_ACCOUNT_PASSWORD);
-        }else return apiToServer;
+    @Story(value = "Переходим в публикацию, которой с нами поделились")
+    @Description(value = "Авторизуемся под кчётной записью 7012. Пользователь 7013 деится публикацией канала через API." +
+            "Проверяем, что пользователь 7012 видит публикацию и может перейти к ней")
+    @Order(9)
+    @Test
+    void test_Get_Share_Publication_Closed_channel_7012(){
+        String message = "{\"type\":\"publication\",\"chId\":" +
+                "" + getIDChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN) + ",\"pubId\":1}";
+
+        Runnable clientGetMessage = () -> {
+            clientChannelsPage.clickItemComments();
+            clientChannelsPage.clickChat(CONTACT_NUMBER_7013);
+            clientChannelsPage.clickSharePublicationChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN);
+            assertAll("Проверяем, отображается ли публикация после перехода к публикации",
+                    () -> assertEquals(clientChannelsPage.getAuthorPublication("1"),
+                            CONTACT_NUMBER_7012,
+                            "В публикации указан неправильный автор"),
+                    () -> assertTrue(clientChannelsPage.isShowTitlePublication("1", CLIENT_TITLE_PUBLICATION_CHANNEL),
+                            "Заголовок публикации не совпадает с " + CLIENT_TITLE_PUBLICATION_CHANNEL),
+                    () -> assertTrue(clientChannelsPage.
+                                    isShowDescriptionPublication("1", CLIENT_DESCRIPTION_PUBLICATION_PUBLIC_CHANNEL, true),
+                            "Описание публикации не совпадает с " + CLIENT_DESCRIPTION_PUBLICATION_PUBLIC_CHANNEL)
+            );
+        };
+
+        Thread apiSendMessage = new Thread() {
+            @Override
+            public void run() {
+                apiToServer = getApiToServer(apiHost, apiUser, apiToServer);
+                Selenide.sleep(3000);
+                apiToServer.SendTextMessageToUser(
+                        "user",
+                        CIDUser,
+                        "data",
+                        message,
+                        30
+                );
+            }
+        };
+
+        apiSendMessage.start();
+        clientGetMessage.run();
+    }
+
+    @Story(value = "Делимся публикацией")
+    @Description(value = "Авторизуемся под учётной записью 7012 и делимся публикацией канала с пользователем 7013." +
+            "Проверяем при помощи API, что успешно поделились публикацией.")
+    @Order(10)
+    @Test
+    void test_Send_Share_Publication_Closed_Channel_7012() throws ExecutionException, InterruptedException {
+        String[] apiGetMessageResult;
+        String message = "{\"type\":\"publication\",\"chId\":" +
+                "" + getIDChannel(CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN) + ",\"pubId\":1}";
+
+        Runnable clientSharePublicationChannel = () -> {
+            clientChannelsPage.sharePublicationChannel(
+                    CLIENT_NEW_NAME_PUBLIC_CHANNEL_PROVEN,
+                    "1",
+                    CONTACT_NUMBER_7013);
+        };
+
+        CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
+            apiToServer = getApiToServer(apiHost, apiUser, apiToServer);
+            String[] getMessageResult = apiToServer.GetTextMessageFromUser(
+                    CLIENT_CHATS_SEND_EVENT,
+                    "data",
+                    60
+            );
+            return getMessageResult;
+        });
+
+        clientSharePublicationChannel.run();
+        apiGetMessageResult = socketGetMessage.get();
+        assertAll("Проверяем, поделились ли публикацией",
+                () -> assertEquals(apiGetMessageResult[0], CIDUser, "Сообщение пришло " +
+                        "не от пользователя " + CONTACT_NUMBER_7012),
+                () -> assertEquals(apiGetMessageResult[1], message,"Сообщение не соответствует ожидаемому" +
+                        "" + message)
+        );
     }
 
     @AfterAll

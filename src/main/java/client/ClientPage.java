@@ -6,6 +6,7 @@ import com.codeborne.selenide.SelenideElement;
 import com.codeborne.selenide.ex.ElementNotFound;
 import com.codeborne.selenide.ex.ElementShould;
 import io.qameta.allure.Step;
+import io.qameta.allure.Story;
 import org.openqa.selenium.Keys;
 
 import static com.codeborne.selenide.Selenide.*;
@@ -19,6 +20,8 @@ public interface ClientPage {
     SelenideElement iStaySystem = $("i.fal.fa-check");
     SelenideElement buttonLogin = $("button#login-btn");
     SelenideElement buttonConfirmError = $("div.alert-confirn button");
+    SelenideElement successAuthClient = $("div.columns-layout:not([style='display: none;'])");
+
     SelenideElement inputSelectContacts = $("div.select-contact input.search-input");
     ElementsCollection listContacts = $$("div.contact-list div.fio.name");
 
@@ -80,7 +83,18 @@ public interface ClientPage {
         sendInputPassword(password);
         if(staySystem) clickCheckboxStaySystem();
         clickButtonLogin();
-        return isNotShowConfirmError();
+        return isSuccessAuthClient();
+    }
+
+    @Step(value = "Проверяем, что успешно авторизовались на клиенте")
+    static boolean isSuccessAuthClient(){
+        try {
+            successAuthClient.shouldBe(Condition.visible);
+        }catch (ElementNotFound e){
+            return false;
+        }
+
+        return true;
     }
 
     @Step(value = "Проверяем, что появился заголовок контакта/группы/канала")

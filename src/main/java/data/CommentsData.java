@@ -35,7 +35,7 @@ public interface CommentsData {
     String CLIENT_INFO_SHARE_LINK_CHANNEL = "Поделиться ссылкой";
     String CLIENT_INFO_COPY_LINK_CHANNEL = "Копировать ссылку";
     String CLIENT_SHARE_LINK_CHANNEL_CONTEXT_MENU = "Поделиться";
-    String CLIENT_BUTTON_SHARE_LINK_CHANNEL = "Поделиться";
+    String CLIENT_BUTTON_SHARE_MESSAGE = "Поделиться";
 
     /****** Добавление подписчиков ******/
     String CLIENT_INFO_ITEM_ADMIN_CHANNEL = "Администраторы";
@@ -43,6 +43,10 @@ public interface CommentsData {
     String CLIENT_ADD_USER_CHANNEL = "Добавить";
     String CLIENT_INFO_SUBSCRIBER_CHANNEL = "Подписаться на канал";
     String CLIENT_INFO_EXIT_CHANNEL = "Выйти из канала";
+
+    String CLIENT_PUBLICATION = "li#publication%1$s";
+
+    String CLIENT_DELETE_CHANNEL_CONTEXT_MENU = "Удалить канал";
 
     /***** Параметры для проверки бесед ******/
     String CLIENT_ITEM_NEW_CHAT = "Новая беседа";

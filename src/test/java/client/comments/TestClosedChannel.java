@@ -79,8 +79,7 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
     @Order(3)
     @Test
     void test_Edit_Name_And_Description_Closed_Channel_7012(){
-        clientChannelsPage.editNameAndDescriptionChannel(
-                nameChannel,
+        clientChannelsPage.changeDataChannel(nameChannel,true,true,false,
                 newNameChannel,
                 CLIENT_NEW_DESCRIPTION_CHANNEL_CLOSED);
         assertAll("Проверяем новое название и описание канала",

@@ -72,8 +72,8 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
     @Order(2)
     @Test
     void test_Edit_Name_And_Description_Public_Channel_7012(){
-        clientChannelsPage.editNameAndDescriptionChannel(
-                nameChannel,
+        clientChannelsPage.changeDataChannel(
+                nameChannel,true,true,false,
                 newNameChannel,
                 CLIENT_NEW_DESCRIPTION_PUBLIC_CHANNEL_PROVEN);
         assertAll("Проверяем новое название и описание канала",

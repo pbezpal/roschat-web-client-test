@@ -51,7 +51,7 @@ public class ChannelsPage extends ChatsPage {
     }
 
     @Step(value = "Вводим описание канала {description}")
-    private ChannelsPage sendDivDescriptionChannel(String description){
+    private ChannelsPage sendDescriptionChannel(String description){
         divDescriptionChannel.setValue("");
         divDescriptionChannel.sendKeys(description);
         return this;
@@ -378,26 +378,34 @@ public class ChannelsPage extends ChatsPage {
         clickContextMenu();
         clickItemContextMenu(item);
         return sendInputNameChannel(name).
-                sendDivDescriptionChannel(description).
+                sendDescriptionChannel(description).
                 clickTypeChannel(type).
                 clickButtonCreateOrSaveChannel();
     }
 
-    //Редактируем название и описание канала
-    public ChannelsPage editNameAndDescriptionChannel(String channel, String name, String description){
+    //Редактируем название, описание и тип канала канала
+    public ChannelsPage changeDataChannel(String channel, boolean changeName, boolean changeDescription,
+                                          boolean changeType, String... data){
         clickItemComments().clickChat(channel);
         if(isDivInfoWrapper(false)) clickMainHeaderText();
         clickPencilEdit();
-        return sendInputNameChannel(name).
-                sendDivDescriptionChannel(description).
-                clickButtonCreateOrSaveChannel();
-    }
-
-    public ChannelsPage editTypeChannel(String channel, String type){
-        clickItemComments().clickChat(channel);
-        if(isDivInfoWrapper(false)) clickMainHeaderText();
-        clickPencilEdit();
-        return clickTypeChannel(type).clickButtonCreateOrSaveChannel();
+        if(changeName && changeDescription && changeType) {
+            sendInputNameChannel(data[0]);
+            sendDescriptionChannel(data[1]);
+            clickTypeChannel(data[2]);
+        }else if(changeName && changeDescription) {
+            sendInputNameChannel(data[0]);
+            sendDescriptionChannel(data[1]);
+        }else if(changeName && changeType) {
+            sendInputNameChannel(data[0]);
+            clickTypeChannel(data[1]);
+        }else if(changeDescription && changeType) {
+            sendDescriptionChannel(data[0]);
+            clickTypeChannel(data[1]);
+        }else if(changeName) sendInputNameChannel(data[0]);
+        else if(changeDescription) sendInputNameChannel(data[0]);
+        else if(changeType) clickTypeChannel(data[0]);
+        return clickButtonCreateOrSaveChannel();
     }
 
     //Делимся ссылкой

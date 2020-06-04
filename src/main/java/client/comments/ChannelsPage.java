@@ -152,14 +152,14 @@ public class ChannelsPage extends ChatsPage {
         if(isDivInfoWrapper(false)) clickMainHeaderText();
         if(show) {
             try {
-                spanTypeClosedChannel.shouldBe(Condition.visible);
+                spanTypeClosedChannel.waitUntil(Condition.visible,30000);
             } catch (ElementNotFound e) {
                 return false;
             }
             return spanTypeClosedChannel.text().equals(CLIENT_TYPE_CHANNEL_CLOSED);
         }else{
             try {
-                spanTypeClosedChannel.shouldBe(Condition.not(Condition.visible));
+                spanTypeClosedChannel.waitUntil(Condition.not(Condition.visible),30000);
             } catch (ElementShould e) {
                 return false;
             }

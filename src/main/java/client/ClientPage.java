@@ -50,7 +50,7 @@ public interface ClientPage {
 
     @Step(value = "Нажимаем кнопку 'Ввести логин и пароль'")
     static void clickButtonPencil(){
-        buttonPencil.shouldBe(Condition.visible).click();
+        buttonPencil.waitUntil(Condition.visible,30000).click();
     }
 
     @Step(value = "Вводим адрес электронной почты {email}")

@@ -12,7 +12,7 @@ pipeline{
         label ''
     }
     stages{
-        stage("Cleaning the assembly directory"){
+        stage("Cleaning the build directory"){
             steps{
                 deleteDir();
             }
@@ -48,7 +48,7 @@ pipeline{
     }
     post{
         always{
-            emailext body: "Тестируемая версия - ${SERVER_VER} \n Результат тестирования СУ - ${STATUS_SERVER} \n Отчет - ${REPORT_SERVER} \n \n Результат тестирования web клиента - ${currentBuild.result} \n Отчет - ${BUILD_URL}allure", subject: 'Тестирование росчат', to: 'bezpalko', from: 'jenkins@ros.chat'
+            emailext body: "Server version testing - ${SERVER_VER} \n Result testing MS - ${STATUS_SERVER} \n Report - ${REPORT_SERVER} \n \n Result testing web-client - ${currentBuild.result} \n Report - ${BUILD_URL}allure", subject: 'Roschat server testing', to: 'bezpalko', from: 'jenkins@ros.chat'
         }
     }
 }

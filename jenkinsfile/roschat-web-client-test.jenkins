@@ -23,7 +23,7 @@ pipeline{
                     try{
                         git 'ssh://bezpalko_p@10.10.199.35/opt/git/firelink/test-roschat-web-client'
                     }catch(err){
-                        currentBuild.result = "Failure"
+                        currentBuild.result = "FAILURE"
                         error("Error copying from git repository")
                     }
                 }

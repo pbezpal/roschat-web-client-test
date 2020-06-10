@@ -40,12 +40,13 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
     private String[] subscribers = {CLIENT_USER_D, CLIENT_USER_E, CLIENT_USER_F, CONTACT_NUMBER_7013};
     private static String nameChannel = "CHP%1$s";
     private static String newNameChannel = null;
-    private boolean status = false;
+    private static boolean status;
     
     @BeforeAll
     static void setUp(){
         nameChannel = String.format(nameChannel,System.currentTimeMillis());
         newNameChannel = nameChannel + System.currentTimeMillis();
+        status = false;
     }
     
 
@@ -433,7 +434,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
     @Order(13)
     @Test
     void test_Delete_Channel_7012(){
-        assertTrue(status, "Канал не был создан");
+        assertTrue(status, "Канал не был создан или измененно навзание");
         assertTrue(clientChannelsPage.deleteChannel(newNameChannel).
                         isExistComments(newNameChannel, false),
                 "Канал найден в списке бесед после удаления");

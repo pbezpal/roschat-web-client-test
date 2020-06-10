@@ -36,12 +36,13 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
     private String[] subscribers = {CLIENT_USER_D, CLIENT_USER_E, CLIENT_USER_F, CONTACT_NUMBER_7013};
     private static String nameChannel = "CHC%1$s";
     private static String newNameChannel = null;
-    private boolean status = false;
+    private static boolean status;
 
     @BeforeAll
     static void setUp(){
         nameChannel = String.format(nameChannel,System.currentTimeMillis());
         newNameChannel = nameChannel + System.currentTimeMillis();
+        status = false;
     }
 
     @Story(value = "Создаём новый закрытый канал")

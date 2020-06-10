@@ -3,7 +3,6 @@
 def SERVER_VER="${params.VER}"
 def STATUS_SERVER="${params.REZULT}"
 def REPORT_SERVER="${params.REPORT}"
-STATUS="Успешно"
 
 properties([disableConcurrentBuilds()])
 

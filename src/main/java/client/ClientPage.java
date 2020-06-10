@@ -89,7 +89,7 @@ public interface ClientPage {
     @Step(value = "Проверяем, что успешно авторизовались на клиенте")
     static boolean isSuccessAuthClient(){
         try {
-            successAuthClient.shouldBe(Condition.visible);
+            successAuthClient.waitUntil(Condition.visible,60000);
         }catch (ElementNotFound e){
             return false;
         }

@@ -445,7 +445,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
     @Story(value = "Ищем на клиенте 7013 публичный канал после удаления канала")
     @Description(value = "Авторизуемся на клиенте под учётной записью 7013 и вводим в поле поиска имя канала." +
             " Проверяем, что канал не отображается в списке каналов")
-    @Order(13)
+    @Order(14)
     @Test
     void test_Search_Public_Channel_7013_After_Delete_Channel(){
         assertTrue(status, "Канал не был создан или измененно навзание");

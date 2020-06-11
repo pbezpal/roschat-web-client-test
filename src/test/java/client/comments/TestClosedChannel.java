@@ -396,6 +396,20 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
                 "Канал найден в списке бесед после удаления");
     }
 
+    @Story(value = "Ищем на клиенте 7013 закрытый канал после удаления канала")
+    @Description(value = "Авторизуемся на клиенте под учётной записью 7013 и вводим в поле поиска имя канала." +
+            " Проверяем, что канал не отображается в списке каналов")
+    @Order(14)
+    @Test
+    void test_Search_Closed_Channel_7013_After_Delete_Channel(){
+        assertTrue(status, "Канал не был создан или измененно навзание");
+        assertTrue(
+                isExistComments(
+                        newNameChannel,
+                        false),
+                "Канал отображается в списке бесед после удаления");
+    }
+
     @AfterAll
     static void tearDown(){
         if(apiToServer != null) apiToServer.disconnect();

@@ -70,7 +70,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
     }
 
     @Story(value = "Ищем на клиенте 7013 публичный канал")
-    @Description(value = "Авторизуемся на клиенте под учётной записью 7013 и вводим в поле поиска имя закрытого канала." +
+    @Description(value = "Авторизуемся на клиенте под учётной записью 7013 и вводим в поле поиска имя канала." +
             " Проверяем, что канал отображается в списке каналов")
     @Order(2)
     @Test
@@ -81,23 +81,24 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
                         nameChannel,
                         CLIENT_TYPE_CHANNEL_PUBLIC),
                 "Канал не отображается в списке бесед");
+        clickChat(nameChannel);
         assertAll("Проверяем название и описание канала",
                 () -> assertEquals(
                         clientChannelsPage.getNameMainHeaderChannel(nameChannel),
                         nameChannel,
-                        "Новое название канала не найдено в заголовке канала"),
+                        "Название канала не найдено в заголовке канала"),
                 () -> assertEquals(
-                        clientChannelsPage.getDescriptionMainHeaderChannel(CLIENT_NEW_DESCRIPTION_PUBLIC_CHANNEL_PROVEN),
+                        clientChannelsPage.getDescriptionMainHeaderChannel(CLIENT_DESCRIPTION_CHANNEL_PUBLIC_PROVEN),
                         CLIENT_NEW_DESCRIPTION_PUBLIC_CHANNEL_PROVEN,
-                        "Новое описание канала не найдено в заголовке канала"),
+                        "Описание канала не найдено в заголовке канала"),
                 () -> assertEquals(
                         clientChannelsPage.getTitleName(nameChannel),
                         nameChannel,
-                        "Новое название канала не найдено в разделе информация о канале"),
+                        "Название канала не найдено в разделе информация о канале"),
                 () -> assertEquals(
                         clientChannelsPage.getDescriptionChannel(),
-                        CLIENT_NEW_DESCRIPTION_PUBLIC_CHANNEL_PROVEN,
-                        "Новое описание канала не найдено в разделе информация о канале")
+                        CLIENT_DESCRIPTION_CHANNEL_PUBLIC_PROVEN,
+                        "Описание канала не найдено в разделе информация о канале")
         );
     }
 
@@ -398,8 +399,8 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
     }
 
     @Story(value = "Ищем на клиенте 7013 публичный канал после изменения названия")
-    @Description(value = "Авторизуемся на клиенте под учётной записью 7013 и вводим в поле поиска имя закрытого канала." +
-            " Проверяем, что канал не отображается в списке каналов")
+    @Description(value = "Авторизуемся на клиенте под учётной записью 7013 и вводим в поле поиска имя канала." +
+            " Проверяем, что канал отображается в списке каналов")
     @Order(12)
     @Test
     void test_Search_Public_Channel_7013_After_Edit_Name_Channel(){
@@ -409,6 +410,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
                         newNameChannel,
                         CLIENT_TYPE_CHANNEL_PUBLIC),
                 "Канал не отображается в списке бесед");
+        clickChat(newNameChannel);
         assertAll("Проверяем новое название и описание канала",
                 () -> assertEquals(
                         clientChannelsPage.getNameMainHeaderChannel(newNameChannel),
@@ -438,6 +440,20 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
         assertTrue(clientChannelsPage.deleteChannel(newNameChannel).
                         isExistComments(newNameChannel, false),
                 "Канал найден в списке бесед после удаления");
+    }
+
+    @Story(value = "Ищем на клиенте 7013 публичный канал после удаления канала")
+    @Description(value = "Авторизуемся на клиенте под учётной записью 7013 и вводим в поле поиска имя канала." +
+            " Проверяем, что канал не отображается в списке каналов")
+    @Order(13)
+    @Test
+    void test_Search_Public_Channel_7013_After_Delete_Channel(){
+        assertTrue(status, "Канал не был создан или измененно навзание");
+        assertTrue(
+                isExistComments(
+                        newNameChannel,
+                        false),
+                "Канал отображается в списке бесед после удаления");
     }
 
     @AfterAll

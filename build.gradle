@@ -97,20 +97,6 @@ allure {
     }
 }
 
-task comments(type: Test){
-
-    useJUnitPlatform()
-
-    include("**/comments/TestChatsPage.class")
-
-    dependsOn 'cleanTest'
-
-    testLogging {
-        events "passed", "skipped", "failed"
-    }
-
-}
-
 test{
     useJUnitPlatform()
 

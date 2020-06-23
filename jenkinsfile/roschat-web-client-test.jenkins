@@ -1,8 +1,8 @@
 #!groovy
 
-def SERVER_VER="${params.VER}"
-def STATUS_SERVER="${params.REZULT}"
-def REPORT_SERVER="${params.REPORT}"
+String SERVER_VER="${params.VER}"
+String STATUS_SERVER="${params.REZULT}"
+String REPORT_SERVER="${params.REPORT}"
 
 properties([disableConcurrentBuilds()])
 

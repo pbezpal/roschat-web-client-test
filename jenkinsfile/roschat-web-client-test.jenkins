@@ -47,7 +47,13 @@ pipeline{
     }
     post{
         always{
-            emailext body: "Server version testing - ${SERVER_VER} \n Result testing MS - ${STATUS_SERVER} \n Report - ${REPORT_SERVER} \n \n Result testing web-client - ${currentBuild.result} \n Report - ${BUILD_URL}allure", subject: 'Roschat server testing', to: 'bezpalko', from: 'jenkins@ros.chat'
+            script{
+                if(STATUS_SERVER == null){
+                    emailext body: "Server version testing - ${SERVER_VER} \n Result testing - ${currentBuild.result} \n Report - ${BUILD_URL}allure", subject: 'Roschat server testing', to: 'bezpalko', from: 'jenkins@ros.chat'
+                }else{
+                    emailext body: "Server version testing - ${SERVER_VER} \n Result testing MS - ${STATUS_SERVER} \n Report - ${REPORT_SERVER} \n \n Result testing web-client - ${currentBuild.result} \n Report - ${BUILD_URL}allure", subject: 'Roschat server testing', to: 'bezpalko', from: 'jenkins@ros.chat'
+                }
+            }
         }
     }
 }

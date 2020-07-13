@@ -6,7 +6,6 @@ import com.codeborne.selenide.SelenideElement;
 import com.codeborne.selenide.ex.ElementNotFound;
 import com.codeborne.selenide.ex.ElementShould;
 import io.qameta.allure.Step;
-import io.qameta.allure.Story;
 import org.openqa.selenium.Keys;
 
 import static com.codeborne.selenide.Selenide.*;
@@ -16,7 +15,9 @@ public interface ClientPage {
     ElementsCollection loginWindow = $$("div.component-footer span");
     SelenideElement buttonPencil = $("i.fal.fa-pencil");
     SelenideElement inputEmail = $("input.input.non-border-input[type='text']");
+    SelenideElement divValueInputEmail = $(".non-border-input[type='text']").parent();
     SelenideElement inputPassword = $("input.input.non-border-input[type='password']");
+    SelenideElement divValueInputPassword = $(".non-border-input[type='password']").parent();
     SelenideElement iStaySystem = $("i.fal.fa-check");
     SelenideElement buttonLogin = $("button#login-btn");
     SelenideElement buttonConfirmError = $("div.alert-confirn button");
@@ -50,7 +51,26 @@ public interface ClientPage {
 
     @Step(value = "Нажимаем кнопку 'Ввести логин и пароль'")
     static void clickButtonPencil(){
-        buttonPencil.waitUntil(Condition.visible,30000).click();
+        buttonPencil.click();
+    }
+
+    @Step(value = "Проверяем, виден ли элемент {element}")
+    static boolean isVisibleElement(SelenideElement element, boolean show) {
+        if (show){
+            try {
+                element.shouldBe(Condition.visible);
+            } catch (ElementNotFound e) {
+                return false;
+            }
+        }else{
+            try {
+                element.shouldBe(Condition.not(Condition.visible));
+            } catch (ElementShould e) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Step(value = "Вводим адрес электронной почты {email}")
@@ -78,9 +98,19 @@ public interface ClientPage {
     }
 
     static boolean loginClient(String email, String password, boolean staySystem){
-        clickButtonPencil();
-        sendInputEmail(email);
-        sendInputPassword(password);
+        for(int i = 0; i < 3 && isVisibleElement(buttonPencil, true); i++){
+            clickButtonPencil();
+            sleep(500);
+        }
+
+        for(int i = 0; i < 3 && divValueInputEmail.getAttribute("input_text").isEmpty(); i++){
+            sendInputEmail(email);
+            sleep(500);
+        }
+        for(int i = 0; i < 3 && divValueInputPassword.getAttribute("input_text").isEmpty(); i++){
+            sendInputPassword(password);
+            sleep(500);
+        }
         if(staySystem) clickCheckboxStaySystem();
         clickButtonLogin();
         return isSuccessAuthClient();

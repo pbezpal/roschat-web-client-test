@@ -97,8 +97,41 @@ allure {
     }
 }
 
+task testchats(type: Test){
+    useJUnitPlatform()
+
+    include("**/TestChatsPage.class")
+
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+
+}
+
+task testchannels(type: Test){
+    useJUnitPlatform()
+
+    systemProperties = [
+            'junit.jupiter.execution.parallel.enabled':'true',
+            'junit.jupiter.execution.parallel.config.strategy':'fixed',
+            'junit.jupiter.execution.parallel.config.fixed.parallelism':'2',
+            'junit.jupiter.execution.parallel.mode.default':'same_thread',
+            'junit.jupiter.execution.parallel.mode.classes.default':'concurrent'
+    ]
+
+    include("**/*Channel.class")
+
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
+
+testchats.finalizedBy(testchannels)
+
 test{
     useJUnitPlatform()
+
+    include("**/TestChatsPage.class")
 
     dependsOn 'cleanTest'
 

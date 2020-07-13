@@ -1,9 +1,6 @@
 package client.comments;
 
-import client.APIToServer;
-import client.Helper;
-import client.RecourcesTests;
-import client.WatcherTests;
+import client.*;
 import client.helper.SSHGetCommand;
 import com.codeborne.selenide.Selenide;
 import io.qameta.allure.Description;
@@ -12,23 +9,23 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.openqa.selenium.WebDriver;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import static chat.ros.testing2.data.ContactsData.*;
-import static chat.ros.testing2.data.LoginData.HOST_SERVER;
 import static data.CommentsData.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Epic(value = "Каналы")
 @Feature(value = "Публичный проверенный канал")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@ExtendWith(RecourcesTests.class)
+//@ExtendWith(RecourcesTests.class)
 @ExtendWith(WatcherTests.class)
-public class TestPublicChannel extends chat.ros.testing2.server.administration.ChannelsPage implements CommentsPage, Helper {
+public class TestPublicChannel extends chat.ros.testing2.server.administration.ChannelsPage implements CommentsPage, Helper, StartParallelTest {
 
-    private static String apiHost = "https://" + HOST_SERVER + ":8080";
+    private static String apiHost = hostApiServer;
     private static String apiUser = CONTACT_NUMBER_7013 + "@ros.chat";
     private static APIToServer apiToServer = null;
     private static String CIDUser = SSHGetCommand.isCheckQuerySSH(
@@ -44,17 +41,18 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
     
     @BeforeAll
     static void setUp(){
+        StartParallelTest.init();
         nameChannel = String.format(nameChannel,System.currentTimeMillis());
         newNameChannel = nameChannel + System.currentTimeMillis();
         status = false;
     }
-    
 
     @Story(value = "Создаём новый публичный канал")
     @Description(value = "Авторизуемся под пользователем 7012 и создаём новый публичный канал")
     @Order(1)
     @Test
     void test_Create_Public_Channel_7012(){
+        openClient(CONTACT_NUMBER_7012 + "@ros.chat", false);
         assertTrue(
                 clientChannelsPage.createNewChannel(
                         nameChannel,
@@ -75,6 +73,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
     @Order(2)
     @Test
     void test_Search_Public_Channel_7013(){
+        openClient(CONTACT_NUMBER_7013 + "@ros.chat", false);
         assertTrue(status, "Канал не был создан");
         assertTrue(
                 clientChannelsPage.searchChannel(
@@ -112,6 +111,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
         String[] apiGetMessageResult;
 
         Runnable clientShareLinkChannel = () -> {
+            openClient(CONTACT_NUMBER_7012 + "@ros.chat", false);
             clientChannelsPage.copyLinkChannel(nameChannel, CONTACT_NUMBER_7013);
         };
 
@@ -143,6 +143,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
         String[] apiGetMessageResult;
 
         Runnable clientShareLinkChannel = () -> {
+            openClient(CONTACT_NUMBER_7012 + "@ros.chat", false);
             clientChannelsPage.shareLinkChannel(nameChannel, CONTACT_NUMBER_7013);
         };
 
@@ -172,6 +173,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
     @Test
     void test_Add_User_Public_Channel_7012() {
         assertTrue(status, "Канал не был создан");
+        openClient(CONTACT_NUMBER_7012 + "@ros.chat", false);
         clientChannelsPage.addUsersChannel(nameChannel, CLIENT_INFO_ITEM_ADMIN_CHANNEL, admins);
         assertAll("Проверяем, что есть иконка и добавляются администраторы",
                 () -> assertTrue(clientChannelsPage.isIconUserPlus(),
@@ -196,6 +198,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
     @Test
     void test_Subscriber_Public_Channel_7013() {
         assertTrue(status, "Канал не был создан");
+        openClient(CONTACT_NUMBER_7013 + "@ros.chat", false);
         assertAll("Проверяем, что есть иконка," +
                         "подписываемся на канал," +
                         "проверяем сколько администраторов и подписчиков отображается у подписчика",
@@ -226,6 +229,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
         String[] apiGetMessageResult;
 
         Runnable clientNewPublicationChannel = () -> {
+            openClient(CONTACT_NUMBER_7012 + "@ros.chat", false);
             clientChannelsPage.newPublication(
                     nameChannel,
                     CLIENT_TITLE_PUBLICATION_CHANNEL,
@@ -263,6 +267,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
     @Test
     void test_Check_New_Publication_Public_Channel_7013(){
         assertTrue(status, "Канал не был создан");
+        openClient(CONTACT_NUMBER_7013 + "@ros.chat", false);
         clientChannelsPage.clickItemComments();
         clientChannelsPage.clickChat(nameChannel);
         assertAll("Проверяем, отображается ли публикация у подписчика",
@@ -290,6 +295,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
                 "" + getIDChannel(nameChannel) + ",\"pubId\":1}";
 
         Runnable clientGetMessage = () -> {
+            openClient(CONTACT_NUMBER_7012 + "@ros.chat", false);
             clientChannelsPage.clickItemComments();
             clientChannelsPage.clickChat(CONTACT_NUMBER_7013);
             clientChannelsPage.clickSharePublicationChannel(nameChannel);
@@ -336,6 +342,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
                 "" + getIDChannel(nameChannel) + ",\"pubId\":1}";
 
         Runnable clientSharePublicationChannel = () -> {
+            openClient(CONTACT_NUMBER_7012 + "@ros.chat", false);
             clientChannelsPage.sharePublicationChannel(
                     nameChannel,
                     "1",
@@ -370,6 +377,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
     void test_Edit_Name_And_Description_Public_Channel_7012(){
         assertTrue(status, "Канал не был создан");
         status = false;
+        openClient(CONTACT_NUMBER_7012 + "@ros.chat", false);
         clientChannelsPage.changeDataChannel(
                 nameChannel,true,true,false,
                 newNameChannel,
@@ -405,6 +413,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
     @Test
     void test_Search_Public_Channel_7013_After_Edit_Name_Channel(){
         assertTrue(status, "Канал не был создан или измененно навзание");
+        openClient(CONTACT_NUMBER_7013 + "@ros.chat", false);
         assertTrue(
                 clientChannelsPage.searchChannel(
                         newNameChannel,
@@ -437,6 +446,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
     @Test
     void test_Delete_Channel_7012(){
         assertTrue(status, "Канал не был создан или измененно навзание");
+        openClient(CONTACT_NUMBER_7012 + "@ros.chat", false);
         assertTrue(clientChannelsPage.deleteChannel(newNameChannel).
                         isExistComments(newNameChannel, false),
                 "Канал найден в списке бесед после удаления");
@@ -449,6 +459,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
     @Test
     void test_Search_Public_Channel_7013_After_Delete_Channel(){
         assertTrue(status, "Канал не был создан или измененно навзание");
+        openClient(CONTACT_NUMBER_7013 + "@ros.chat", false);
         assertTrue(
                 isExistComments(
                         newNameChannel,

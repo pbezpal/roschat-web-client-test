@@ -44,13 +44,13 @@ public interface CommentsPage extends ClientPage {
     default boolean isExistComments(String comments, boolean show){
         if(show) {
             try {
-                itemsListChat.find(Condition.text(comments)).shouldBe(visible);
+                itemsListChat.find(Condition.text(comments)).waitUntil(visible, 30000);
             } catch (ElementNotFound e) {
                 return false;
             }
         } else {
             try {
-                itemsListChat.find(Condition.text(comments)).shouldBe(not(visible));
+                itemsListChat.find(Condition.text(comments)).waitUntil(disappear,30000);
             } catch (ElementShould e) {
                 return false;
             }

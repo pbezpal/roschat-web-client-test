@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Epic(value = "Каналы")
 @Feature(value = "Закрытый канал")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-//@ExtendWith(RecourcesTests.class)
+@ExtendWith(RecourcesTests.class)
 @ExtendWith(WatcherTests.class)
 public class TestClosedChannel extends chat.ros.testing2.server.administration.ChannelsPage implements CommentsPage, Helper, StartParallelTest {
 
@@ -43,7 +43,6 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
 
     @BeforeAll
     static void setUp(){
-        StartParallelTest.init();
         nameChannel = String.format(nameChannel,System.currentTimeMillis());
         newNameChannel = nameChannel + System.currentTimeMillis();
         status = false;

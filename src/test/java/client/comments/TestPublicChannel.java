@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Epic(value = "Каналы")
 @Feature(value = "Публичный проверенный канал")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-//@ExtendWith(RecourcesTests.class)
+@ExtendWith(RecourcesTests.class)
 @ExtendWith(WatcherTests.class)
 public class TestPublicChannel extends chat.ros.testing2.server.administration.ChannelsPage implements CommentsPage, Helper, StartParallelTest {
 
@@ -41,7 +41,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
     
     @BeforeAll
     static void setUp(){
-        StartParallelTest.init();
+        //StartParallelTest.init();
         nameChannel = String.format(nameChannel,System.currentTimeMillis());
         newNameChannel = nameChannel + System.currentTimeMillis();
         status = false;

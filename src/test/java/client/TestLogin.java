@@ -1,7 +1,6 @@
 package client;
 
 import com.codeborne.selenide.Configuration;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -17,7 +16,6 @@ public class TestLogin {
     String hostClient = "https://testing2.ros.chat";
 
     @Test
-    @Disabled
     void testLogin(){
         Configuration.baseUrl = hostClient;
         open("/");

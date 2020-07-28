@@ -86,7 +86,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
             " вводим в поле поиска имя канала. Проверяем, что канал отображается в списке каналов")
     @Order(2)
     @Test
-    void test_Search_Public_Channel_On_Client_B(){
+    void test_Search_Public_Channel(){
         assertTrue(status_create, "Канал не был создан");
         openClient(client_B, false);
         assertTrue(

@@ -81,7 +81,7 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
             " Проверяем, что канал не отображается в списке каналов")
     @Order(2)
     @Test
-    void test_Search_Closed_Channel_on_Client_B(){
+    void test_Search_Closed_Channel(){
         assertTrue(status_create, "Канал не был создан");
         openClient(client_B, false);
         assertTrue(
@@ -141,7 +141,9 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
             apiToServer = getApiToServer(apiHost, client_B, apiToServer);
-            String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_CHATS_SEND_EVENT, "data",60);
+            String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_CHATS_SEND_EVENT,
+                    "data",
+                    60);
             return getMessageResult;
         });
 
@@ -189,7 +191,7 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
             "Проверяем сколько администраторов и подписчиков в канале отображается у подписчика")
     @Order(6)
     @Test
-    void test_Subscriber_Closed_Channel_on_Client_B() {
+    void test_Subscriber_Closed_Channel() {
         assertTrue(status_create, "Канал не был создан");
         openClient(client_B, false);
         assertAll("Проверяем, что есть иконка," +
@@ -252,7 +254,8 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
                 () -> assertTrue(clientChannelsPage.isShowTitlePublication("1", CLIENT_TITLE_PUBLICATION_CHANNEL),
                         "Заголовок публикации не совпадает с " + CLIENT_TITLE_PUBLICATION_CHANNEL),
                 () -> assertTrue(clientChannelsPage.
-                                isShowDescriptionPublication("1", CLIENT_DESCRIPTION_PUBLICATION_CLOSED_CHANNEL, true),
+                                isShowDescriptionPublication("1", CLIENT_DESCRIPTION_PUBLICATION_CLOSED_CHANNEL,
+                                        true),
                         "Описание публикации не совпадает с " + CLIENT_DESCRIPTION_PUBLICATION_CLOSED_CHANNEL)
         );
     }
@@ -274,7 +277,8 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
                 () -> assertTrue(clientChannelsPage.isShowTitlePublication("1", CLIENT_TITLE_PUBLICATION_CHANNEL),
                         "Заголовок публикации не совпадает с " + CLIENT_TITLE_PUBLICATION_CHANNEL),
                 () -> assertTrue(clientChannelsPage.
-                                isShowDescriptionPublication("1", CLIENT_DESCRIPTION_PUBLICATION_CLOSED_CHANNEL, true),
+                                isShowDescriptionPublication("1", CLIENT_DESCRIPTION_PUBLICATION_CLOSED_CHANNEL,
+                                        true),
                         "Описание публикации не совпадает с " + CLIENT_DESCRIPTION_PUBLICATION_CLOSED_CHANNEL)
         );
     }
@@ -300,7 +304,8 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
                     () -> assertTrue(clientChannelsPage.isShowTitlePublication("1", CLIENT_TITLE_PUBLICATION_CHANNEL),
                             "Заголовок публикации не совпадает с " + CLIENT_TITLE_PUBLICATION_CHANNEL),
                     () -> assertTrue(clientChannelsPage.
-                                    isShowDescriptionPublication("1", CLIENT_DESCRIPTION_PUBLICATION_CLOSED_CHANNEL, true),
+                                    isShowDescriptionPublication("1", CLIENT_DESCRIPTION_PUBLICATION_CLOSED_CHANNEL,
+                                            true),
                             "Описание публикации не совпадает с " + CLIENT_DESCRIPTION_PUBLICATION_CLOSED_CHANNEL)
             );
         };

@@ -9,8 +9,8 @@ public class WatcherTests implements TestWatcher {
 
     @Override
     public void testFailed(ExtensionContext context, Throwable throwable) {
-        String filename = String.valueOf(context.getTestMethod());
-        AScreenshot(filename);
+        String methodName = String.valueOf(context.getTestMethod());
+        AScreenshot(methodName);
         ABrowserLogNetwork();
         ABrowserLogConsole();
     }

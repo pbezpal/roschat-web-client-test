@@ -1,3 +1,9 @@
+/***
+ * Тестируем отправку и приём сообщений на WEB-клиенте
+ * Клиент 1 - 7012@ros.chat
+ * Клиент 2 - 7013@ros.chat
+ */
+
 package client.comments;
 
 import client.*;
@@ -34,10 +40,11 @@ public class TestChatsPage implements CommentsPage {
     private ChatsPage chatsPage = new ChatsPage();
 
     @Story(value = "Проверка получения сообщения")
-    @Description(value = "Авторизуемся под пользователем 7012, пользователь 7013 отправляет сообщение, проверяем, " +
-            "появилось ли сообщение у пользователя 7012")
+    @Description(value = "1. Авторизуемся первым пользователем на WEB-клиенте \n." +
+            "2. Авторизуемся вторым пользователем через api и отправляем сообщение \n" +
+            "3. Проверяем WEB-клиенте, пришло ли сообщение от второго пользователя")
     @Test
-    void test_Get_New_Message_7012(){
+    void test_Get_New_Message(){
         Runnable clientGetMessage = () -> {
             assertTrue(chatsPage.isGetNewMessage(CONTACT_NUMBER_7013, CLIENT_CHATS_RECEIVED_MESSAGE));
         };
@@ -62,10 +69,12 @@ public class TestChatsPage implements CommentsPage {
     }
 
     @Story(value = "Проверка отправки сообщения")
-    @Description(value = "Авторизуемся под пользователем 7012, пользователь 7013 отправляет сообщение, проверяем, " +
-            "появилось ли сообщение у пользователя 7012")
+    @Description(value = "1. Авторизуемся первым пользователем на WEB-клиенте. \n" +
+            "2. Авторизуемся вторым пользователем через api. \n" +
+            "3. Первый пользователь отправляет сообщение второму пользователю. \n" +
+            "4. Второй пользователь проверяет, пришло ли ему сообщение от первого клиента.")
     @Test
-    void test_Send_New_Message_7012() throws ExecutionException, InterruptedException {
+    void test_Send_New_Message() throws ExecutionException, InterruptedException {
         String[] apiGetMessageResult;
 
         Runnable clientSendMessage = () -> {
@@ -96,6 +105,6 @@ public class TestChatsPage implements CommentsPage {
 
     @AfterAll
     static void tearDown(){
-        apiToServer.disconnect();
+        if(apiToServer != null) apiToServer.disconnect();
     }
 }

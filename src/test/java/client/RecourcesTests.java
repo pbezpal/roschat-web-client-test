@@ -5,12 +5,9 @@ import chat.ros.testing2.server.LoginPage;
 import chat.ros.testing2.server.contacts.ContactsPage;
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.WebDriverRunner;
-import org.junit.gen5.api.extension.Extensions;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.parallel.Execution;
-import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
@@ -88,16 +85,12 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback{
     @Override
     public void beforeEach(ExtensionContext context){
         sleep(2000);
-        if (String.valueOf(context.getRequiredTestMethod()).contains(CONTACT_NUMBER_7012)){
+        if(classTest.contains("TestChatsPage")){
             openClient(CONTACT_NUMBER_7012 + "@ros.chat", false);
         }
-        else if (String.valueOf(context.getRequiredTestMethod()).contains(CONTACT_NUMBER_7013)){
-            openClient(CONTACT_NUMBER_7013 + "@ros.chat", false);
-        }
-        else openMS("/admin/channels");
     }
 
-    private void openMS(String page){
+    public void openMS(String page){
         Configuration.baseUrl = hostServer;
         if( ! WebDriverRunner.getWebDriver().getCurrentUrl().contains(hostServer)) open("/");
         if( ! loginPage.isLoginMS()) loginPage.loginOnServer(LOGIN_ADMIN_MS, PASSWORD_ADMIN_MS);

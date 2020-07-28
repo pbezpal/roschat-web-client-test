@@ -1,3 +1,22 @@
+/***
+ * Тестирование закрытого канала на WEB-клиенте
+ * клиент А - 7000@ros.chat
+ * клиента B - 7001@ros.chat
+ * Проверяется:
+ * 1. Создание закрытого канала клиентом А
+ * 2. Поиск канала клиентом B
+ * 3. Поделиться ссылкой на канал с клиентом B
+ * 4. Добавление подписчиков и администраторов в канал
+ * 5. Подписаться клиентом B на канал
+ * 6. Создание публикации клиентом А
+ * 7. Поделиться публикацие с клиентом B
+ * 8. Видит ли клиента B пубьликацию
+ * 9. Изменение названия и описания канала
+ * 10. Поиск на втором клиенте канала после изменения названия и описания
+ * 11. Удаление канала клиентом А
+ * 12. Поиск на втором пользователе канала после удаления канала
+ */
+
 package client.comments;
 
 import client.*;
@@ -6,14 +25,10 @@ import com.codeborne.selenide.Selenide;
 import io.qameta.allure.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.parallel.Execution;
-import org.junit.jupiter.api.parallel.ExecutionMode;
-import org.openqa.selenium.WebDriver;
 
 import java.util.concurrent.*;
 
 import static chat.ros.testing2.data.ContactsData.*;
-import static chat.ros.testing2.data.LoginData.HOST_SERVER;
 import static data.CommentsData.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,35 +40,29 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestClosedChannel extends chat.ros.testing2.server.administration.ChannelsPage implements CommentsPage, Helper, StartParallelTest {
 
     private static String apiHost = hostApiServer;
-    private static String apiUser = CONTACT_NUMBER_7013 + "@ros.chat";
+    private final String client_A = CLIENT_USER_A + "@ros.chat";
+    private final String client_B = CLIENT_USER_B + "@ros.chat";
     private static APIToServer apiToServer = null;
     private static String CIDUser = SSHGetCommand.isCheckQuerySSH(
             "sudo -u roschat psql -c \"select cid, login from users;\" " +
-                    "| grep " + CONTACT_NUMBER_7012 + " | awk '{print $1}'"
+                    "| grep " + CLIENT_USER_A + " | awk '{print $1}'"
     );
     private static ChannelsPage clientChannelsPage = new ChannelsPage();
-    private String[] admins = {CLIENT_USER_A, CLIENT_USER_B, CLIENT_USER_C};
-    private String[] subscribers = {CLIENT_USER_D, CLIENT_USER_E, CLIENT_USER_F, CONTACT_NUMBER_7013};
-    private static String nameChannel = "CHC%1$s";
-    private static String newNameChannel = null;
-    private static boolean status;
-    private static WebDriver driver;
-    private static String[] users = {CLIENT_USER_A, CLIENT_USER_B, CLIENT_USER_C, CLIENT_USER_D, CLIENT_USER_E, CLIENT_USER_F,
-            CONTACT_NUMBER_7012, CONTACT_NUMBER_7013};
-
-    @BeforeAll
-    static void setUp(){
-        nameChannel = String.format(nameChannel,System.currentTimeMillis());
-        newNameChannel = nameChannel + System.currentTimeMillis();
-        status = false;
-    }
+    private String[] admins = {CONTACT_NUMBER_7013, CLIENT_USER_B, CLIENT_USER_C};
+    private String[] subscribers = {CLIENT_USER_D, CLIENT_USER_E, CLIENT_USER_F, CONTACT_NUMBER_7012};
+    private static String nameChannel = "CHC" + System.currentTimeMillis();
+    private static String newNameChannel = nameChannel + System.currentTimeMillis();
+    private static boolean status_create = false;
+    private static boolean status_change = false;
+    private static boolean status_delete = false;
+    private String channelName = null;
 
     @Story(value = "Создаём новый закрытый канал")
-    @Description(value = "Авторизуемся под пользователем 7012 и создаём новый закрытый канал")
+    @Description(value = "Авторизуемся под клиентом А и создаём новый закрытый канал")
     @Order(1)
     @Test
-    void test_Create_Closed_Channel_7012(){
-        openClient(CONTACT_NUMBER_7012 + "@ros.chat", false);
+    void test_Create_Channel(){
+        openClient(client_A, false);
         assertTrue(clientChannelsPage.createNewChannel(
                 nameChannel,
                 CLIENT_DESCRIPTION_CHANNEL_CLOSED,
@@ -64,17 +73,17 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
         clickChat(nameChannel);
         assertTrue(clientChannelsPage.isTextInfoClosedChannel(true),"Отсутствует надпись Закрытый " +
                 "в разделе 'Информация о канале'");
-        status = true;
+        status_create = true;
     }
 
-    @Story(value = "Ищем на клиенте 7013 закрытый канал")
-    @Description(value = "Авторизуемся на клиенте под учётной записью 7013 и вводим в поле поиска имя закрытого канала." +
+    @Story(value = "Ищем под клиентом B закрытый канал")
+    @Description(value = "Авторизуемся под учётной записью клиента B и вводим в поле поиска имя закрытого канала." +
             " Проверяем, что канал не отображается в списке каналов")
     @Order(2)
     @Test
-    void test_Search_Closed_Channel_7013(){
-        assertTrue(status, "Канал не был создан");
-        openClient(CONTACT_NUMBER_7013 + "@ros.chat", false);
+    void test_Search_Closed_Channel_on_Client_B(){
+        assertTrue(status_create, "Канал не был создан");
+        openClient(client_B, false);
         assertTrue(
                 clientChannelsPage.searchChannel(
                         nameChannel,
@@ -83,25 +92,24 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
     }
 
     @Story(value = "Копируем и делимся ссылкой на канал")
-    @Description(value = "Авторизуемся на клиенте под учётной записью 7012, переходим в раздел информации о канале," +
+    @Description(value = "Авторизуемся под учётной записью клиента А, переходим в раздел информации о канале," +
             "нажимаем 'Копировать ссылку' и делимся ссылкой. Проверяем, что ссылка дошла до адресата.")
     @Order(3)
     @Test
-    void test_Copy_And_Paste_Link_Closed_Channel_7012() throws ExecutionException, InterruptedException {
+    void test_Copy_And_Paste_Link_Closed_Channel() throws ExecutionException, InterruptedException {
         String[] apiGetMessageResult;
-
+        assertTrue(status_create, "Канал не был создан");
         Runnable clientShareLinkChannel = () -> {
-            assertTrue(status, "Канал не был создан");
-            openClient(CONTACT_NUMBER_7012 + "@ros.chat", false);
+            openClient(client_A, false);
             clientChannelsPage.copyLinkChannel(
                     nameChannel,
-                    CONTACT_NUMBER_7013
+                    CLIENT_USER_B
             );
         };
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
-            assertTrue(status, "Канал не был создан");
-            apiToServer = getApiToServer(apiHost, apiUser, apiToServer);
+            assertTrue(status_create, "Канал не был создан");
+            apiToServer = getApiToServer(apiHost, client_B, apiToServer);
             String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_CHATS_SEND_EVENT, "data",60);
             return getMessageResult;
         });
@@ -112,28 +120,27 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
                 () -> assertTrue(clientChannelsPage.isIconCopyLinkChannel(nameChannel),
                         "Нет иконки 'Копировать ссылку'"),
                 () -> assertEquals(apiGetMessageResult[0], CIDUser, "Сообщение пришло " +
-                        "не от пользователя " + CONTACT_NUMBER_7012),
+                        "не от пользователя " + CLIENT_USER_A),
                 () -> assertTrue(apiGetMessageResult[1].contains(nameChannel),
                         "Ссылка на канал " + nameChannel + " не пришла")
         );
     }
 
     @Story(value = "Делимся ссылкой на канал")
-    @Description(value = "Авторизуемся на клиенте под учётной записью 7012, переходим в раздел информации о канале" +
-            " и нажимаем 'Поделиться ссылкой'. Проверяем, что сохранения применились.")
+    @Description(value = "Авторизуемся под учётной записью клиента A, переходим в раздел" +
+            " информации о канале и нажимаем 'Поделиться ссылкой'. Проверяем, что сохранения применились.")
     @Order(4)
     @Test
-    void test_Share_Link_Closed_Channel_7012() throws ExecutionException, InterruptedException {
-        assertTrue(status, "Канал не был создан");
+    void test_Share_Link_Closed_Channel() throws ExecutionException, InterruptedException {
         String[] apiGetMessageResult;
-
+        assertTrue(status_create, "Канал не был создан");
         Runnable clientShareLinkChannel = () -> {
-            openClient(CONTACT_NUMBER_7012 + "@ros.chat", false);
-            clientChannelsPage.shareLinkChannel(nameChannel, CONTACT_NUMBER_7013);
+            openClient(client_A, false);
+            clientChannelsPage.shareLinkChannel(nameChannel, CLIENT_USER_B);
         };
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
-            apiToServer = getApiToServer(apiHost, apiUser, apiToServer);
+            apiToServer = getApiToServer(apiHost, client_B, apiToServer);
             String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_CHATS_SEND_EVENT, "data",60);
             return getMessageResult;
         });
@@ -144,21 +151,22 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
                 () -> assertTrue(clientChannelsPage.isIconShareChannel(),
                         "Нет иконки 'Поделиться ссылкой'"),
                 () -> assertEquals(apiGetMessageResult[0], CIDUser, "Сообщение пришло " +
-                        "не от пользователя " + CONTACT_NUMBER_7012),
+                        "не от пользователя " + CLIENT_USER_A),
                 () -> assertTrue(apiGetMessageResult[1].contains(nameChannel),
                         "Ссылка на канал " + nameChannel + " не пришла")
         );
     }
 
     @Story(value = "Добавляем администраторов и подписчиков")
-    @Description(value = "Авторизуемся на клиенте под учётной записью 7012, переходим в раздел информации о канале," +
-            "нажимаем 'Администраторы' и добавляем администраторов в канал. Проверяем, что администарторы добавились." +
-            " Затем нажимаем 'Подписчики' и добавляем подписчиков в канал. Проверяем, что подписчики добавились.")
+    @Description(value = "Авторизуемся под учётной записью клиента А, переходим в раздел" +
+            " информации о канале, нажимаем 'Администраторы' и добавляем администраторов в канал. Проверяем, " +
+            "что администарторы добавились. Затем нажимаем 'Подписчики' и добавляем подписчиков в канал. Проверяем, " +
+            "что подписчики добавились.")
     @Order(5)
     @Test
-    void test_Add_User_Closed_Channel_7012() {
-        assertTrue(status, "Канал не был создан");
-        openClient(CONTACT_NUMBER_7012 + "@ros.chat", false);
+    void test_Add_User_Closed_Channel() {
+        assertTrue(status_create, "Канал не был создан");
+        openClient(client_A, false);
         clientChannelsPage.addUsersChannel(nameChannel, CLIENT_INFO_ITEM_ADMIN_CHANNEL, admins);
         assertAll("Проверяем, что есть иконка и добавляются администраторы",
                 () -> assertTrue(clientChannelsPage.isIconUserPlus(),
@@ -176,14 +184,14 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
     }
 
     @Story(value = "Пользователь подписывается на канал")
-    @Description(value = "Авторизуемся на клиенте под учётной записью 7013, переходим в раздел информации о канале," +
-            "нажимаем 'Подписаться на канал'. Проверяем, что пользователь подписался на канал. Проверяем сколько" +
-            "администраторов и подписчиков в канале отображается у подписчика")
+    @Description(value = "Авторизуемся под учётной записью клиента B, переходим в раздел" +
+            " информации о канале, нажимаем 'Подписаться на канал'. Проверяем, что пользователь подписался на канал. " +
+            "Проверяем сколько администраторов и подписчиков в канале отображается у подписчика")
     @Order(6)
     @Test
-    void test_Subscriber_Closed_Channel_7013() {
-        assertTrue(status, "Канал не был создан");
-        openClient(CONTACT_NUMBER_7013 + "@ros.chat", false);
+    void test_Subscriber_Closed_Channel_on_Client_B() {
+        assertTrue(status_create, "Канал не был создан");
+        openClient(client_B, false);
         assertAll("Проверяем, что есть иконка," +
                           "подписываемся на канал," +
                           "проверяем сколько администраторов и подписчиков отображается у подписчика",
@@ -205,16 +213,16 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
     }
 
     @Story(value = "Новая публикация")
-    @Description(value = "Авторизуемся на клиенте под учётной записью 7012, в контекстном меню выбираем 'Новая публикация'" +
-            " опубликовываем публикацию. Проверяем, что публикация была успешно опубликована.")
+    @Description(value = "Авторизуемся под учётной записью клиента А, в контекстном меню выбираем" +
+            " 'Новая публикация' опубликовываем публикацию. Проверяем, что публикация была успешно опубликована.")
     @Order(7)
     @Test
-    void test_New_Publication_Closed_Channel_7012() throws ExecutionException, InterruptedException {
-        assertTrue(status, "Канал не был создан");
+    void test_New_Publication_Closed_Channel() throws ExecutionException, InterruptedException {
+        assertTrue(status_create, "Канал не был создан");
         String[] apiGetMessageResult;
 
         Runnable clientNewPublicationChannel = () -> {
-            openClient(CONTACT_NUMBER_7012 + "@ros.chat", false);
+            openClient(client_A, false);
             clientChannelsPage.newPublication(
                     nameChannel,
                     CLIENT_TITLE_PUBLICATION_CHANNEL,
@@ -222,7 +230,7 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
         };
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
-            apiToServer = getApiToServer(apiHost, apiUser, apiToServer);
+            apiToServer = getApiToServer(apiHost, client_B, apiToServer);
             String[] getMessageResult = apiToServer.GetTextMessageFromUser(
                     CLIENT_PUBLICATION_EVENT,
                     "title",
@@ -235,11 +243,11 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
         apiGetMessageResult = socketGetMessage.get();
         assertAll("Проверяем, опубликована ли новая публикация",
                 () -> assertEquals(apiGetMessageResult[0], CIDUser, "Сообщение пришло " +
-                        "не от пользователя " + CONTACT_NUMBER_7012),
+                        "не от пользователя " + CLIENT_USER_A),
                 () -> assertEquals(apiGetMessageResult[1], CLIENT_TITLE_PUBLICATION_CHANNEL,"Текст заголовка " +
                         "публикации не совпадает с эталоном "  + CLIENT_TITLE_PUBLICATION_CHANNEL),
                 () -> assertEquals(clientChannelsPage.getAuthorPublication("1"),
-                        CONTACT_NUMBER_7012,
+                        CLIENT_USER_A,
                         "В публикации указан неправильный автор"),
                 () -> assertTrue(clientChannelsPage.isShowTitlePublication("1", CLIENT_TITLE_PUBLICATION_CHANNEL),
                         "Заголовок публикации не совпадает с " + CLIENT_TITLE_PUBLICATION_CHANNEL),
@@ -250,18 +258,18 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
     }
 
     @Story(value = "Проверяем, видна ли публикация у подписчика")
-    @Description(value = "Авторизуемся на клиенте под учётной записью 7013 и проверяем, что новая публикация" +
+    @Description(value = "Авторизуемся под учётной записью клиента B и проверяем, что новая публикация" +
             "видна у подписчика")
     @Order(8)
     @Test
-    void test_Check_New_Publication_Closed_Channel_7013(){
-        assertTrue(status, "Канал не был создан");
-        openClient(CONTACT_NUMBER_7013 + "@ros.chat", false);
+    void test_Check_New_Publication_Closed_Channel(){
+        assertTrue(status_create, "Канал не был создан");
+        openClient(client_B, false);
         clientChannelsPage.clickItemComments();
         clientChannelsPage.clickChat(nameChannel);
         assertAll("Проверяем, отображается ли публикация у подписчика",
                 () -> assertEquals(clientChannelsPage.getAuthorPublication("1"),
-                        CONTACT_NUMBER_7012,
+                        CLIENT_USER_A,
                         "В публикации указан неправильный автор"),
                 () -> assertTrue(clientChannelsPage.isShowTitlePublication("1", CLIENT_TITLE_PUBLICATION_CHANNEL),
                         "Заголовок публикации не совпадает с " + CLIENT_TITLE_PUBLICATION_CHANNEL),
@@ -272,22 +280,22 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
     }
 
     @Story(value = "Переходим в публикацию, которой с нами поделились")
-    @Description(value = "Авторизуемся под кчётной записью 7012. Пользователь 7013 деится публикацией канала через API." +
-            "Проверяем, что пользователь 7012 видит публикацию и может перейти к ней")
+    @Description(value = "Авторизуемся под учётной записью клиента А. Клиент B делится публикацией канала через API." +
+            "Проверяем, что клиент А видит публикацию и может перейти к ней")
     @Order(9)
     @Test
-    void test_Get_Share_Publication_Closed_channel_7012(){
-        assertTrue(status, "Канал не был создан");
+    void test_Get_Share_Publication_Closed_channel(){
+        assertTrue(status_create, "Канал не был создан");
         String message = "{\"type\":\"publication\",\"chId\":" + getIDChannel(nameChannel) + ",\"pubId\":1}";
 
         Runnable clientGetMessage = () -> {
-            openClient(CONTACT_NUMBER_7012 + "@ros.chat", false);
+            openClient(client_A, false);
             clientChannelsPage.clickItemComments();
-            clientChannelsPage.clickChat(CONTACT_NUMBER_7013);
+            clientChannelsPage.clickChat(CLIENT_USER_B);
             clientChannelsPage.clickSharePublicationChannel(nameChannel);
             assertAll("Проверяем, отображается ли публикация после перехода к публикации",
                     () -> assertEquals(clientChannelsPage.getAuthorPublication("1"),
-                            CONTACT_NUMBER_7012,
+                            CLIENT_USER_A,
                             "В публикации указан неправильный автор"),
                     () -> assertTrue(clientChannelsPage.isShowTitlePublication("1", CLIENT_TITLE_PUBLICATION_CHANNEL),
                             "Заголовок публикации не совпадает с " + CLIENT_TITLE_PUBLICATION_CHANNEL),
@@ -300,7 +308,7 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
         Thread apiSendMessage = new Thread() {
             @Override
             public void run() {
-                apiToServer = getApiToServer(apiHost, apiUser, apiToServer);
+                apiToServer = getApiToServer(apiHost, client_B, apiToServer);
                 Selenide.sleep(3000);
                 apiToServer.SendTextMessageToUser(
                         "user",
@@ -317,25 +325,24 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
     }
 
     @Story(value = "Делимся публикацией")
-    @Description(value = "Авторизуемся под учётной записью 7012 и делимся публикацией канала с пользователем 7013." +
+    @Description(value = "Авторизуемся под учётной записью клиента А и делимся публикацией канала с клиентом B." +
             "Проверяем при помощи API, что успешно поделились публикацией.")
     @Order(10)
     @Test
-    void test_Send_Share_Publication_Closed_Channel_7012() throws ExecutionException, InterruptedException {
-        assertTrue(status, "Канал не был создан");
+    void test_Send_Share_Publication_Closed_Channel() throws ExecutionException, InterruptedException {
         String[] apiGetMessageResult;
         String message = "{\"type\":\"publication\",\"chId\":" + getIDChannel(nameChannel) + ",\"pubId\":1}";
-
+        assertTrue(status_create, "Канал не был создан");
         Runnable clientSharePublicationChannel = () -> {
-            openClient(CONTACT_NUMBER_7012 + "@ros.chat", false);
+            openClient(client_A, false);
             clientChannelsPage.sharePublicationChannel(
                     nameChannel,
                     "1",
-                    CONTACT_NUMBER_7013);
+                    CLIENT_USER_B);
         };
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
-            apiToServer = getApiToServer(apiHost, apiUser, apiToServer);
+            apiToServer = getApiToServer(apiHost, client_B, apiToServer);
             String[] getMessageResult = apiToServer.GetTextMessageFromUser(
                     CLIENT_CHATS_SEND_EVENT,
                     "data",
@@ -348,21 +355,20 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
         apiGetMessageResult = socketGetMessage.get();
         assertAll("Проверяем, поделились ли публикацией",
                 () -> assertEquals(apiGetMessageResult[0], CIDUser, "Сообщение пришло " +
-                        "не от пользователя " + CONTACT_NUMBER_7012),
+                        "не от пользователя " + CLIENT_USER_A),
                 () -> assertEquals(apiGetMessageResult[1], message,"Сообщение не соответствует ожидаемому" +
                         "" + message)
         );
     }
 
     @Story(value = "Меняем название и описание закрытого канала")
-    @Description(value = "Авторизуемся на клиенте под учётной записью 7012, переходим в раздел информации о канале" +
+    @Description(value = "Авторизуемся под учётной записью клиента А, переходим в раздел информации о канале" +
             " и правим название и описание канала. Проверяем, что сохранения применились.")
     @Order(11)
     @Test
-    void test_Edit_Name_And_Description_Closed_Channel_7012(){
-        assertTrue(status, "Канал не был создан");
-        status = false;
-        openClient(CONTACT_NUMBER_7012 + "@ros.chat", false);
+    void test_Edit_Name_And_Description_Closed_Channel(){
+        assertTrue(status_create, "Канал не был создан");
+        openClient(client_A, false);
         clientChannelsPage.changeDataChannel(nameChannel,true,true,false,
                 newNameChannel,
                 CLIENT_NEW_DESCRIPTION_CHANNEL_CLOSED);
@@ -383,17 +389,18 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
                         CLIENT_NEW_DESCRIPTION_CHANNEL_CLOSED,
                         "Новое описание канала не найдено в разделе информация о канале")
         );
-        status = true;
+        status_change = true;
     }
 
-    @Story(value = "Ищем на клиенте 7013 закрытый канал после изменения названия")
-    @Description(value = "Авторизуемся на клиенте под учётной записью 7013 и вводим в поле поиска имя закрытого канала." +
+    @Story(value = "Ищем под учетной записью клиента B закрытый канал после изменения названия")
+    @Description(value = "Авторизуемся под учётной записью клиента B и вводим в поле поиска имя закрытого канала." +
             " Проверяем, что канал не отображается в списке каналов")
     @Order(12)
     @Test
-    void test_Search_Closed_Channel_7013_After_Edit_Name_Channel(){
-        assertTrue(status, "Канал не был создан или измененно навзание");
-        openClient(CONTACT_NUMBER_7013 + "@ros.chat", false);
+    void test_Search_Closed_Channel_After_Edit_Name_Channel(){
+        assertTrue(status_create, "Канал не был создан или не изменены данные");
+        assertTrue(status_change, "Не поменялось название и/или описание канала");
+        openClient(client_B, false);
         assertTrue(
                 clientChannelsPage.searchChannel(
                         newNameChannel,
@@ -405,25 +412,31 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
     @Description(value = "Авторизуемся под учётно записью администратора канала и удалем канал")
     @Order(13)
     @Test
-    void test_Delete_Channel_7012(){
-        assertTrue(status, "Канал не был создан");
-        openClient(CONTACT_NUMBER_7012 + "@ros.chat", false);
-        assertTrue(clientChannelsPage.deleteChannel(nameChannel).
-                        isExistComments(newNameChannel, false),
+    void test_Delete_Channel(){
+        assertTrue(status_create, "Канал не был создан");
+        if(status_change) channelName = newNameChannel;
+        else channelName = nameChannel;
+        openClient(client_A, false);
+        assertTrue(clientChannelsPage.deleteChannel(channelName).
+                        isExistComments(channelName, false),
                 "Канал найден в списке бесед после удаления");
+        status_delete = true;
     }
 
-    @Story(value = "Ищем на клиенте 7013 закрытый канал после удаления канала")
-    @Description(value = "Авторизуемся на клиенте под учётной записью 7013 и вводим в поле поиска имя канала." +
+    @Story(value = "Ищем клиентом B закрытый канал после удаления канала")
+    @Description(value = "Авторизуемся под учётной записью клиента B и вводим в поле поиска имя канала." +
             " Проверяем, что канал не отображается в списке каналов")
     @Order(14)
     @Test
-    void test_Search_Closed_Channel_7013_After_Delete_Channel(){
-        assertTrue(status, "Канал не был создан или измененно навзание");
-        openClient(CONTACT_NUMBER_7013 + "@ros.chat", false);
+    void test_Search_Closed_Channel_After_Delete_Channel(){
+        assertTrue(status_create, "Канал не был создан");
+        assertTrue(status_delete, "Канал не удалён");
+        if(status_change) channelName = newNameChannel;
+        else channelName = nameChannel;
+        openClient(client_B, false);
         assertTrue(
                 isExistComments(
-                        newNameChannel,
+                        channelName,
                         false),
                 "Канал отображается в списке бесед после удаления");
     }

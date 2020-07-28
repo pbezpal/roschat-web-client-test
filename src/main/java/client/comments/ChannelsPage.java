@@ -7,8 +7,7 @@ import com.codeborne.selenide.ex.ElementShould;
 import io.qameta.allure.Step;
 import org.openqa.selenium.Keys;
 
-import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.$$;
+import static com.codeborne.selenide.Selenide.*;
 import static data.CommentsData.*;
 
 public class ChannelsPage extends ChatsPage {
@@ -287,6 +286,7 @@ public class ChannelsPage extends ChatsPage {
     private ChannelsPage sendInputTitlePublication(String title){
         for (Character c: title.toCharArray()) {
             inputTitlePublication.sendKeys(c.toString());
+            sleep(500);
         }
         return this;
     }

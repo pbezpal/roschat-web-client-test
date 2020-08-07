@@ -20,7 +20,10 @@ public interface ClientPage {
     SelenideElement divValueInputPassword = $(".non-border-input[type='password']").parent();
     SelenideElement iStaySystem = $("i.fal.fa-check");
     SelenideElement buttonLogin = $("button#login-btn");
-    SelenideElement buttonConfirmError = $("div.alert-confirn button");
+    SelenideElement confirmErrorModalWindow = $(".v--modal-box");
+    SelenideElement confirmErrorModalWindowText = confirmErrorModalWindow.$(".body");
+    SelenideElement confirmErrorModalWindowButton = confirmErrorModalWindow.$("button");
+    SelenideElement buttonConfirmError = $("div.alert-confirm button");
     SelenideElement successAuthClient = $("div.columns-layout:not([style='display: none;'])");
 
     SelenideElement inputSelectContacts = $("div.select-contact input.search-input");
@@ -51,7 +54,10 @@ public interface ClientPage {
 
     @Step(value = "Нажимаем кнопку 'Ввести логин и пароль'")
     static void clickButtonPencil(){
-        buttonPencil.click();
+        for(int i = 0; i < 3 && isVisibleElement(buttonPencil, true); i++){
+            buttonPencil.click();
+            sleep(500);
+        }
     }
 
     @Step(value = "Проверяем, виден ли элемент {element}")
@@ -75,16 +81,22 @@ public interface ClientPage {
 
     @Step(value = "Вводим адрес электронной почты {email}")
     static void sendInputEmail(String email){
-        inputEmail.sendKeys(Keys.CONTROL + "a");
-        inputEmail.sendKeys(Keys.BACK_SPACE);
-        inputEmail.sendKeys(email);
+        for(int i = 0; i < 3 && divValueInputEmail.getAttribute("input_text").isEmpty(); i++){
+            inputEmail.sendKeys(Keys.CONTROL + "a");
+            inputEmail.sendKeys(Keys.BACK_SPACE);
+            inputEmail.sendKeys(email);
+            sleep(500);
+        }
     }
 
     @Step(value = "Вводим пароль {password}")
     static void sendInputPassword(String password){
-        inputPassword.sendKeys(Keys.CONTROL + "a");
-        inputPassword.sendKeys(Keys.BACK_SPACE);
-        inputPassword.sendKeys(password);
+        for(int i = 0; i < 3 && divValueInputPassword.getAttribute("input_text").isEmpty(); i++){
+            inputPassword.sendKeys(Keys.CONTROL + "a");
+            inputPassword.sendKeys(Keys.BACK_SPACE);
+            inputPassword.sendKeys(password);
+            sleep(500);
+        }
     }
 
     @Step(value = "Нажимаем чекбокс, чтобы оставаться в системе")
@@ -97,27 +109,21 @@ public interface ClientPage {
         buttonLogin.click();
     }
 
-    static boolean loginClient(String email, String password, boolean staySystem){
-        for(int i = 0; i < 3 && isVisibleElement(buttonPencil, true); i++){
-            clickButtonPencil();
-            sleep(500);
-        }
+    default ClientPage loginClientClickButtonEnter(String email, String password, boolean staySystem, boolean clickButton){
+        clickButtonPencil();
+        sendInputEmail(email);
+        sendInputPassword(password);
 
-        for(int i = 0; i < 3 && divValueInputEmail.getAttribute("input_text").isEmpty(); i++){
-            sendInputEmail(email);
-            sleep(500);
-        }
-        for(int i = 0; i < 3 && divValueInputPassword.getAttribute("input_text").isEmpty(); i++){
-            sendInputPassword(password);
-            sleep(500);
-        }
         if(staySystem) clickCheckboxStaySystem();
-        clickButtonLogin();
-        return isSuccessAuthClient();
+        //Вход по кнопке
+        if(clickButton) clickButtonLogin();
+        //Вход по нажатию Enter
+        else inputPassword.pressEnter();
+        return this;
     }
 
-    @Step(value = "Проверяем, что успешно авторизовались на клиенте")
-    static boolean isSuccessAuthClient(){
+    @Step(value = "Проверяем, что авторизованы на клиенте")
+    default boolean isSuccessAuthClient(){
         try {
             successAuthClient.waitUntil(Condition.visible,60000);
         }catch (ElementNotFound e){
@@ -125,6 +131,27 @@ public interface ClientPage {
         }
 
         return true;
+    }
+
+    @Step(value = "Проверяем, появилось ли модальное окно об ошибке авторизации")
+    default boolean isConfirmErrorModalWindow(){
+        try{
+            confirmErrorModalWindow.should(Condition.visible);
+        }catch (ElementNotFound e){
+            return false;
+        }
+
+        return true;
+    }
+
+    @Step(value = "Проверяем текст в модальном окне об ошбке авторизации")
+    default String getTextConfirmErrorModalWindow(){
+        return confirmErrorModalWindowText.text();
+    }
+
+    @Step(value = "Нажимаем кнопку Ок в модальном окне об ошибке авторизации")
+    default void clickButtonConfirmModalWindow(){
+        confirmErrorModalWindowButton.click();
     }
 
     @Step(value = "Проверяем, что появился заголовок контакта/группы/канала")

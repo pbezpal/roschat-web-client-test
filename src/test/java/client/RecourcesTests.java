@@ -5,6 +5,7 @@ import chat.ros.testing2.server.LoginPage;
 import chat.ros.testing2.server.contacts.ContactsPage;
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.WebDriverRunner;
+import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -23,12 +24,11 @@ import java.util.logging.Level;
 
 import static chat.ros.testing2.data.ContactsData.*;
 import static chat.ros.testing2.data.LoginData.*;
-import static com.codeborne.selenide.Selenide.open;
-import static com.codeborne.selenide.Selenide.sleep;
+import static com.codeborne.selenide.Selenide.*;
 import static data.CommentsData.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback{
+public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback, AfterEachCallback, ClientPage {
 
     private LoginPage loginPage = new LoginPage();
     private String hostServer;
@@ -37,7 +37,7 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback{
     private WebDriver driver = null;
     private String sshCommandIsContact = "sudo -u roschat psql -c \"select cid, login from users;\" | grep ";
     private String[] users = {CLIENT_USER_A, CLIENT_USER_B, CLIENT_USER_C, CLIENT_USER_D, CLIENT_USER_E, CLIENT_USER_F,
-    CONTACT_NUMBER_7012, CONTACT_NUMBER_7013};
+            CONTACT_A, CONTACT_B, CONTACT_C};
 
     public RecourcesTests() {
         hostServer = "https://" + HOST_SERVER + ":" + PORT_SERVER;
@@ -77,41 +77,51 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback{
 
         Configuration.screenshots = false;
 
-        for(int i = 0; i < users.length; i++){
-            addContactAndAccount(users[i]);
+        if(classTest.contains("TestLogin")){
+            assertTrue(SSHManager.isCheckQuerySSH(sshCommandIsContact + CLIENT_USER_A),
+                    "Отсутствует пользователь " + CLIENT_USER_A + " в БД, невозможно начать тестирование");
+            Configuration.baseUrl = hostClient;
+            open("/");
+        }
+
+        if(classTest.contains("TestChatsPage")) {
+            assertTrue(SSHManager.isCheckQuerySSH(sshCommandIsContact + CLIENT_USER_A),
+                    "Отсутствует пользователь " + CLIENT_USER_A + " в БД, невозможно начать тестирование");
+            assertTrue(SSHManager.isCheckQuerySSH(sshCommandIsContact + CLIENT_USER_B),
+                    "Отсутствует пользователь " + CLIENT_USER_B + " в БД, невозможно начать тестирование");
+        }
+
+        if(classTest.contains("Channel")){
+            for(int i = 0; i < users.length; i++){
+                assertTrue(SSHManager.isCheckQuerySSH(sshCommandIsContact + users[i]),
+                        "В БД нет учётной записи " + users[i] + " невозможно начать тестирование каналов");
+            }
         }
     }
 
     @Override
     public void beforeEach(ExtensionContext context){
         sleep(2000);
+        String method = context.getTestMethod().toString();
         if(classTest.contains("TestChatsPage")){
-            openClient(CONTACT_NUMBER_7012 + "@ros.chat", false);
+            if(method.contains("test_Get_New_Message")) openClient( CLIENT_USER_A + "@ros.chat", false);
+            else openClient(CLIENT_USER_B + "@ros.chat", false);
         }
-    }
-
-    public void openMS(String page){
-        Configuration.baseUrl = hostServer;
-        if( ! WebDriverRunner.getWebDriver().getCurrentUrl().contains(hostServer)) open("/");
-        if( ! loginPage.isLoginMS()) loginPage.loginOnServer(LOGIN_ADMIN_MS, PASSWORD_ADMIN_MS);
-        assertTrue(loginPage.isLoginMS(), "Не удалось авторизоваться");
-        open(page);
     }
 
     private void openClient(String login, boolean staySystem){
         Configuration.baseUrl = hostClient;
         open("/");
         if(ClientPage.isLoginWindow()) {
-            assertTrue(ClientPage.loginClient(login, USER_ACCOUNT_PASSWORD, staySystem), "Ошибка при " +
+            assertTrue(loginClientClickButtonEnter(login, USER_ACCOUNT_PASSWORD, staySystem, true).isSuccessAuthClient(), "Ошибка при " +
                     "авторизации");
         }
     }
 
-    private void addContactAndAccount(String number){
-        if (!SSHManager.isCheckQuerySSH(sshCommandIsContact + number)) {
-            ContactsPage contactsPage = new ContactsPage();
-            openMS("/contacts");
-            contactsPage.addContact(number).addUserAccount(number, USER_ACCOUNT_PASSWORD, USER_ACOUNT_ITEM_MENU);
+    @Override
+    public void afterEach(ExtensionContext context) {
+        if(classTest.contains("TestLogin")){
+            refresh();
         }
     }
 }

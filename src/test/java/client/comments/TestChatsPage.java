@@ -7,7 +7,8 @@
 package client.comments;
 
 import client.*;
-import client.helper.SSHGetCommand;
+import client.tools.APIToServer;
+import client.tools.SSHGetCommand;
 import com.codeborne.selenide.Selenide;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
@@ -39,40 +40,12 @@ public class TestChatsPage implements CommentsPage {
     );
     private ChatsPage chatsPage = new ChatsPage();
 
-    @Story(value = "Проверка получения сообщения")
-    @Description(value = "1. Авторизуемся первым пользователем на WEB-клиенте \n." +
-            "2. Авторизуемся вторым пользователем через api и отправляем сообщение \n" +
-            "3. Проверяем WEB-клиенте, пришло ли сообщение от второго пользователя")
-    @Test
-    void test_Get_New_Message(){
-        Runnable clientGetMessage = () -> {
-            assertTrue(chatsPage.isGetNewMessage(CONTACT_NUMBER_7013, CLIENT_CHATS_RECEIVED_MESSAGE));
-        };
-
-        Thread apiSendMessage = new Thread() {
-            @Override
-            public void run() {
-                apiToServer = getApiToServer(apiToServer);
-                Selenide.sleep(3000);
-                apiToServer.SendTextMessageToUser(
-                        "user",
-                        CIDUser,
-                        "text",
-                        CLIENT_CHATS_RECEIVED_MESSAGE,
-                        30
-                );
-            }
-        };
-
-        apiSendMessage.start();
-        clientGetMessage.run();
-    }
-
     @Story(value = "Проверка отправки сообщения")
     @Description(value = "1. Авторизуемся первым пользователем на WEB-клиенте. \n" +
             "2. Авторизуемся вторым пользователем через api. \n" +
             "3. Первый пользователь отправляет сообщение второму пользователю. \n" +
             "4. Второй пользователь проверяет, пришло ли ему сообщение от первого клиента.")
+    @Order(1)
     @Test
     void test_Send_New_Message() throws ExecutionException, InterruptedException {
         String[] apiGetMessageResult;
@@ -97,6 +70,15 @@ public class TestChatsPage implements CommentsPage {
         );
     }
 
+    @Story(value = "Проверка получения сообщения")
+    @Description(value = "1. Авторизуемся вторым клиентом на WEB-клиенте\n." +
+            "2. Проверяем WEB-клиенте, пришло ли сообщение от первого клиента")
+    @Order(2)
+    @Test
+    void test_Get_New_Message(){
+        assertTrue(chatsPage.isGetNewMessage(CONTACT_NUMBER_7012, CLIENT_CHATS_SEND_MESSAGE));
+    }
+
     private APIToServer getApiToServer(APIToServer apiToServer){
         if(apiToServer == null){
             return new APIToServer(apiHost, apiUser, USER_ACCOUNT_PASSWORD);
@@ -106,5 +88,6 @@ public class TestChatsPage implements CommentsPage {
     @AfterAll
     static void tearDown(){
         if(apiToServer != null) apiToServer.disconnect();
+        Selenide.close();
     }
 }

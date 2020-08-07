@@ -100,17 +100,6 @@ allure {
     }
 }
 
-task testchats(type: Test){
-    useJUnitPlatform()
-
-    include("**/TestChatsPage.class")
-
-    testLogging {
-        events "passed", "skipped", "failed"
-    }
-
-}
-
 task testchannels(type: Test){
     useJUnitPlatform()
 
@@ -129,7 +118,30 @@ task testchannels(type: Test){
     }
 }
 
-testchats.finalizedBy(testchannels)
+task testchats(type: Test){
+    useJUnitPlatform()
+
+    include("**/TestChatsPage.class")
+
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+
+    finalizedBy(testchannels)
+
+}
+
+task testlogin(type: Test){
+    useJUnitPlatform()
+
+    include("**/TestLogin.class")
+
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+
+    finalizedBy(testchats)
+}
 
 test{
     useJUnitPlatform()

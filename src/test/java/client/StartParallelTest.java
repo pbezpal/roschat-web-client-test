@@ -25,7 +25,7 @@ import static data.CommentsData.*;
 import static data.CommentsData.CLIENT_USER_F;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public interface StartParallelTest {
+public interface StartParallelTest extends ClientPage {
 
     String hostApiServer = "https://" + HOST_SERVER + ":8080";
     String hostServer = "https://" + HOST_SERVER + ":" + PORT_SERVER;
@@ -76,7 +76,7 @@ public interface StartParallelTest {
         Configuration.baseUrl = hostClient;
         open("/");
         if(ClientPage.isLoginWindow()) {
-            assertTrue(ClientPage.loginClient(login, USER_ACCOUNT_PASSWORD, staySystem), "Ошибка при " +
+            assertTrue(loginClientClickButtonEnter(login, USER_ACCOUNT_PASSWORD, staySystem, true).isSuccessAuthClient(), "Ошибка при " +
                     "авторизации");
         }
     }

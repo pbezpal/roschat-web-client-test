@@ -32,7 +32,7 @@ public interface StartParallelTest extends ClientPage {
     String hostClient = "https://" + HOST_SERVER;
     String sshCommandIsContact = "sudo -u roschat psql -c \"select cid, login from users;\" | grep ";
     String[] users = {CLIENT_USER_A, CLIENT_USER_B, CLIENT_USER_C, CLIENT_USER_D, CLIENT_USER_E, CLIENT_USER_F,
-            CONTACT_NUMBER_7012, CONTACT_NUMBER_7013};
+            CONTACT_A, CONTACT_B};
 
     static void init(){
         DesiredCapabilities capabilities = new DesiredCapabilities();
@@ -64,14 +64,6 @@ public interface StartParallelTest extends ClientPage {
         }
     }
 
-    static void openMS(String page){
-        Configuration.baseUrl = hostServer;
-        if( ! WebDriverRunner.getWebDriver().getCurrentUrl().contains(hostServer)) open("/");
-        if( ! loginPage.isLoginMS()) loginPage.loginOnServer(LOGIN_ADMIN_MS, PASSWORD_ADMIN_MS);
-        assertTrue(loginPage.isLoginMS(), "Не удалось авторизоваться");
-        open(page);
-    }
-
     default void openClient(String login, boolean staySystem){
         Configuration.baseUrl = hostClient;
         open("/");
@@ -84,8 +76,8 @@ public interface StartParallelTest extends ClientPage {
     static void addContactAndAccount(String number){
         if (!SSHManager.isCheckQuerySSH(sshCommandIsContact + number)) {
             ContactsPage contactsPage = new ContactsPage();
-            openMS("/contacts");
-            contactsPage.addContact(number).addUserAccount(number, USER_ACCOUNT_PASSWORD, USER_ACOUNT_ITEM_MENU);
+            //openMS("/contacts");
+            //contactsPage.addContact(number).addUserAccount(number, USER_ACCOUNT_PASSWORD, USER_ACOUNT_ITEM_MENU);
         }
     }
 

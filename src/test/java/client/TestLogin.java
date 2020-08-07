@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TestLogin extends ProfilePage {
 
     private final String login = CLIENT_USER_A + "@ros.chat";
-    private final String wrongLogin = CLIENT_USER_B + "ros.chat";
+    private final String wrongLogin = CLIENT_USER_A + "ros.chat";
     private final String wrongPassword = USER_ACCOUNT_PASSWORD + "qwerty";
 
     @Story(value = "Проверяем авторизацию на клиенте без опции 'Остаться в системе'")

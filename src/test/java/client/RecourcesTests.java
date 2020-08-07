@@ -104,8 +104,8 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback, Af
         sleep(2000);
         String method = context.getTestMethod().toString();
         if(classTest.contains("TestChatsPage")){
-            if(method.contains("test_Get_New_Message")) openClient( CLIENT_USER_A + "@ros.chat", false);
-            else openClient(CLIENT_USER_B + "@ros.chat", false);
+            if(method.contains("test_Get_New_Message")) openClient( CLIENT_USER_B + "@ros.chat", false);
+            else openClient(CLIENT_USER_A + "@ros.chat", false);
         }
     }
 

@@ -1,4 +1,4 @@
-package client.helper;
+package client.tools;
 
 import com.jcraft.jsch.*;
 

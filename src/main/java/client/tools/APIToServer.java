@@ -1,4 +1,4 @@
-package client;
+package client.tools;
 
 import io.qameta.allure.Step;
 import io.socket.client.Ack;

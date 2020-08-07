@@ -1,7 +1,7 @@
 /***
  * Тестирование закрытого канала на WEB-клиенте
  * клиент А - 7000@ros.chat
- * клиента B - 7001@ros.chat
+ * клиент B - 7001@ros.chat
  * Проверяется:
  * 1. Создание закрытого канала клиентом А
  * 2. Поиск канала клиентом B
@@ -20,7 +20,8 @@
 package client.comments;
 
 import client.*;
-import client.helper.SSHGetCommand;
+import client.tools.APIToServer;
+import client.tools.SSHGetCommand;
 import com.codeborne.selenide.Selenide;
 import io.qameta.allure.*;
 import org.junit.jupiter.api.*;
@@ -48,8 +49,8 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
                     "| grep " + CLIENT_USER_A + " | awk '{print $1}'"
     );
     private static ChannelsPage clientChannelsPage = new ChannelsPage();
-    private String[] admins = {CONTACT_NUMBER_7013, CLIENT_USER_B, CLIENT_USER_C};
-    private String[] subscribers = {CLIENT_USER_D, CLIENT_USER_E, CLIENT_USER_F, CONTACT_NUMBER_7012};
+    private String[] admins = {CONTACT_B, CLIENT_USER_B, CLIENT_USER_C};
+    private String[] subscribers = {CLIENT_USER_D, CLIENT_USER_E, CLIENT_USER_F, CONTACT_A};
     private static String nameChannel = "CHC" + System.currentTimeMillis();
     private static String newNameChannel = nameChannel + System.currentTimeMillis();
     private static boolean status_create = false;
@@ -449,5 +450,6 @@ public class TestClosedChannel extends chat.ros.testing2.server.administration.C
     @AfterAll
     static void tearDown(){
         if(apiToServer != null) apiToServer.disconnect();
+        Selenide.close();
     }
 }

@@ -1,7 +1,7 @@
 /***
  * Тестирование публичного канала на WEB-клиенте
- * клиент А - 7012@ros.chat
- * клиент B - 7013@ros.chat
+ * клиент А - 7007@ros.chat
+ * клиент B - 7008@ros.chat
  * Проверяется:
  * 1. Создание публичного канала под учётной записью клиентом А
  * 2. Поиск канала под учётной записью клиентом B
@@ -20,7 +20,8 @@
 package client.comments;
 
 import client.*;
-import client.helper.SSHGetCommand;
+import client.tools.APIToServer;
+import client.tools.SSHGetCommand;
 import com.codeborne.selenide.Selenide;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
@@ -44,16 +45,16 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestPublicChannel extends chat.ros.testing2.server.administration.ChannelsPage implements CommentsPage, Helper, StartParallelTest {
 
     private static String apiHost = hostApiServer;
-    private final String client_A = CONTACT_NUMBER_7012 + "@ros.chat";
-    private final String client_B = CONTACT_NUMBER_7013 + "@ros.chat";
+    private final String client_A = CONTACT_A + "@ros.chat";
+    private final String client_B = CONTACT_B + "@ros.chat";
     private static APIToServer apiToServer = null;
     private static String CIDUser = SSHGetCommand.isCheckQuerySSH(
             "sudo -u roschat psql -c \"select cid, login from users;\" " +
-                    "| grep " + CONTACT_NUMBER_7012 + " | awk '{print $1}'"
+                    "| grep " + CLIENT_USER_A + " | awk '{print $1}'"
     );
     private ChannelsPage clientChannelsPage = new ChannelsPage();
     private String[] admins = {CLIENT_USER_A, CLIENT_USER_B, CLIENT_USER_C};
-    private String[] subscribers = {CLIENT_USER_D, CLIENT_USER_E, CLIENT_USER_F, CONTACT_NUMBER_7013};
+    private String[] subscribers = {CLIENT_USER_D, CLIENT_USER_E, CLIENT_USER_F, CONTACT_B};
     private static String nameChannel = "CHP" + System.currentTimeMillis();
     private static String newNameChannel = nameChannel + System.currentTimeMillis();
     private static boolean status_create = false;
@@ -127,7 +128,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
 
         Runnable clientShareLinkChannel = () -> {
             openClient(client_A, false);
-            clientChannelsPage.copyLinkChannel(nameChannel, CONTACT_NUMBER_7013);
+            clientChannelsPage.copyLinkChannel(nameChannel, CONTACT_B);
         };
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
@@ -142,7 +143,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
                 () -> assertTrue(clientChannelsPage.isIconCopyLinkChannel(nameChannel),
                         "Нет иконки 'Копировать ссылку'"),
                 () -> assertEquals(apiGetMessageResult[0], CIDUser, "Сообщение пришло " +
-                        "не от пользователя " + CONTACT_NUMBER_7012),
+                        "не от пользователя " + CONTACT_B),
                 () -> assertTrue(apiGetMessageResult[1].contains(nameChannel),
                         "Ссылка на канал " + nameChannel + " не пришла")
         );
@@ -159,7 +160,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
 
         Runnable clientShareLinkChannel = () -> {
             openClient(client_A, false);
-            clientChannelsPage.shareLinkChannel(nameChannel, CONTACT_NUMBER_7013);
+            clientChannelsPage.shareLinkChannel(nameChannel, CONTACT_B);
         };
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
@@ -174,7 +175,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
                 () -> assertTrue(clientChannelsPage.isIconShareChannel(),
                         "Нет иконки 'Поделиться каналом'"),
                 () -> assertEquals(apiGetMessageResult[0], CIDUser, "Сообщение пришло " +
-                        "не от пользователя " + CONTACT_NUMBER_7012),
+                        "не от пользователя " + CONTACT_A),
                 () -> assertTrue(apiGetMessageResult[1].contains(nameChannel),
                         "Ссылка на канал " + nameChannel + " не пришла")
         );
@@ -262,11 +263,11 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
         apiGetMessageResult = socketGetMessage.get();
         assertAll("Проверяем, опубликована ли новая публикация",
                 () -> assertEquals(apiGetMessageResult[0], CIDUser, "Сообщение пришло " +
-                        "не от пользователя " + CONTACT_NUMBER_7012),
+                        "не от пользователя " + CONTACT_A),
                 () -> assertEquals(apiGetMessageResult[1], CLIENT_TITLE_PUBLICATION_CHANNEL,"Текст заголовка " +
                         "публикации не совпадает с эталоном "  + CLIENT_TITLE_PUBLICATION_CHANNEL),
                 () -> assertEquals(clientChannelsPage.getAuthorPublication("1"),
-                        CONTACT_NUMBER_7012,
+                        CONTACT_A,
                         "В публикации указан неправильный автор"),
                 () -> assertTrue(clientChannelsPage.isShowTitlePublication("1", CLIENT_TITLE_PUBLICATION_CHANNEL),
                         "Заголовок публикации не совпадает с " + CLIENT_TITLE_PUBLICATION_CHANNEL),
@@ -288,7 +289,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
         clientChannelsPage.clickChat(nameChannel);
         assertAll("Проверяем, отображается ли публикация у подписчика",
                 () -> assertEquals(clientChannelsPage.getAuthorPublication("1"),
-                        CONTACT_NUMBER_7012,
+                        CONTACT_A,
                         "В публикации указан неправильный автор"),
                 () -> assertTrue(clientChannelsPage.isShowTitlePublication("1", CLIENT_TITLE_PUBLICATION_CHANNEL),
                         "Заголовок публикации не совпадает с " + CLIENT_TITLE_PUBLICATION_CHANNEL),
@@ -314,11 +315,11 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
         Runnable clientGetMessage = () -> {
             openClient(client_A, false);
             clientChannelsPage.clickItemComments();
-            clientChannelsPage.clickChat(CONTACT_NUMBER_7013);
+            clientChannelsPage.clickChat(CONTACT_B);
             clientChannelsPage.clickSharePublicationChannel(nameChannel);
             assertAll("Проверяем, отображается ли публикация после перехода к публикации",
                     () -> assertEquals(clientChannelsPage.getAuthorPublication("1"),
-                            CONTACT_NUMBER_7012,
+                            CONTACT_A,
                             "В публикации указан неправильный автор"),
                     () -> assertTrue(clientChannelsPage.isShowTitlePublication("1", CLIENT_TITLE_PUBLICATION_CHANNEL),
                             "Заголовок публикации не совпадает с " + CLIENT_TITLE_PUBLICATION_CHANNEL),
@@ -363,7 +364,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
             clientChannelsPage.sharePublicationChannel(
                     nameChannel,
                     "1",
-                    CONTACT_NUMBER_7013);
+                    CONTACT_B);
         };
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
@@ -380,7 +381,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
         apiGetMessageResult = socketGetMessage.get();
         assertAll("Проверяем, поделились ли публикацией",
                 () -> assertEquals(apiGetMessageResult[0], CIDUser, "Сообщение пришло " +
-                        "не от пользователя " + CONTACT_NUMBER_7012),
+                        "не от пользователя " + CONTACT_A),
                 () -> assertEquals(apiGetMessageResult[1], message,"Сообщение не соответствует ожидаемому" +
                         "" + message)
         );
@@ -493,5 +494,6 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
     @AfterAll
     static void tearDown(){
         if(apiToServer != null) apiToServer.disconnect();
+        Selenide.close();
     }
 }

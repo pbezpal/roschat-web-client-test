@@ -277,7 +277,7 @@ public class ChannelsPage extends ChatsPage {
 
     @Step(value = "Получаем количество подписчиков/администраторов")
     public int getCountUsersChannel(){
-        int count = listUsersChannel.shouldBe(CollectionCondition.sizeNotEqual(0)).size();
+        int count = listUsersChannel.shouldBe(CollectionCondition.sizeNotEqual(0), 10000).size();
         iFaArrowLeft.shouldBe(Condition.visible).click();
         return count;
     }

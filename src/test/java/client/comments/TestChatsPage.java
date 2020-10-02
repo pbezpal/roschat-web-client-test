@@ -33,10 +33,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestChatsPage implements CommentsPage {
 
     private static String apiHost = "https://" + HOST_SERVER + ":8080";
-    private static String apiUser = CLIENT_USER_B + "@ros.chat";
+    private static String apiUser = CLIENT_7001 + "@ros.chat";
     private static APIToServer apiToServer = null;
     private static String CIDUser = SSHGetCommand.isCheckQuerySSH(
-            "sudo -u roschat psql -c \"select cid, login from users;\" | grep " + CLIENT_USER_A + " | awk '{print $1}'"
+            "sudo -u roschat psql -c \"select cid, login from users;\" | grep " + CLIENT_7000 + " | awk '{print $1}'"
     );
     private ChatsPage chatsPage = new ChatsPage();
 
@@ -51,7 +51,7 @@ public class TestChatsPage implements CommentsPage {
         String[] apiGetMessageResult;
 
         Runnable clientSendMessage = () -> {
-            chatsPage.sendNewMessage(CLIENT_USER_B, CLIENT_CHATS_SEND_MESSAGE);
+            chatsPage.sendNewMessage(CLIENT_7001, CLIENT_CHATS_SEND_MESSAGE);
         };
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
@@ -64,9 +64,9 @@ public class TestChatsPage implements CommentsPage {
         apiGetMessageResult = socketGetMessage.get();
         assertAll("Проверяем, совпадает ли ID и сообщение с ссылкой на канал",
                 () -> assertEquals(apiGetMessageResult[0], CIDUser, "Сообщение пришло " +
-                        "не от пользователя " + CLIENT_USER_A),
+                        "не от пользователя " + CLIENT_7000),
                 () -> assertEquals(apiGetMessageResult[1], CLIENT_CHATS_SEND_MESSAGE, "Текст сообщения не совпадает с тем," +
-                        "которое отправил пользователь " + CLIENT_USER_A)
+                        "которое отправил пользователь " + CLIENT_7000)
         );
     }
 
@@ -76,7 +76,7 @@ public class TestChatsPage implements CommentsPage {
     @Order(2)
     @Test
     void test_Get_New_Message(){
-        assertTrue(chatsPage.isGetNewMessage(CLIENT_USER_A, CLIENT_CHATS_SEND_MESSAGE));
+        assertTrue(chatsPage.isGetNewMessage(CLIENT_7000, CLIENT_CHATS_SEND_MESSAGE));
     }
 
     private APIToServer getApiToServer(APIToServer apiToServer){

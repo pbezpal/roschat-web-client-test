@@ -10,8 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import static chat.ros.testing2.data.ContactsData.USER_ACCOUNT_PASSWORD;
 import static com.codeborne.selenide.Selenide.refresh;
-import static data.CommentsData.CLIENT_USER_A;
-import static data.CommentsData.CLIENT_USER_B;
+import static data.CommentsData.CLIENT_7000;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -21,8 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Feature(value = "")
 public class TestLogin extends ProfilePage {
 
-    private final String login = CLIENT_USER_A + "@ros.chat";
-    private final String wrongLogin = CLIENT_USER_A + "ros.chat";
+    private final String login = CLIENT_7000 + "@ros.chat";
+    private final String wrongLogin = CLIENT_7000 + "ros.chat";
     private final String wrongPassword = USER_ACCOUNT_PASSWORD + "qwerty";
 
     @Story(value = "Проверяем авторизацию на клиенте без опции 'Остаться в системе'")
@@ -31,8 +30,8 @@ public class TestLogin extends ProfilePage {
     @Test
     void test_Login_Without_Stay_System(){
         if(ClientPage.isLoginWindow()) {
-            assertTrue(loginClientClickButtonEnter(login, USER_ACCOUNT_PASSWORD, false, true).
-                            isSuccessAuthClient(),
+            ClientPage.loginClientClickButtonOrEnter(login, USER_ACCOUNT_PASSWORD, false, true);
+            assertTrue(isSuccessAuthClient(),
                     "Ошибка при авторизации");
             refresh();
             assertTrue(ClientPage.isVisibleElement(ClientPage.buttonPencil, true) &&
@@ -47,8 +46,8 @@ public class TestLogin extends ProfilePage {
     @Test
     void test_Login_With_Stay_System(){
         if(ClientPage.isLoginWindow()) {
-            assertTrue(loginClientClickButtonEnter(login, USER_ACCOUNT_PASSWORD, true, true).
-                            isSuccessAuthClient(),
+            ClientPage.loginClientClickButtonOrEnter(login, USER_ACCOUNT_PASSWORD, true, true);
+            assertTrue(isSuccessAuthClient(),
                     "Ошибка при авторизации");
             refresh();
             assertTrue(isSuccessAuthClient(), "После перезагрузки браузера разлогинились");
@@ -64,8 +63,8 @@ public class TestLogin extends ProfilePage {
     @Test
     void test_Login_Press_Enter(){
         if(ClientPage.isLoginWindow()) {
-            assertTrue(loginClientClickButtonEnter(login, USER_ACCOUNT_PASSWORD, false, false).
-                            isSuccessAuthClient(),
+            ClientPage.loginClientClickButtonOrEnter(login, USER_ACCOUNT_PASSWORD, false, false);
+            assertTrue(isSuccessAuthClient(),
                     "Ошибка при авторизации");
         }
     }
@@ -76,8 +75,8 @@ public class TestLogin extends ProfilePage {
     @Test
     void test_Reg_With_Wrong_Login(){
         if(ClientPage.isLoginWindow()) {
-            assertTrue(loginClientClickButtonEnter(wrongLogin, USER_ACCOUNT_PASSWORD, false, true).
-                    isConfirmErrorModalWindow(), "Не появилось модальное окно об ошибке при авторизации");
+            ClientPage.loginClientClickButtonOrEnter(wrongLogin, USER_ACCOUNT_PASSWORD, false, true);
+            assertTrue(isConfirmErrorModalWindow(), "Не появилось модальное окно об ошибке при авторизации");
             assertEquals(getTextConfirmErrorModalWindow(), "Неверное имя пользователя или пароль",
                     "Надпись в модальном окне не совпадает с эталонной");
             clickButtonConfirmModalWindow();
@@ -90,8 +89,8 @@ public class TestLogin extends ProfilePage {
     @Test
     void test_Reg_With_Wrong_Password(){
         if(ClientPage.isLoginWindow()) {
-            assertTrue(loginClientClickButtonEnter(login, wrongPassword, false, true).
-                    isConfirmErrorModalWindow(),
+            ClientPage.loginClientClickButtonOrEnter(login, wrongPassword, false, true);
+            assertTrue(isConfirmErrorModalWindow(),
                     "Не появилось модальное окно об ошибке при авторизации");
             assertEquals(getTextConfirmErrorModalWindow(), "Неверное имя пользователя или пароль",
                     "Надпись в модальном окне не совпадает с эталонной");

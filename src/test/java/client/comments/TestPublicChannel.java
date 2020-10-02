@@ -1,7 +1,7 @@
 /***
  * Тестирование публичного канала на WEB-клиенте
- * клиент А - 7007@ros.chat
- * клиент B - 7008@ros.chat
+ * клиент А - 7006@ros.chat
+ * клиент B - 7007@ros.chat
  * Проверяется:
  * 1. Создание публичного канала под учётной записью клиентом А
  * 2. Поиск канала под учётной записью клиентом B
@@ -44,17 +44,16 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(WatcherTests.class)
 public class TestPublicChannel extends chat.ros.testing2.server.administration.ChannelsPage implements CommentsPage, Helper, StartParallelTest {
 
-    private static String apiHost = hostApiServer;
-    private final String client_A = CONTACT_A + "@ros.chat";
-    private final String client_B = CONTACT_B + "@ros.chat";
+    private final String client_A = CLIENT_7006 + "@ros.chat";
+    private final String client_B = CLIENT_7007 + "@ros.chat";
     private static APIToServer apiToServer = null;
     private static String CIDUser = SSHGetCommand.isCheckQuerySSH(
             "sudo -u roschat psql -c \"select cid, login from users;\" " +
-                    "| grep " + CLIENT_USER_A + " | awk '{print $1}'"
+                    "| grep " + CLIENT_7006 + " | awk '{print $1}'"
     );
     private ChannelsPage clientChannelsPage = new ChannelsPage();
-    private String[] admins = {CLIENT_USER_A, CLIENT_USER_B, CLIENT_USER_C};
-    private String[] subscribers = {CLIENT_USER_D, CLIENT_USER_E, CLIENT_USER_F, CONTACT_B};
+    private String[] admins = {CLIENT_7000, CLIENT_7001, CLIENT_7002};
+    private String[] subscribers = {CLIENT_7003, CLIENT_7004, CLIENT_7005, CLIENT_7007};
     private static String nameChannel = "CHP" + System.currentTimeMillis();
     private static String newNameChannel = nameChannel + System.currentTimeMillis();
     private static boolean status_create = false;
@@ -128,11 +127,13 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
 
         Runnable clientShareLinkChannel = () -> {
             openClient(client_A, false);
-            clientChannelsPage.copyLinkChannel(nameChannel, CONTACT_B);
+            clientChannelsPage.copyLinkChannel(
+                    nameChannel,
+                    CLIENT_7007);
         };
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
-            apiToServer = getApiToServer(apiHost, client_B, apiToServer);
+            apiToServer = getApiToServer(hostApiServer, client_B, apiToServer);
             String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_CHATS_SEND_EVENT, "data",60);
             return getMessageResult;
         });
@@ -143,7 +144,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
                 () -> assertTrue(clientChannelsPage.isIconCopyLinkChannel(nameChannel),
                         "Нет иконки 'Копировать ссылку'"),
                 () -> assertEquals(apiGetMessageResult[0], CIDUser, "Сообщение пришло " +
-                        "не от пользователя " + CONTACT_B),
+                        "не от пользователя " + CLIENT_7007),
                 () -> assertTrue(apiGetMessageResult[1].contains(nameChannel),
                         "Ссылка на канал " + nameChannel + " не пришла")
         );
@@ -160,11 +161,11 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
 
         Runnable clientShareLinkChannel = () -> {
             openClient(client_A, false);
-            clientChannelsPage.shareLinkChannel(nameChannel, CONTACT_B);
+            clientChannelsPage.shareLinkChannel(nameChannel, CLIENT_7007);
         };
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
-            apiToServer = getApiToServer(apiHost, client_B, apiToServer);
+            apiToServer = getApiToServer(hostApiServer, client_B, apiToServer);
             String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_CHATS_SEND_EVENT, "data",60);
             return getMessageResult;
         });
@@ -175,7 +176,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
                 () -> assertTrue(clientChannelsPage.isIconShareChannel(),
                         "Нет иконки 'Поделиться каналом'"),
                 () -> assertEquals(apiGetMessageResult[0], CIDUser, "Сообщение пришло " +
-                        "не от пользователя " + CONTACT_A),
+                        "не от пользователя " + CLIENT_7006),
                 () -> assertTrue(apiGetMessageResult[1].contains(nameChannel),
                         "Ссылка на канал " + nameChannel + " не пришла")
         );
@@ -254,7 +255,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
         };
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
-            apiToServer = getApiToServer(apiHost, client_B, apiToServer);
+            apiToServer = getApiToServer(hostApiServer, client_B, apiToServer);
             String[] getMessageResult = apiToServer.GetTextMessageFromUser(CLIENT_PUBLICATION_EVENT, "title",60);
             return getMessageResult;
         });
@@ -263,11 +264,11 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
         apiGetMessageResult = socketGetMessage.get();
         assertAll("Проверяем, опубликована ли новая публикация",
                 () -> assertEquals(apiGetMessageResult[0], CIDUser, "Сообщение пришло " +
-                        "не от пользователя " + CONTACT_A),
+                        "не от пользователя " + CLIENT_7006),
                 () -> assertEquals(apiGetMessageResult[1], CLIENT_TITLE_PUBLICATION_CHANNEL,"Текст заголовка " +
                         "публикации не совпадает с эталоном "  + CLIENT_TITLE_PUBLICATION_CHANNEL),
                 () -> assertEquals(clientChannelsPage.getAuthorPublication("1"),
-                        CONTACT_A,
+                        CLIENT_7006,
                         "В публикации указан неправильный автор"),
                 () -> assertTrue(clientChannelsPage.isShowTitlePublication("1", CLIENT_TITLE_PUBLICATION_CHANNEL),
                         "Заголовок публикации не совпадает с " + CLIENT_TITLE_PUBLICATION_CHANNEL),
@@ -289,7 +290,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
         clientChannelsPage.clickChat(nameChannel);
         assertAll("Проверяем, отображается ли публикация у подписчика",
                 () -> assertEquals(clientChannelsPage.getAuthorPublication("1"),
-                        CONTACT_A,
+                        CLIENT_USER_G,
                         "В публикации указан неправильный автор"),
                 () -> assertTrue(clientChannelsPage.isShowTitlePublication("1", CLIENT_TITLE_PUBLICATION_CHANNEL),
                         "Заголовок публикации не совпадает с " + CLIENT_TITLE_PUBLICATION_CHANNEL),
@@ -307,7 +308,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
             " перейти к ней")
     @Order(9)
     @Test
-    void test_Get_Share_Publication_Closed_channel(){
+    void test_Get_Share_Publication_Public_channel(){
         assertTrue(status_create, "Канал не был создан");
         String message = "{\"type\":\"publication\",\"chId\":" +
                 "" + getIDChannel(nameChannel) + ",\"pubId\":1}";
@@ -315,11 +316,11 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
         Runnable clientGetMessage = () -> {
             openClient(client_A, false);
             clientChannelsPage.clickItemComments();
-            clientChannelsPage.clickChat(CONTACT_B);
+            clientChannelsPage.clickChat(CLIENT_7007);
             clientChannelsPage.clickSharePublicationChannel(nameChannel);
             assertAll("Проверяем, отображается ли публикация после перехода к публикации",
                     () -> assertEquals(clientChannelsPage.getAuthorPublication("1"),
-                            CONTACT_A,
+                            CLIENT_USER_G,
                             "В публикации указан неправильный автор"),
                     () -> assertTrue(clientChannelsPage.isShowTitlePublication("1", CLIENT_TITLE_PUBLICATION_CHANNEL),
                             "Заголовок публикации не совпадает с " + CLIENT_TITLE_PUBLICATION_CHANNEL),
@@ -332,7 +333,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
         Thread apiSendMessage = new Thread() {
             @Override
             public void run() {
-                apiToServer = getApiToServer(apiHost, client_B, apiToServer);
+                apiToServer = getApiToServer(hostApiServer, client_B, apiToServer);
                 Selenide.sleep(3000);
                 apiToServer.SendTextMessageToUser(
                         "user",
@@ -364,11 +365,11 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
             clientChannelsPage.sharePublicationChannel(
                     nameChannel,
                     "1",
-                    CONTACT_B);
+                    CLIENT_7007);
         };
 
         CompletableFuture<String[]> socketGetMessage = CompletableFuture.supplyAsync(() ->{
-            apiToServer = getApiToServer(apiHost, client_B, apiToServer);
+            apiToServer = getApiToServer(hostApiServer, client_B, apiToServer);
             String[] getMessageResult = apiToServer.GetTextMessageFromUser(
                     CLIENT_CHATS_SEND_EVENT,
                     "data",
@@ -381,7 +382,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
         apiGetMessageResult = socketGetMessage.get();
         assertAll("Проверяем, поделились ли публикацией",
                 () -> assertEquals(apiGetMessageResult[0], CIDUser, "Сообщение пришло " +
-                        "не от пользователя " + CONTACT_A),
+                        "не от пользователя " + CLIENT_7006),
                 () -> assertEquals(apiGetMessageResult[1], message,"Сообщение не соответствует ожидаемому" +
                         "" + message)
         );

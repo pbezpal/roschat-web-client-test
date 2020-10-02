@@ -109,7 +109,7 @@ public interface ClientPage {
         buttonLogin.click();
     }
 
-    default ClientPage loginClientClickButtonEnter(String email, String password, boolean staySystem, boolean clickButton){
+    static void loginClientClickButtonOrEnter(String email, String password, boolean staySystem, boolean clickButton){
         clickButtonPencil();
         sendInputEmail(email);
         sendInputPassword(password);
@@ -119,7 +119,6 @@ public interface ClientPage {
         if(clickButton) clickButtonLogin();
         //Вход по нажатию Enter
         else inputPassword.pressEnter();
-        return this;
     }
 
     @Step(value = "Проверяем, что авторизованы на клиенте")

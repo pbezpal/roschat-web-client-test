@@ -19,10 +19,9 @@ import java.util.logging.Level;
 
 import static chat.ros.testing2.data.ContactsData.*;
 import static chat.ros.testing2.data.LoginData.*;
-import static client.Helper.loginPage;
 import static com.codeborne.selenide.Selenide.open;
 import static data.CommentsData.*;
-import static data.CommentsData.CLIENT_USER_F;
+import static data.CommentsData.CLIENT_7005;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public interface StartParallelTest extends ClientPage {
@@ -31,8 +30,8 @@ public interface StartParallelTest extends ClientPage {
     String hostServer = "https://" + HOST_SERVER + ":" + PORT_SERVER;
     String hostClient = "https://" + HOST_SERVER;
     String sshCommandIsContact = "sudo -u roschat psql -c \"select cid, login from users;\" | grep ";
-    String[] users = {CLIENT_USER_A, CLIENT_USER_B, CLIENT_USER_C, CLIENT_USER_D, CLIENT_USER_E, CLIENT_USER_F,
-            CONTACT_A, CONTACT_B};
+    String[] users = {CLIENT_7000, CLIENT_7001, CLIENT_7002, CLIENT_7003, CLIENT_7004, CLIENT_7005,
+            CLIENT_USER_G, CLIENT_USER_H};
 
     static void init(){
         DesiredCapabilities capabilities = new DesiredCapabilities();
@@ -68,7 +67,8 @@ public interface StartParallelTest extends ClientPage {
         Configuration.baseUrl = hostClient;
         open("/");
         if(ClientPage.isLoginWindow()) {
-            assertTrue(loginClientClickButtonEnter(login, USER_ACCOUNT_PASSWORD, staySystem, true).isSuccessAuthClient(), "Ошибка при " +
+            ClientPage.loginClientClickButtonOrEnter(login, USER_ACCOUNT_PASSWORD, staySystem, true);
+            assertTrue(isSuccessAuthClient(), "Ошибка при " +
                     "авторизации");
         }
     }

@@ -4,12 +4,17 @@ public interface CommentsData {
 
     /***** Параметры для создания канала на клиенте ******/
     String CLIENT_ITEM_NEW_CHANNEL = "Новый канал";
-    String CLIENT_USER_A = "7000";
-    String CLIENT_USER_B = "7001";
-    String CLIENT_USER_C = "7002";
-    String CLIENT_USER_D = "7003";
-    String CLIENT_USER_E = "7004";
-    String CLIENT_USER_F = "7005";
+    String CLIENT_7000 = "7000";
+    String CLIENT_7001 = "7001";
+    String CLIENT_7002 = "7002";
+    String CLIENT_7003 = "7003";
+    String CLIENT_7004 = "7004";
+    String CLIENT_7005 = "7005";
+    String CLIENT_7006 = "7006";
+    String CLIENT_7007 = "7007";
+    String CLIENT_7008 = "7008";
+    String CLIENT_7009 = "7009";
+    String CLIENT_7010 = "7010";
 
     /***** Публичный проверенный канал ******/
     String CLIENT_NAME_CHANNEL_PUBLIC_PROVEN = "Публичный проверенный канал";

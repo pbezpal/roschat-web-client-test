@@ -37,8 +37,8 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback, Af
             CLIENT_7007,CLIENT_7008};
 
     public RecourcesTests() {
-        hostServer = "https://" + HOST_SERVER + ":" + PORT_SERVER;
-        hostClient = "https://" + HOST_SERVER;
+        hostServer = "https://" + System.getProperty("hostserver") + ":" + System.getProperty("portserver");
+        hostClient = "https://" + System.getProperty("hostserver");
     }
 
     @Override

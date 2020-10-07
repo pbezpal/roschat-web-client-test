@@ -26,6 +26,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public interface StartParallelTest extends ClientPage {
 
+    String HOST_SERVER = System.getProperty("hostserver");
+    String PORT_SERVER = System.getProperty("portserver");
+
     String hostApiServer = "https://" + HOST_SERVER + ":8080";
     String hostServer = "https://" + HOST_SERVER + ":" + PORT_SERVER;
     String hostClient = "https://" + HOST_SERVER;

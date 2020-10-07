@@ -7,9 +7,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Properties;
 
-import static chat.ros.testing2.data.LoginData.HOST_SERVER;
-
 public class SSHGetCommand {
+
+    private static String HOST_SERVER = System.getProperty("hostserver");
 
     private static JSch ssh = new JSch();
     private static  String line;

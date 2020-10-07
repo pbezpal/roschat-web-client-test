@@ -32,7 +32,7 @@ pipeline{
             steps{
                 script{
                     try{
-                        sh './gradlew clean testlogin'
+                        sh './gradlew clean testlogin -Dhostserver="testing2.ros.chat" -Dportserver="1110"'
                     }catch(err){
                         currentBuild.result = 'FAILURE' 
                     }

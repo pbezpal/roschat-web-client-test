@@ -289,8 +289,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
         clientChannelsPage.clickItemComments();
         clientChannelsPage.clickChat(nameChannel);
         assertAll("Проверяем, отображается ли публикация у подписчика",
-                () -> assertEquals(clientChannelsPage.getAuthorPublication("1"),
-                        CLIENT_USER_G,
+                () -> assertEquals(clientChannelsPage.getAuthorPublication("1"), CLIENT_7006,
                         "В публикации указан неправильный автор"),
                 () -> assertTrue(clientChannelsPage.isShowTitlePublication("1", CLIENT_TITLE_PUBLICATION_CHANNEL),
                         "Заголовок публикации не совпадает с " + CLIENT_TITLE_PUBLICATION_CHANNEL),
@@ -320,7 +319,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
             clientChannelsPage.clickSharePublicationChannel(nameChannel);
             assertAll("Проверяем, отображается ли публикация после перехода к публикации",
                     () -> assertEquals(clientChannelsPage.getAuthorPublication("1"),
-                            CLIENT_USER_G,
+                            CLIENT_7006,
                             "В публикации указан неправильный автор"),
                     () -> assertTrue(clientChannelsPage.isShowTitlePublication("1", CLIENT_TITLE_PUBLICATION_CHANNEL),
                             "Заголовок публикации не совпадает с " + CLIENT_TITLE_PUBLICATION_CHANNEL),

@@ -34,7 +34,7 @@ public interface StartParallelTest extends ClientPage {
     String hostClient = "https://" + HOST_SERVER;
     String sshCommandIsContact = "sudo -u roschat psql -c \"select cid, login from users;\" | grep ";
     String[] users = {CLIENT_7000, CLIENT_7001, CLIENT_7002, CLIENT_7003, CLIENT_7004, CLIENT_7005,
-            CLIENT_USER_G, CLIENT_USER_H};
+            CLIENT_7006, CLIENT_7007};
 
     static void init(){
         DesiredCapabilities capabilities = new DesiredCapabilities();

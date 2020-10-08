@@ -57,5 +57,8 @@ public interface CommentsData {
     String CLIENT_ITEM_NEW_CHAT = "Новая беседа";
     String CLIENT_CHATS_RECEIVED_MESSAGE = "Это тестовое сообщение от пользователя 7013 отправленное пользователю 7012";
     String CLIENT_CHATS_SEND_EVENT = "message-event";
-    String CLIENT_CHATS_SEND_MESSAGE = "Это тестовое сообщение от пользователя 7012 отправленное пользователю 7013";
+    String CLIENT_CHATS_FIRST_MESSAGE = "Это первое тестовое сообщение. Если оно отображается у всех пользователей, значит" +
+            " тест прошёл успешно";
+    String CLIENT_CHATS_SECOND_MESSAGE = "Это второе тестовое сообщение. Если оно отображается у всех пользователей, значит" +
+            " тест прошёл успешно";
 }

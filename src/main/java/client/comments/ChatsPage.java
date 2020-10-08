@@ -44,13 +44,26 @@ public class ChatsPage implements CommentsPage {
         return this;
     }
 
-    public boolean isGetNewMessage(String contact, String message){
+    /**
+     * This method is checking exist message
+     *
+     * @param contact
+     * @param message
+     * @return exist message
+     */
+    public boolean isExistChatMessage(String contact, String message){
         clickItemComments();
         clickChat(contact);
         return isExistMessage(message);
     }
 
-    public void sendNewMessage(String contact, String message){
+    /**
+     * This method is send message
+     *
+     * @param contact
+     * @param message
+     */
+    public void sendChatMessage(String contact, String message){
         clickItemComments();
         if(isExistComments(contact, false)){
             clickContextMenu().clickItemContextMenu(CLIENT_ITEM_NEW_CHAT);

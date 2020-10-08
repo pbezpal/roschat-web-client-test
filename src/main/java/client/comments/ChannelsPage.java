@@ -432,7 +432,7 @@ public class ChannelsPage extends ChatsPage {
         clickItemComments().clickChat(channel);
         if(isDivInfoWrapper(false)) clickMainHeaderText();
         actionInfoWrapper(CLIENT_INFO_COPY_LINK_CHANNEL);
-        sendNewMessage(contact, Keys.CONTROL + "v");
+        sendChatMessage(contact, Keys.CONTROL + "v");
         return this;
     }
 

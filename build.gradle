@@ -120,18 +120,57 @@ task testchannels(type: Test){
     }
 }
 
-task testchats(type: Test){
+task testchatssecondmessage(type: Test){
     useJUnitPlatform()
+
+    systemProperties = [
+            'junit.jupiter.execution.parallel.enabled':'true',
+            'junit.jupiter.execution.parallel.config.strategy':'fixed',
+            'junit.jupiter.execution.parallel.config.fixed.parallelism':'2',
+            'junit.jupiter.execution.parallel.mode.default':'same_thread',
+            'junit.jupiter.execution.parallel.mode.classes.default':'concurrent'
+    ]
 
     systemProperties System.getProperties()
 
-    include("**/TestChatsPage.class")
+    filter {
+        //include specific method in any of the tests
+        includeTestsMatching "*.TestChatsUserA.test_Get_Second_Message"
+        includeTestsMatching "*.TestChatsUserB.test_Send_Second_Message"
+    }
 
     testLogging {
         events "passed", "skipped", "failed"
     }
 
     finalizedBy(testchannels)
+
+}
+
+task testchatsfirstmessage(type: Test){
+    useJUnitPlatform()
+
+    systemProperties = [
+            'junit.jupiter.execution.parallel.enabled':'true',
+            'junit.jupiter.execution.parallel.config.strategy':'fixed',
+            'junit.jupiter.execution.parallel.config.fixed.parallelism':'2',
+            'junit.jupiter.execution.parallel.mode.default':'same_thread',
+            'junit.jupiter.execution.parallel.mode.classes.default':'concurrent'
+    ]
+
+    systemProperties System.getProperties()
+
+    filter {
+        //include specific method in any of the tests
+        includeTestsMatching "*.TestChatsUserA.test_Send_First_Message"
+        includeTestsMatching "*.TestChatsUserB.test_Get_First_Message"
+    }
+
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+
+    finalizedBy(testchatssecondmessage)
 
 }
 
@@ -146,5 +185,5 @@ task testlogin(type: Test){
         events "passed", "skipped", "failed"
     }
 
-    finalizedBy(testchats)
+    finalizedBy(testchatsfirstmessage)
 }

@@ -135,7 +135,7 @@ task testactionchats(type: Test){
         events "passed", "skipped", "failed"
     }
 
-    //finalizedBy(testchannels)
+    finalizedBy(testchannels)
 }
 
 task testchatsreplymessage(type: Test){

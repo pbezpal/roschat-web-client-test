@@ -59,7 +59,7 @@ public interface CommentsData {
     String CLIENT_CHATS_SEND_EVENT = "message-event";
     String CLIENT_CHATS_FIRST_MESSAGE = "Это первое тестовое сообщение. Если оно отображается у всех пользователей, значит" +
             " тест прошёл успешно";
-    String CLIENT_CHATS_SECOND_MESSAGE = "Это второе тестовое сообщение. Если оно отображается у всех пользователей, значит" +
+    String CLIENT_CHATS_TEXT_REPLY_MESSAGE = "Это ответное тестовое сообщение. Если оно отображается у всех пользователей, значит" +
             " тест прошёл успешно";
     String CLIENT_CHATS_ITEM_DELETE_CHAT = "Удалить беседу";
 }

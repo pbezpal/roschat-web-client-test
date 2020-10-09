@@ -11,7 +11,6 @@ import io.qameta.allure.Step;
 import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
-import static data.CommentsData.CLIENT_DELETE_CHANNEL_CONTEXT_MENU;
 
 public interface CommentsPage extends ClientPage {
 
@@ -59,9 +58,15 @@ public interface CommentsPage extends ClientPage {
         return true;
     }
 
-    @Step(value = "Выбираем чат {chat}")
+    @Step(value = "Выбираем беседу {chat}")
     default CommentsPage clickChat(String chat){
         itemsListChat.findBy(Condition.text(chat)).waitUntil(Condition.visible, 10000).click();
+        return this;
+    }
+
+    @Step(value = "Вызываем контекстное меню у беседы {chat} нажатием правой кнопкой мыши по беседе")
+    default CommentsPage clickContextMenuInChat(String chat){
+        itemsListChat.findBy(Condition.text(chat)).waitUntil(Condition.visible, 10000).contextClick();
         return this;
     }
 
@@ -72,8 +77,13 @@ public interface CommentsPage extends ClientPage {
         return this;
     }
 
-    default CommentsPage deleteChat(String chat, String itemDelete){
-        clickItemComments().clickChat(chat);
+    default CommentsPage deleteChat(String chat, String itemDelete, boolean clickRight){
+        if(clickRight){
+            clickItemComments().clickContextMenuInChat(chat);
+        }else{
+            clickItemComments().clickChat(chat);
+            clickHeaderContextMenu();
+        }
         selectItemContextMenu(itemDelete);
         clickButtonFooterConfirm("Ок");
         return this;

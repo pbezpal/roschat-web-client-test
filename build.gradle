@@ -135,10 +135,10 @@ task testactionchats(type: Test){
         events "passed", "skipped", "failed"
     }
 
-    finalizedBy(testchannels)
+    //finalizedBy(testchannels)
 }
 
-task testchatssecondmessage(type: Test){
+task testchatsreplymessage(type: Test){
     useJUnitPlatform()
 
     systemProperties = [
@@ -153,8 +153,8 @@ task testchatssecondmessage(type: Test){
 
     filter {
         //include specific method in any of the tests
-        includeTestsMatching "*.TestChatsUserA.test_Get_Second_Message"
-        includeTestsMatching "*.TestChatsUserB.test_Send_Second_Message"
+        includeTestsMatching "*.TestChatsUserA.test_Get_Reply_Message"
+        includeTestsMatching "*.TestChatsUserB.test_Send_Reply_Message"
     }
 
     testLogging {
@@ -181,14 +181,14 @@ task testchatsfirstmessage(type: Test){
     filter {
         //include specific method in any of the tests
         includeTestsMatching "*.TestChatsUserA.test_Send_First_Message"
-        includeTestsMatching "*.TestChatsUserB.test_Get_First_Message"
+        includeTestsMatching "*.TestChatsUserB.test_Get_Message"
     }
 
     testLogging {
         events "passed", "skipped", "failed"
     }
 
-    finalizedBy(testchatssecondmessage)
+    finalizedBy(testchatsreplymessage)
 
 }
 

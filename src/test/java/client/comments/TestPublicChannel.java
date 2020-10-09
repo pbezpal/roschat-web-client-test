@@ -33,7 +33,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import static chat.ros.testing2.data.ContactsData.*;
 import static data.CommentsData.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -467,7 +466,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
         if(status_change) channelName = newNameChannel;
         else channelName = nameChannel;
         openClient(client_A, false);
-        assertTrue(deleteChat(channelName, CLIENT_DELETE_CHANNEL_CONTEXT_MENU).
+        assertTrue(deleteChat(channelName, CLIENT_DELETE_CHANNEL_CONTEXT_MENU, true).
                         isExistComments(channelName, false),
                 "Канал найден в списке бесед после удаления");
         status_delete = true;

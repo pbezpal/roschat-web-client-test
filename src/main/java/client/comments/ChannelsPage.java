@@ -239,17 +239,6 @@ public class ChannelsPage extends ChatsPage {
         return true;
     }
 
-    @Step(value = "Проверяем, появилось ли контекстное меню")
-    private boolean isDivContextMenu(){
-        try{
-            divContextMenu.shouldBe(Condition.visible);
-        }catch (ElementNotFound e){
-            return false;
-        }
-
-        return true;
-    }
-
     @Step(value = "Добавляем подписчиков/администраторов в канал")
     private ChannelsPage clickAddUsersChannel(){
         divAddUserChannel.shouldBe(Condition.visible).click();
@@ -413,7 +402,7 @@ public class ChannelsPage extends ChatsPage {
     //Делимся ссылкой через контекстное меню
     public ChannelsPage shareLinkChannelContextMenu(String channel, String chat){
         clickItemComments().clickChat(channel);
-        selectItemContextMenu(CLIENT_SHARE_LINK_CHANNEL_CONTEXT_MENU);
+        clickHeaderContextMenu().selectItemContextMenu(CLIENT_SHARE_LINK_CHANNEL_CONTEXT_MENU);
         sendInputSearchChat(chat).selectChat(chat).isSelectChat(chat);
         return clickButtonFooter(CLIENT_BUTTON_SHARE_MESSAGE);
     }
@@ -423,7 +412,7 @@ public class ChannelsPage extends ChatsPage {
         clickItemComments().clickChat(channel);
         if(isDivInfoWrapper(false)) clickMainHeaderText();
         actionInfoWrapper(CLIENT_INFO_COPY_LINK_CHANNEL);
-        sendChatMessage(contact, Keys.CONTROL + "v");
+        sendChatMessage(contact, Keys.CONTROL + "v", false);
         return this;
     }
 
@@ -448,7 +437,7 @@ public class ChannelsPage extends ChatsPage {
 
     public ChannelsPage newPublication(String channel, String title, String description){
         clickItemComments().clickChat(channel);
-        selectItemContextMenu(CLIENT_NEW_PUBLICATION_CHANNEL_CONTEXT_MENU);
+        clickHeaderContextMenu().selectItemContextMenu(CLIENT_NEW_PUBLICATION_CHANNEL_CONTEXT_MENU);
         return sendInputTitlePublication(title).sendDescriptionPublication(description).
                 clickOkPublication();
     }

@@ -222,9 +222,14 @@ public interface ClientPage {
         return this;
     }
 
+    @Step(value = "Вызываем контекстное меню в верхнем разделе")
+    default ClientPage clickHeaderContextMenu(){
+        divMainHeaderContextMenu.shouldBe(Condition.visible).click();
+        return this;
+    }
+
     @Step(value = "Выбираем элемент контекстного меню {item}")
     default ClientPage selectItemContextMenu(String item){
-        divMainHeaderContextMenu.shouldBe(Condition.visible).click();
         divContextMenu.shouldBe(Condition.visible).$$("li").findBy(Condition.text(item)).click();
         return this;
     }

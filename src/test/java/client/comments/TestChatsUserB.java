@@ -55,8 +55,6 @@ public class TestChatsUserB implements CommentsPage {
             "3. Проверяем, что беседа с пользователем 7000 была удалена")
     @Test
     void test_Delete_Chat(){
-        assertTrue(isExistComments(CLIENT_7000, true), "Беседа с пользователем " + CLIENT_7000 + "" +
-                " отсутствует");
         assertTrue(deleteChat(CLIENT_7000, CLIENT_CHATS_ITEM_DELETE_CHAT).
                 isExistComments(CLIENT_7000, false),
                 "Беседа с пользователем " + CLIENT_7000 + " отображается в списке ебесед после удаления");

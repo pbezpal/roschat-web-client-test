@@ -61,4 +61,5 @@ public interface CommentsData {
             " тест прошёл успешно";
     String CLIENT_CHATS_SECOND_MESSAGE = "Это второе тестовое сообщение. Если оно отображается у всех пользователей, значит" +
             " тест прошёл успешно";
+    String CLIENT_CHATS_ITEM_DELETE_CHAT = "Удалить беседу";
 }

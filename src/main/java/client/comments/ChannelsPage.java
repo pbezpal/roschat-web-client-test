@@ -27,7 +27,6 @@ public class ChannelsPage extends ChatsPage {
     private ElementsCollection selectedChat = $$("div.selected span");
     private ElementsCollection buttonFooter = $$("div.footer button");
     private SelenideElement iCopyLinkChannel = $("i.fal.fa-external-link");
-    private SelenideElement divContextMenu = $("div.v-context");
     private SelenideElement iUserPlus = $("i.fa-user-plus");
     private SelenideElement divAddUserChannel = $("div.btns.info-section");
     private ElementsCollection listUsersChannel = $$("div.members.info-section div.fio.name");
@@ -251,13 +250,6 @@ public class ChannelsPage extends ChatsPage {
         return true;
     }
 
-    @Step(value = "Выбираем элемент контекстного меню {item}")
-    private ChannelsPage selectItemContextMenu(String item){
-        divMainHeaderContextMenu.shouldBe(Condition.visible).click();
-        divContextMenu.shouldBe(Condition.visible).$$("li").findBy(Condition.text(item)).click();
-        return this;
-    }
-
     @Step(value = "Добавляем подписчиков/администраторов в канал")
     private ChannelsPage clickAddUsersChannel(){
         divAddUserChannel.shouldBe(Condition.visible).click();
@@ -421,9 +413,8 @@ public class ChannelsPage extends ChatsPage {
     //Делимся ссылкой через контекстное меню
     public ChannelsPage shareLinkChannelContextMenu(String channel, String chat){
         clickItemComments().clickChat(channel);
-        selectItemContextMenu(CLIENT_SHARE_LINK_CHANNEL_CONTEXT_MENU).
-                sendInputSearchChat(chat).
-                selectChat(chat).isSelectChat(chat);
+        selectItemContextMenu(CLIENT_SHARE_LINK_CHANNEL_CONTEXT_MENU);
+        sendInputSearchChat(chat).selectChat(chat).isSelectChat(chat);
         return clickButtonFooter(CLIENT_BUTTON_SHARE_MESSAGE);
     }
 
@@ -457,9 +448,8 @@ public class ChannelsPage extends ChatsPage {
 
     public ChannelsPage newPublication(String channel, String title, String description){
         clickItemComments().clickChat(channel);
-        return selectItemContextMenu(CLIENT_NEW_PUBLICATION_CHANNEL_CONTEXT_MENU).
-                sendInputTitlePublication(title).
-                sendDescriptionPublication(description).
+        selectItemContextMenu(CLIENT_NEW_PUBLICATION_CHANNEL_CONTEXT_MENU);
+        return sendInputTitlePublication(title).sendDescriptionPublication(description).
                 clickOkPublication();
     }
 
@@ -469,12 +459,5 @@ public class ChannelsPage extends ChatsPage {
                 sendInputSearchChat(chat).
                 selectChat(chat).isSelectChat(chat);
         return clickButtonFooter(CLIENT_BUTTON_SHARE_MESSAGE);
-    }
-
-    public ChannelsPage deleteChannel(String channel){
-        clickItemComments().clickChat(channel);
-        selectItemContextMenu(CLIENT_DELETE_CHANNEL_CONTEXT_MENU);
-        clickButtonFooterConfirm("Ок");
-        return this;
     }
 }

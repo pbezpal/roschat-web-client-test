@@ -11,6 +11,7 @@ import io.qameta.allure.Step;
 import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
+import static data.CommentsData.CLIENT_DELETE_CHANNEL_CONTEXT_MENU;
 
 public interface CommentsPage extends ClientPage {
 
@@ -68,6 +69,13 @@ public interface CommentsPage extends ClientPage {
     @Step(value = "Нажимаем кнопку {button} в форме подтверждения")
     default CommentsPage clickButtonFooterConfirm(String button){
         buttonFooterConfirm.findBy(text(button)).click();
+        return this;
+    }
+
+    default CommentsPage deleteChat(String chat, String itemDelete){
+        clickItemComments().clickChat(chat);
+        selectItemContextMenu(itemDelete);
+        clickButtonFooterConfirm("Ок");
         return this;
     }
 }

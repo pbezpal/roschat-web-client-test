@@ -120,6 +120,24 @@ task testchannels(type: Test){
     }
 }
 
+task testactionchats(type: Test){
+    useJUnitPlatform()
+
+    systemProperties System.getProperties()
+
+    filter {
+        //include specific method in any of the tests
+        includeTestsMatching "*.TestChatsUserA.test_Delete_Chat"
+        includeTestsMatching "*.TestChatsUserB.test_Delete_Chat"
+    }
+
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+
+    finalizedBy(testchannels)
+}
+
 task testchatssecondmessage(type: Test){
     useJUnitPlatform()
 
@@ -143,7 +161,7 @@ task testchatssecondmessage(type: Test){
         events "passed", "skipped", "failed"
     }
 
-    finalizedBy(testchannels)
+    finalizedBy(testactionchats)
 
 }
 

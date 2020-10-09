@@ -10,7 +10,7 @@
  * 5. Подписаться клиентом B на канал
  * 6. Создание публикации подклиентом А
  * 7. Поделиться публикацие с клиентом B
- * 8. Видит ли клиент B пубьликацию
+ * 8. Видит ли клиент B публикацию
  * 9. Изменение названия и описания канала
  * 10. Поиск на клиенте B канала после изменения названия и описания
  * 11. Удаление канала под клиентом А
@@ -467,7 +467,7 @@ public class TestPublicChannel extends chat.ros.testing2.server.administration.C
         if(status_change) channelName = newNameChannel;
         else channelName = nameChannel;
         openClient(client_A, false);
-        assertTrue(clientChannelsPage.deleteChannel(channelName).
+        assertTrue(deleteChat(channelName, CLIENT_DELETE_CHANNEL_CONTEXT_MENU).
                         isExistComments(channelName, false),
                 "Канал найден в списке бесед после удаления");
         status_delete = true;

@@ -30,7 +30,7 @@ public class TestChatsUserB implements CommentsPage {
     private ChatsPage chatsPage = new ChatsPage();
 
     @Story(value = "Проверка отправки сообщения")
-    @Description(value = "1. Авторизуемся пользователем 7001. \n" +
+    @Description(value = "1. Авторизуемся под пользователем 7001. \n" +
             "2. Пользователь 7001 отправляет сообщение пользователю 7000. \n" +
             "3. Проверяем, отображается ли отправленое сообщение на клиенте")
     @Test
@@ -41,12 +41,25 @@ public class TestChatsUserB implements CommentsPage {
     }
 
     @Story(value = "Проверка получения сообщения")
-    @Description(value = "1. Авторизуемся пользователем 7001.\n." +
+    @Description(value = "1. Авторизуемся под пользователем 7001. \n" +
             "2. Проверяем, что приишло сообщение от пользователя 7000")
     @Test
     void test_Get_First_Message(){
         assertTrue(chatsPage.isExistChatMessage(CLIENT_7000, CLIENT_CHATS_FIRST_MESSAGE),
                 "Не найдено сообщение \"" + CLIENT_CHATS_FIRST_MESSAGE + "\" в беседе " + CLIENT_7000);
+    }
+
+    @Story(value = "Удаляем беседу")
+    @Description(value = "1. Авторизуемся под пользователем 7001 \n" +
+            "2. Удаляем беседу с пользователем 7000 \n" +
+            "3. Проверяем, что беседа с пользователем 7000 была удалена")
+    @Test
+    void test_Delete_Chat(){
+        assertTrue(isExistComments(CLIENT_7000, true), "Беседа с пользователем " + CLIENT_7000 + "" +
+                " отсутствует");
+        assertTrue(deleteChat(CLIENT_7000, CLIENT_CHATS_ITEM_DELETE_CHAT).
+                isExistComments(CLIENT_7000, false),
+                "Беседа с пользователем " + CLIENT_7000 + " отображается в списке ебесед после удаления");
     }
 
     @AfterAll

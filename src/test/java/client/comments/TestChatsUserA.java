@@ -37,12 +37,25 @@ public class TestChatsUserA implements CommentsPage {
     }
 
     @Story(value = "Проверка получения сообщения")
-    @Description(value = "1. Авторизуемся пользователем 7000.\n." +
+    @Description(value = "1. Авторизуемся пользователем 7000. \n" +
             "2. Проверяем, что приишло сообщение от пользователя 7001")
     @Test
     void test_Get_Second_Message(){
         assertTrue(chatsPage.isExistChatMessage(CLIENT_7001, CLIENT_CHATS_SECOND_MESSAGE),
                 "Не найдено сообщение \"" + CLIENT_CHATS_SECOND_MESSAGE + "\" в беседе " + CLIENT_7001);
+    }
+
+    @Story(value = "Удаляем беседу")
+    @Description(value = "1. Авторизуемся под пользователем 7000 \n" +
+            "2. Удаляем беседу с пользователем 7001 \n" +
+            "3. Проверяем, что беседа с пользователем 7001 была удалена")
+    @Test
+    void test_Delete_Chat(){
+        assertTrue(isExistComments(CLIENT_7001, true), "Беседа с пользователем " + CLIENT_7001 + "" +
+                " отсутствует");
+        assertTrue(deleteChat(CLIENT_7001, CLIENT_CHATS_ITEM_DELETE_CHAT).
+                isExistComments(CLIENT_7001, false),
+                "Беседа с пользователем " + CLIENT_7001 + " отображается в списке ебесед после удаления");
     }
 
     @AfterAll

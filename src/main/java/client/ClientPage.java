@@ -1,5 +1,6 @@
 package client;
 
+import client.comments.ChannelsPage;
 import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
@@ -33,6 +34,7 @@ public interface ClientPage {
     ElementsCollection itemsToolbar = $$("div.toolbar-wrapper span");
     SelenideElement divMainHeader = $("div.main-header");
     SelenideElement divMainHeaderContextMenu = divMainHeader.find("div.circle-animation[title] svg");
+    SelenideElement divContextMenu = $("div.v-context");
     SelenideElement inputSearch = $("div.search-wrapper input");
     SelenideElement divSuccessLogin = $("div.side div.section-header h4.header-text");
 
@@ -217,6 +219,13 @@ public interface ClientPage {
         inputSearch.sendKeys(Keys.CONTROL + "a");
         inputSearch.sendKeys(Keys.BACK_SPACE);
         inputSearch.sendKeys(text);
+        return this;
+    }
+
+    @Step(value = "Выбираем элемент контекстного меню {item}")
+    default ClientPage selectItemContextMenu(String item){
+        divMainHeaderContextMenu.shouldBe(Condition.visible).click();
+        divContextMenu.shouldBe(Condition.visible).$$("li").findBy(Condition.text(item)).click();
         return this;
     }
 

@@ -21,18 +21,19 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ExtendWith(RecourcesTests.class)
 @ExtendWith(WatcherTests.class)
-public class TestChatsUserA implements CommentsPage {
-
-    private ChatsPage chatsPage = new ChatsPage();
+public class TestChatUser7000 extends ChatPage {
 
     @Story(value = "Проверка отправки сообщения")
     @Description(value = "1. Авторизуемся пользователем 7000. \n" +
             "2. Пользователь 7000 отправляет сообщение пользователю 7001. \n" +
             "3. Проверяем, отображается ли отправленое сообщение на клиенте")
     @Test
+    @Order(1)
     void test_Send_First_Message() {
-        chatsPage.sendChatMessage(CLIENT_7001, CLIENT_CHATS_FIRST_MESSAGE, false);
-        assertTrue(chatsPage.isExistChatMessage(CLIENT_7001, CLIENT_CHATS_FIRST_MESSAGE),
+        sendMessageToChat(CLIENT_7001, CLIENT_CHATS_FIRST_MESSAGE, false);
+        assertTrue(clickItemComments().
+                        clickChat(CLIENT_7001).
+                        isExistChatMessage(CLIENT_7001, CLIENT_CHATS_FIRST_MESSAGE),
                 "Не найдено сообщение \"" + CLIENT_CHATS_FIRST_MESSAGE + "\" в беседе " + CLIENT_7001);
     }
 
@@ -40,13 +41,20 @@ public class TestChatsUserA implements CommentsPage {
     @Description(value = "1. Авторизуемся пользователем 7000. \n" +
             "2. Проверяем, что пришло ответное сообщение от пользователя 7001 ")
     @Test
+    @Order(2)
     void test_Get_Reply_Message(){
-        assertTrue(chatsPage.isExistChatMessage(CLIENT_7001, CLIENT_CHATS_TEXT_REPLY_MESSAGE),
+        assertTrue(clickItemComments().
+                        clickChat(CLIENT_7001).
+                        isExistChatMessage(CLIENT_7001, CLIENT_CHATS_TEXT_REPLY_MESSAGE),
                 "Не найдено сообщение \"" + CLIENT_CHATS_TEXT_REPLY_MESSAGE + "\" в беседе " + CLIENT_7001);
         assertAll("Проверяем, отображается ли автор и текст сообщения, на которое отвечали",
-                () -> assertTrue(chatsPage.isAuthReplyMessage(CLIENT_7000),
+                () -> assertTrue(clickItemComments().
+                                clickChat(CLIENT_7001).
+                                isAuthReplyMessage(CLIENT_7000),
                         "Автор, сообщения, на которое отвечали не отображается или не совпадает"),
-                () -> assertTrue(chatsPage.isReplyMessage(CLIENT_CHATS_FIRST_MESSAGE),
+                () -> assertTrue(clickItemComments().
+                                clickChat(CLIENT_7001).
+                                isReplyMessage(CLIENT_CHATS_FIRST_MESSAGE),
                         "Текст сообщение, на которое отвечали не совпадает или не отображается")
         );
     }
@@ -56,9 +64,11 @@ public class TestChatsUserA implements CommentsPage {
             "2. Удаляем беседу с пользователем 7001 \n" +
             "3. Проверяем, что беседа с пользователем 7001 была удалена")
     @Test
+    @Order(3)
     void test_Delete_Chat(){
-        assertTrue(deleteChat(CLIENT_7001, CLIENT_CHATS_ITEM_DELETE_CHAT, false).
-                isExistComments(CLIENT_7001, false),
+        assertTrue(clickItemComments().
+                        deleteChat(CLIENT_7001, CLIENT_CHATS_ITEM_DELETE_CHAT, false).
+                        isExistComments(CLIENT_7001, false),
                 "Беседа с пользователем " + CLIENT_7001 + " отображается в списке ебесед после удаления");
     }
 

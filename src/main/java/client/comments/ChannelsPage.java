@@ -10,11 +10,10 @@ import org.openqa.selenium.Keys;
 import static com.codeborne.selenide.Selenide.*;
 import static data.CommentsData.*;
 
-public class ChannelsPage extends ChatsPage {
+public class ChannelsPage extends ChatPage implements CommentsPage {
 
-    private SelenideElement inputNameChannel = $("div.channel-create input[type='text']");
+    private SelenideElement inputNameChannel = $(".channel-create input[type='text']");
     private SelenideElement divDescriptionChannel = $("div.info.non-border-input.div-input");
-    private SelenideElement buttonCreateOrSaveChannel = $("div.footer button.btn.btn-primary");
     private SelenideElement spanItemChannel = $("div.filter.channels span");
     private ElementsCollection radioTypeChannel = $$("form.custom-radio label");
     private SelenideElement divAddUser = $("div.btn-list-item.list-item");
@@ -25,7 +24,6 @@ public class ChannelsPage extends ChatsPage {
     private SelenideElement inputSearchChat = $("div.select-chat input.search-input");
     private ElementsCollection listChats = $$("div.select-chat div.fio.name");
     private ElementsCollection selectedChat = $$("div.selected span");
-    private ElementsCollection buttonFooter = $$("div.footer button");
     private SelenideElement iCopyLinkChannel = $("i.fal.fa-external-link");
     private SelenideElement iUserPlus = $("i.fa-user-plus");
     private SelenideElement divAddUserChannel = $("div.btns.info-section");
@@ -52,12 +50,6 @@ public class ChannelsPage extends ChatsPage {
     private ChannelsPage sendDescriptionChannel(String description){
         divDescriptionChannel.setValue("");
         divDescriptionChannel.sendKeys(description);
-        return this;
-    }
-
-    @Step(value = "Нажимаем кнопку Создать/Сохранить")
-    private ChannelsPage clickButtonCreateOrSaveChannel(){
-        buttonCreateOrSaveChannel.click();
         return this;
     }
 
@@ -221,12 +213,6 @@ public class ChannelsPage extends ChatsPage {
         return true;
     }
 
-    @Step(value = "Нажимаем кнопку {button}")
-    private ChannelsPage clickButtonFooter(String button){
-        buttonFooter.findBy(Condition.text(button)).click();
-        return this;
-    }
-
     @Step(value = "Проверяем, что есть иконка 'Копировать ссылку'")
     public boolean isIconCopyLinkChannel(String channel){
         try{
@@ -355,13 +341,12 @@ public class ChannelsPage extends ChatsPage {
 
     //Создаём канал
     public ChannelsPage createNewChannel(String name, String description, String item, String type){
-        clickItemComments();
-        clickContextMenu();
-        clickItemContextMenu(item);
-        return sendInputNameChannel(name).
+        clickItemComments().clickContextMenu().clickItemContextMenu(item);
+        sendInputNameChannel(name).
                 sendDescriptionChannel(description).
                 clickTypeChannel(type).
-                clickButtonCreateOrSaveChannel();
+                clickButtonCreateOrSave();
+        return this;
     }
 
     //Редактируем название, описание и тип канала канала
@@ -386,7 +371,8 @@ public class ChannelsPage extends ChatsPage {
         }else if(changeName) sendInputNameChannel(data[0]);
         else if(changeDescription) sendInputNameChannel(data[0]);
         else if(changeType) clickTypeChannel(data[0]);
-        return clickButtonCreateOrSaveChannel();
+        clickButtonCreateOrSave();
+        return this;
     }
 
     //Делимся ссылкой
@@ -396,7 +382,8 @@ public class ChannelsPage extends ChatsPage {
         actionInfoWrapper(CLIENT_INFO_SHARE_LINK_CHANNEL).
                 sendInputSearchChat(chat).
                 selectChat(chat).isSelectChat(chat);
-        return clickButtonFooter(CLIENT_BUTTON_SHARE_MESSAGE);
+        clickButtonFooter(CLIENT_BUTTON_SHARE_MESSAGE);
+        return this;
     }
 
     //Делимся ссылкой через контекстное меню
@@ -404,7 +391,8 @@ public class ChannelsPage extends ChatsPage {
         clickItemComments().clickChat(channel);
         clickHeaderContextMenu().selectItemContextMenu(CLIENT_SHARE_LINK_CHANNEL_CONTEXT_MENU);
         sendInputSearchChat(chat).selectChat(chat).isSelectChat(chat);
-        return clickButtonFooter(CLIENT_BUTTON_SHARE_MESSAGE);
+        clickButtonFooter(CLIENT_BUTTON_SHARE_MESSAGE);
+        return this;
     }
 
     //Копируем ссылку
@@ -412,7 +400,7 @@ public class ChannelsPage extends ChatsPage {
         clickItemComments().clickChat(channel);
         if(isDivInfoWrapper(false)) clickMainHeaderText();
         actionInfoWrapper(CLIENT_INFO_COPY_LINK_CHANNEL);
-        sendChatMessage(contact, Keys.CONTROL + "v", false);
+        sendMessageToChat(contact, Keys.CONTROL + "v", false);
         return this;
     }
 
@@ -425,7 +413,8 @@ public class ChannelsPage extends ChatsPage {
             searchContactForAction(contacts[i]);
             selectFoundContact(contacts[i]);
         }
-        return clickButtonFooter(CLIENT_ADD_USER_CHANNEL);
+        clickButtonFooter(CLIENT_BUTTON_ADD);
+        return this;
     }
 
     //Подпись на канал
@@ -447,6 +436,7 @@ public class ChannelsPage extends ChatsPage {
         clickIconSharePublication(id).
                 sendInputSearchChat(chat).
                 selectChat(chat).isSelectChat(chat);
-        return clickButtonFooter(CLIENT_BUTTON_SHARE_MESSAGE);
+        clickButtonFooter(CLIENT_BUTTON_SHARE_MESSAGE);
+        return this;
     }
 }

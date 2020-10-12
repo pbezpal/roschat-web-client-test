@@ -2,6 +2,10 @@ package data;
 
 public interface CommentsData {
 
+    /***** Общие параметры *****/
+    String CLIENT_BUTTON_NEXT = "Далее";
+    String CLIENT_BUTTON_ADD = "Добавить";
+
     /***** Параметры для создания канала на клиенте ******/
     String CLIENT_ITEM_NEW_CHANNEL = "Новый канал";
     String CLIENT_7000 = "7000";
@@ -45,12 +49,9 @@ public interface CommentsData {
     /****** Добавление подписчиков ******/
     String CLIENT_INFO_ITEM_ADMIN_CHANNEL = "Администраторы";
     String CLIENT_INFO_ITEM_USER_CHANNEL = "Подписчики";
-    String CLIENT_ADD_USER_CHANNEL = "Добавить";
     String CLIENT_INFO_SUBSCRIBER_CHANNEL = "Подписаться на канал";
     String CLIENT_INFO_EXIT_CHANNEL = "Выйти из канала";
-
     String CLIENT_PUBLICATION = "li#publication%1$s";
-
     String CLIENT_DELETE_CHANNEL_CONTEXT_MENU = "Удалить канал";
 
     /***** Параметры для проверки бесед ******/
@@ -62,4 +63,9 @@ public interface CommentsData {
     String CLIENT_CHATS_TEXT_REPLY_MESSAGE = "Это ответное тестовое сообщение. Если оно отображается у всех пользователей, значит" +
             " тест прошёл успешно";
     String CLIENT_CHATS_ITEM_DELETE_CHAT = "Удалить беседу";
+
+    /***** Параметры для проверки групповой беседы ******/
+    String CLIENT_ITEM_NEW_GROUP_CHAT = "Новая группа";
+    String CLIENT_GROUP_CHAT_NAME = "Тестовая групповая беседа";
+    String CLIENT_GROUP_CHAT_AUTH = "7000  создал(а) беседу";
 }

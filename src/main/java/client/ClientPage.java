@@ -30,6 +30,8 @@ public interface ClientPage {
     SelenideElement inputSelectContacts = $("div.select-contact input.search-input");
     ElementsCollection listContacts = $$("div.contact-list div.fio.name");
 
+    ElementsCollection buttonFooter = $$("div.footer button");
+
     //Раздел инструментов(Рация, Контакты, Беседы, Вызовы, Ещё)
     ElementsCollection itemsToolbar = $$("div.toolbar-wrapper span");
     SelenideElement divMainHeader = $("div.main-header");
@@ -242,6 +244,12 @@ public interface ClientPage {
             return false;
         }
         return true;
+    }
+
+    @Step(value = "Нажимаем кнопку {button}")
+    default ClientPage clickButtonFooter(String button){
+        buttonFooter.findBy(Condition.text(button)).click();
+        return this;
     }
 
 }

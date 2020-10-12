@@ -100,10 +100,12 @@ public class RecourcesTests implements BeforeAllCallback, BeforeEachCallback, Af
     public void beforeEach(ExtensionContext context){
         sleep(2000);
         String method = context.getTestMethod().toString();
-        if(classTest.contains("TestChatsUserA")){
+        if(classTest.contains("TestChatUser7000") || classTest.contains("TestGroupChatUser7000")){
             openClient( CLIENT_7000 + "@ros.chat", false);
-        }else if(classTest.contains("TestChatsUserB")){
+        }else if(classTest.contains("TestChatUser7001") || classTest.contains("TestGroupChatUser7001")){
             openClient(CLIENT_7001 + "@ros.chat", false);
+        }else if(classTest.contains("TestGroupChatUser7002")){
+            openClient(CLIENT_7002 + "@ros.chat", false);
         }
     }
 
